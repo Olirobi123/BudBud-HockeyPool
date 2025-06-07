@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import pool from "./config/database";
 
 const app = express();
 app.use(express.json());
@@ -37,11 +38,16 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    // Tester la connexion à la base de données
+    await pool.query('SELECT 1');
+    log('Connexion à la base de données établie', 'postgres');
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    const server = await registerRoutes(app);
+
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
     throw err;
@@ -67,4 +73,8 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port}`);
   });
+  } catch (error) {
+    log(`Erreur lors du démarrage du serveur: ${error}`, 'error');
+    process.exit(1);
+  }
 })();

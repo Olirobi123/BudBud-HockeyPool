@@ -1,8 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import teamsRoutes from "./routes/teams";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Routes pour les équipes
+  app.use('/api/teams', teamsRoutes);
   // NHL Player Search API Proxy
   app.get("/api/search/players", async (req, res) => {
     try {
