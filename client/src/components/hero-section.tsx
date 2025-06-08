@@ -1,8 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Users, TrendingUp, Zap } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import {Equipe} from "interfaces/IEquipes.ts";
+
+
+
+// Fonction pour récupérer les équipes depuis l'API
+const fetchEquipesActives = async (): Promise<Equipe[]> => {
+  const response = await fetch('/api/teams/active');
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des équipes');
+  }
+  return response.json();
+};
 
 export default function HeroSection() {
+  const { data: equipesActives, isLoading, error } = useQuery<Equipe[]>({
+    queryKey: ['equipesActives'],
+    queryFn: fetchEquipesActives
+  });
+
+    if (!equipesActives) return <div>Aucune équipe trouvée</div>;
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20 sm:py-32 mt-16">
       {/* Background pattern */}
@@ -55,7 +75,7 @@ export default function HeroSection() {
               <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300">
                 <CardContent className="p-6 text-center">
                   <Users className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-white">12</div>
+                  <div className="text-2xl font-bold text-white">{equipesActives.length || 0}</div>
                   <div className="text-sm text-gray-400">Équipes Actives</div>
                 </CardContent>
               </Card>

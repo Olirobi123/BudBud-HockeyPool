@@ -12,8 +12,8 @@ interface Equipe {
   active: boolean;
 }
 
-// Fonction pour récupérer les équipes depuis l'API
-const fetchEquipes = async (): Promise<Equipe[]> => {
+// Fonctions pour récupérer les équipes depuis l'API
+const fetchAllEquipes = async (): Promise<Equipe[]> => {
   const response = await fetch('/api/teams');
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération des équipes');
@@ -21,15 +21,36 @@ const fetchEquipes = async (): Promise<Equipe[]> => {
   return response.json();
 };
 
+const fetchEquipesActives = async (): Promise<Equipe[]> => {
+  const response = await fetch('/api/teams/active');
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des équipes actives');
+  }
+  return response.json();
+};
+
 export default function Equipes() {
-  const { data: equipes, isLoading, error } = useQuery<Equipe[]>({
+  const { 
+    data: equipes, 
+    isLoading: isLoadingAll, 
+    error: errorAll 
+  } = useQuery<Equipe[]>({
     queryKey: ['equipes'],
-    queryFn: fetchEquipes
+    queryFn: fetchAllEquipes
   });
 
-  if (isLoading) return <div>Chargement...</div>;
-  if (error) return <div>Erreur: {(error as Error).message}</div>;
+  const { 
+    data: equipesActives, 
+    isLoading: isLoadingActives 
+  } = useQuery<Equipe[]>({
+    queryKey: ['equipes-actives'],
+    queryFn: fetchEquipesActives
+  });
+
+  if (isLoadingAll || isLoadingActives) return <div>Chargement...</div>;
+  if (errorAll) return <div>Erreur: {(errorAll as Error).message}</div>;
   if (!equipes) return <div>Aucune équipe trouvée</div>;
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,7 +68,7 @@ export default function Equipes() {
             <Card>
               <CardContent className="p-6 text-center">
                 <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-gray-900">{equipes.length}</div>
+                <div className="text-2xl font-bold text-gray-900">{equipesActives?.length || 0}</div>
                 <div className="text-sm text-gray-600">Équipes Actives</div>
               </CardContent>
             </Card>
