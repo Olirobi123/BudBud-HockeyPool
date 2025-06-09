@@ -8,7 +8,7 @@ import PlayerSearch from "@/components/player-search";
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +33,8 @@ export default function Navigation() {
   const handlePlayerSelect = (player: any) => {
     console.log("Joueur sélectionné:", player);
     setIsMobileMenuOpen(false);
+    setLocation(`/joueur/${player.playerId}`);
+
   };
 
   return (

@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import Equipes from "@/pages/equipes";
 import Echanges from "@/pages/echanges";
 import Draft from "@/pages/draft";
+import Joueur from "@/pages/joueur";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/equipes" component={Equipes} />
       <Route path="/echanges" component={Echanges} />
       <Route path="/draft" component={Draft} />
+      <Route path="/joueur/:id" component={Joueur} />
       <Route component={NotFound} />
     </Switch>
   );

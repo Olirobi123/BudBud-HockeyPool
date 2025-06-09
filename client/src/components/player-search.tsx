@@ -4,36 +4,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, User, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 
 interface NHLPlayer {
-  playerId: number;
+  playerId: string;
   name: string;
   positionCode: string;
-  teamAbbrev?: string;
-  sweaterNumber?: number;
-  headshot?: string;
+  teamAbbrev: string;
+  lastTeamId: string;
+  lastTeamAbbrev: string;
+  sweaterNumber: number;
+  active: boolean;
 }
 
 async function searchPlayers(query: string): Promise<NHLPlayer[]> {
-  if (!query.trim() || query.length < 2) {
-    return [];
-  }
-
-  try {
-    const encodedQuery = encodeURIComponent(query.trim());
-    
-    const response = await fetch(`/api/search/players?q=${encodedQuery}`);
-
-    if (!response.ok) {
-      throw new Error(`Failed to search players: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error("Search error:", error);
-    throw error;
-  }
+  if (!query || query.length < 2) return [];
+  const response = await fetch(`/api/search/players?q=${encodeURIComponent(query)}`);
+  if (!response.ok) throw new Error('Erreur de recherche');
+  return response.json();
 }
 
 interface PlayerSearchProps {
@@ -47,24 +35,32 @@ export default function PlayerSearch({
   placeholder = "Rechercher un joueur...",
   className = ""
 }: PlayerSearchProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  const searchRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
+  const ref = useRef<HTMLDivElement>(null);
 
-  // Debounce search query
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 300);
+  const { data: players, isLoading, error } = useQuery<NHLPlayer[]>({
+    queryKey: ['players', search],
+    queryFn: () => searchPlayers(search),
+    enabled: search.length >= 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  const handleSelect = (player: NHLPlayer) => {
+    setIsOpen(false);
+    setSearch("");
+    if (onPlayerSelect) {
+      onPlayerSelect(player);
+    } else {
+      setLocation(`/joueur/${player.playerId}`);
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -73,23 +69,10 @@ export default function PlayerSearch({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['player-search', debouncedQuery],
-    queryFn: () => searchPlayers(debouncedQuery),
-    enabled: debouncedQuery.length >= 2,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value);
+    setSearch(value);
     setIsOpen(value.length >= 2);
-  };
-
-  const handlePlayerClick = (player: NHLPlayer) => {
-    setSearchQuery(player.name);
-    setIsOpen(false);
-    onPlayerSelect?.(player);
   };
 
   const getPositionColor = (position: string) => {
@@ -103,36 +86,36 @@ export default function PlayerSearch({
   };
 
   return (
-    <div ref={searchRef} className={`relative ${className}`}>
+    <div ref={ref} className={`relative ${className}`}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Input
           type="text"
           placeholder={placeholder}
-          value={searchQuery}
+          value={search}
           onChange={handleInputChange}
           className="pl-9 bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-primary"
-          onFocus={() => searchQuery.length >= 2 && setIsOpen(true)}
+          onFocus={() => search.length >= 2 && setIsOpen(true)}
         />
         {isLoading && (
           <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 animate-spin" />
         )}
       </div>
 
-      {isOpen && searchQuery.length >= 2 && (
+      {isOpen && search.length >= 2 && (
         <Card className="absolute top-full left-0 right-0 z-50 mt-1 max-h-80 overflow-y-auto bg-white border-slate-200 shadow-lg">
           <CardContent className="p-0">
             {error ? (
               <div className="p-4 text-center text-red-600">
                 Erreur lors de la recherche. Vérifiez votre connexion.
               </div>
-            ) : data?.length ? (
+            ) : players?.length ? (
               <div className="divide-y divide-gray-100">
-                {data.map((player) => (
+                {players.map((player) => (
                   <div
                     key={player.playerId}
                     className="p-3 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                    onClick={() => handlePlayerClick(player)}
+                    onClick={() => handleSelect(player)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
@@ -156,9 +139,9 @@ export default function PlayerSearch({
                   </div>
                 ))}
               </div>
-            ) : debouncedQuery.length >= 2 && !isLoading ? (
+            ) : search.length >= 2 && !isLoading ? (
               <div className="p-4 text-center text-gray-500">
-                Aucun joueur trouvé pour "{debouncedQuery}"
+                Aucun joueur trouvé pour "{search}"
               </div>
             ) : null}
           </CardContent>

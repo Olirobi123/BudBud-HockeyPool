@@ -6,17 +6,8 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
 import EchangeForm from "@/components/forms/echange-form";
+import { Echange } from "../components/interfaces/IEchange.ts";
 
-interface Echange {
-  id: number;
-  date: string;
-  equipe_source_id: number;
-  equipe_destination_id: number;
-  equipe_source_nom: string;
-  equipe_destination_nom: string;
-  details: string;
-  statut_confirmer: boolean;
-}
 
 // Fonction pour récupérer les échanges depuis l'API
 const fetchEchanges = async (): Promise<Echange[]> => {
