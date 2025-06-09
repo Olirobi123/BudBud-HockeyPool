@@ -1,13 +1,18 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
 import teamsRoutes from "./routes/teams";
 import echangesRoutes from "./routes/echanges";
 import playersRoutes from "./routes/players";
+import repechageRoutes from "./routes/repechage";
+import cors from "cors";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
   app.use('/api/teams', teamsRoutes);
+
+  // Routes pour le repêchage
+  app.use('/api/repechage', repechageRoutes);
+
   // Routes pour les échanges
   app.use('/api/echanges', echangesRoutes);
   // Routes pour les joueurs
@@ -21,6 +26,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json([]);
       }
 
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => {
+        abortController.abort();
+      }, 5000); // Timeout after 5 seconds
+
       const encodedQuery = encodeURIComponent(query.trim() + " *");
       const nhlApiUrl = `https://search.d3.nhle.com/api/v1/search/player?culture=en-us&limit=10&q=${encodedQuery}&active=true`;
       
@@ -29,6 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'Accept': 'application/json',
           'User-Agent': 'Mozilla/5.0 (compatible; 38BudBud/1.0)',
         },
+        signal: abortController.signal
       });
 
       if (!response.ok) {
