@@ -24,7 +24,8 @@ CREATE TABLE repechages (
     type_id INT REFERENCES types_repechage(id),
     equipe_id INT REFERENCES equipes(id),
     joueur VARCHAR(100) NOT NULL,
-    rang INT NOT NULL
+    rang INT NOT NULL,
+    round INT NUll 
 );
 
 -- Table des échanges

@@ -4,7 +4,6 @@ import teamsRoutes from "./routes/teams";
 import echangesRoutes from "./routes/echanges";
 import playersRoutes from "./routes/players";
 import repechageRoutes from "./routes/repechage";
-import cors from "cors";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -39,7 +38,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'Accept': 'application/json',
           'User-Agent': 'Mozilla/5.0 (compatible; 38BudBud/1.0)',
         },
-        signal: abortController.signal
+        //signal: abortController.signal
       });
 
       if (!response.ok) {

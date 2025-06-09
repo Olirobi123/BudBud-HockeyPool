@@ -7,7 +7,20 @@ const router = Router();
 router.get('/', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT * from repechages ORDER BY annee DESC, type_id, rang;
+            SELECT 
+                r.annee,
+                r.type_id, 
+                r.rang, 
+                r.round, 
+                e.nom AS nom,
+                r.joueur
+            FROM 
+                repechages r
+            JOIN 
+                equipes e ON r.equipe_id = e.id
+            ORDER BY 
+                r.annee DESC, r.type_id, r.rang;
+
         `);
         res.json(result.rows);
     } catch (err) {
@@ -20,7 +33,21 @@ router.get('/:type/:annee', async (req, res) => {
     const { type, annee } = req.params;
     try {
         const result = await pool.query(`
-            SELECT * from repechages WHERE type_id = ? AND annee = ? ORDER BY annee DESC, type_id, rang;
+         SELECT 
+            r.annee,
+            r.type_id, 
+            r.rang, 
+            r.round, 
+            e.nom AS nom,
+            r.joueur
+        FROM 
+            repechages r
+        JOIN 
+            equipes e ON r.equipe_id = e.id
+        WHERE 
+            r.type_id = ? AND r.annee = ?
+        ORDER BY 
+            r.annee DESC, r.type_id, r.rang;
         `, [type, annee]);
         if (result.rows.length === 0) {
             return res.status(404).json({ message: 'Aucun choix trouvé pour ce type et cette année' });

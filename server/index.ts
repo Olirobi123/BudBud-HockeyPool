@@ -13,16 +13,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.disable('x-powered-by');
+//app.disable('x-powered-by');
 
 app.use(helmet());
 
 // Middleware pour gérer les CORS
-app.use(cors({
+/*app.use(cors({
   origin: [process.env.CLIENT_URL || "http://localhost:3000"],
   methods: ['GET', 'POST'],
   credentials: true,
-}));
+}));*/
 
 // Rate limiting middleware
 const apiLimiter = rateLimit({
@@ -33,7 +33,7 @@ const apiLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-app.use('/api/', apiLimiter);
+//app.use('/api/', apiLimiter);
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -84,7 +84,7 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
-  if (process.env.ENV === "development") {
+  if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
