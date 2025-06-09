@@ -19,9 +19,9 @@ export default function JoueurTabs({ children, player }: Props) {
     return(
          <Tabs defaultValue="apercu" className="w-full">
             <TabsList className="mb-4">
-              <TabsTrigger value="apercu">Aperçu</TabsTrigger>
-              <TabsTrigger value="stats">Statistiques</TabsTrigger>
-              <TabsTrigger value="derniers-matchs">5 derniers matchs</TabsTrigger>
+              <TabsTrigger className="" value="apercu">Aperçu</TabsTrigger>
+              <TabsTrigger className="" value="stats">Statistiques</TabsTrigger>
+              <TabsTrigger className="bg-red" value="derniers-matchs">5 derniers matchs</TabsTrigger>
             </TabsList>
 
             {childrenWithProps}

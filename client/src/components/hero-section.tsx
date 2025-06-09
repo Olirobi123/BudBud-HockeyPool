@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Users, TrendingUp, Zap } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { useLoading } from "@/lib/loading-context";
 import Equipe from "@/types/IEquipes.ts";
 
-
+interface HeroSectionProps {
+  onLoaded: () => void;
+}
 
 // Fonction pour récupérer les équipes depuis l'API
 const fetchEquipesActives = async (): Promise<Equipe[]> => {
@@ -16,12 +20,19 @@ const fetchEquipesActives = async (): Promise<Equipe[]> => {
 };
 
 export default function HeroSection() {
-  const { data: equipesActives, isLoading, error } = useQuery<Equipe[]>({
+  const { setPageLoading } = useLoading();
+  const hasLoaded = useRef(false);
+  const { data: equipesActives = [], isLoading } = useQuery<Equipe[]>({
     queryKey: ['equipesActives'],
     queryFn: fetchEquipesActives
   });
 
-    if (!equipesActives) return <div>Aucune équipe trouvée</div>;
+  useEffect(() => {
+    if (!isLoading && !hasLoaded.current) {
+      hasLoaded.current = true;
+      setPageLoading(false);
+    }
+  }, [isLoading, setPageLoading]);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20 sm:py-32 mt-16">

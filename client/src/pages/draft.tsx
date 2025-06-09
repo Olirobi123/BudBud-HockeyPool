@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Users, Calendar, Clock, Trophy, Star } from "lucide-react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
+import { useLoading } from "@/lib/loading-context";
+import { useEffect } from "react";
 
 // Mock data for draft - in a real app, this would come from your backend
 const draftInfo = {
@@ -50,6 +52,14 @@ const getPositionColor = (position: string) => {
 };
 
 export default function Draft() {
+  const { setPageLoading } = useLoading();
+
+  useEffect(() => {
+    // Pour la page Draft, on peut désactiver le loading immédiatement
+    // car elle n'a pas de données asynchrones pour le moment
+    setPageLoading(false);
+  }, [setPageLoading]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />

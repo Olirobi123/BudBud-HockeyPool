@@ -55,7 +55,7 @@ export default function JoueurTabsStats({ player }: Props) {
                               {(statsTotals.regular.gamesPlayed > 0 || statsTotals.playoffs.gamesPlayed > 0) && (
                                 <div className="grid gap-6 md:grid-cols-2">
                                   {statsTotals.regular.gamesPlayed > 0 && (
-                                    <Card className="bg-primary/5">
+                                    <Card className="bg-primary/10">
                                       <CardHeader>
                                         <CardTitle className="text-lg">Total NHL - Saison régulière</CardTitle>
                                       </CardHeader>
@@ -122,7 +122,7 @@ export default function JoueurTabsStats({ player }: Props) {
                                   )}
                                   
                                   {statsTotals.playoffs.gamesPlayed > 0 && (
-                                    <Card className="bg-yellow-500/5">
+                                    <Card className="bg-yellow-500/10">
                                       <CardHeader>
                                         <CardTitle className="text-lg">Total NHL - Séries</CardTitle>
                                       </CardHeader>
@@ -231,8 +231,8 @@ export default function JoueurTabsStats({ player }: Props) {
                                         className={
                                           season.leagueAbbrev === 'NHL' 
                                             ? season.gameTypeId === 3 
-                                              ? 'bg-yellow-500/5'
-                                              : 'bg-primary/5'
+                                              ? 'bg-yellow-500/10'
+                                              : 'bg-primary/10'
                                             : ''
                                         }
                                       >
@@ -240,7 +240,7 @@ export default function JoueurTabsStats({ player }: Props) {
                                         <TableCell>{season.leagueAbbrev}</TableCell>
                                         <TableCell>{season.teamName.default}</TableCell>
                                         <TableCell>
-                                          <Badge variant={season.gameTypeId === 3 ? "secondary" : "default"}>
+                                          <Badge variant={season.gameTypeId === 3 ? "destructive" : "default"}>
                                             {season.gameTypeId === 3 ? 'Séries' : 'Régulière'}
                                           </Badge>
                                         </TableCell>

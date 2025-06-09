@@ -5,6 +5,9 @@ import { Users } from "lucide-react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "@/components/ui/loading";
+import { useLoading } from "@/lib/loading-context";
+import { useEffect, useRef } from "react";
 import Equipe from "@/types/IEquipes.ts";
 
 // Fonctions pour récupérer les équipes depuis l'API
@@ -25,6 +28,8 @@ const fetchEquipesActives = async (): Promise<Equipe[]> => {
 };
 
 export default function Equipes() {
+  const { setPageLoading } = useLoading();
+  const hasLoaded = useRef(false);
   const { 
     data: equipes, 
     isLoading: isLoadingAll, 
@@ -42,7 +47,21 @@ export default function Equipes() {
     queryFn: fetchEquipesActives
   });
 
-  if (isLoadingAll || isLoadingActives) return <div>Chargement...</div>;
+  useEffect(() => {
+    if (!isLoadingAll && !isLoadingActives && !hasLoaded.current) {
+      hasLoaded.current = true;
+      setPageLoading(false);
+    }
+  }, [isLoadingAll, isLoadingActives, setPageLoading]);
+
+  if (isLoadingAll || isLoadingActives) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
+  
   if (errorAll) return <div>Erreur: {(errorAll as Error).message}</div>;
   if (!equipes) return <div>Aucune équipe trouvée</div>;
   

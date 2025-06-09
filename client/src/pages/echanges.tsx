@@ -5,6 +5,9 @@ import { ArrowLeftRight, Calendar, Clock } from "lucide-react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "@/components/ui/loading";
+import { useLoading } from "@/lib/loading-context";
+import { useEffect, useRef } from "react";
 import EchangeForm from "@/components/forms/echange-form";
 import Echange from "@/types/IEchange.ts";
 
@@ -37,12 +40,32 @@ const getStatusBadge = (statut_confirmer: boolean) => {
 };
 
 export default function Echanges() {
-  const { data: echanges, isLoading, error } = useQuery<Echange[]>({
+  const { setPageLoading } = useLoading();
+  const hasLoaded = useRef(false);
+  const { 
+    data: echanges, 
+    isLoading, 
+    error 
+  } = useQuery<Echange[]>({
     queryKey: ['echanges'],
     queryFn: fetchEchanges
   });
 
-  if (isLoading) return <div>Chargement...</div>;
+  useEffect(() => {
+    if (!isLoading && !hasLoaded.current) {
+      hasLoaded.current = true;
+      setPageLoading(false);
+    }
+  }, [isLoading, setPageLoading]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
+
   if (error) return <div>Erreur: {(error as Error).message}</div>;
   if (!echanges || echanges.length === 0) return <div>Aucun échange trouvé</div>;
 
@@ -133,7 +156,7 @@ export default function Echanges() {
                         <div className="mt-4 pt-4 border-t border-gray-200">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-2">
-                              <div className="bg-blue-50 p-3 rounded-lg">
+                              <div className="bg-blue-100 p-3 rounded-lg">
                                 <div className="text-sm text-blue-700 space-y-1">
                                   {echange.details.split('|')[0]?.trim().split(',').map((item, index) => (
                                     <p key={index} className="whitespace-pre-wrap">
@@ -149,7 +172,7 @@ export default function Echanges() {
                             </div>
                             
                             <div className="space-y-2">
-                              <div className="bg-red-50 p-3 rounded-lg">
+                              <div className="bg-red-100 p-3 rounded-lg">
                                 <div className="text-sm text-red-700 space-y-1">
                                  {echange.details.split('|')[1]?.trim().split(',').map((item, index) => (
                                     <p key={index} className="whitespace-pre-wrap">
