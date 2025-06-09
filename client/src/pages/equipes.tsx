@@ -5,12 +5,7 @@ import { Users } from "lucide-react";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
-
-interface Equipe {
-  id: number;
-  nom: string;
-  active: boolean;
-}
+import Equipe from "@/types/IEquipes.ts";
 
 // Fonctions pour récupérer les équipes depuis l'API
 const fetchAllEquipes = async (): Promise<Equipe[]> => {

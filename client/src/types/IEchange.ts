@@ -1,4 +1,4 @@
-interface Echange {
+export default interface Echange {
   id: number;
   date: string;
   equipe_source_id: number;

@@ -6,8 +6,7 @@ import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
 import EchangeForm from "@/components/forms/echange-form";
-import { Echange } from "../components/interfaces/IEchange.ts";
-
+import Echange from "@/types/IEchange.ts";
 
 // Fonction pour récupérer les échanges depuis l'API
 const fetchEchanges = async (): Promise<Echange[]> => {

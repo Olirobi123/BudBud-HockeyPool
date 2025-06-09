@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Users, TrendingUp, Zap } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import {Equipe} from "interfaces/IEquipes.ts";
+import Equipe from "@/types/IEquipes.ts";
 
 
 
