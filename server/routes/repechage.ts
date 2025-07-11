@@ -29,6 +29,15 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/types', async (_req, res) => {
+  try {
+    const result = await pool.query('SELECT id, nom FROM types_repechage ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des types de repêchage' });
+  }
+});
+
 router.get('/:type/:annee', async (req, res) => {
     const { type, annee } = req.params;
     try {

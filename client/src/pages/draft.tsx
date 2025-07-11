@@ -40,12 +40,20 @@ export default function Draft() {
     queryFn: fetchDraftPicks
   });
 
+  // Ajout du hook pour charger dynamiquement les types de repêchage
+  const { data: types = [], isLoading: isTypesLoading } = useQuery<{ id: number, nom: string }[]>({
+    queryKey: ["typesRepechage"],
+    queryFn: async () => {
+      const res = await fetch("/api/repechage/types");
+      if (!res.ok) throw new Error("Erreur lors de la récupération des types de repêchage");
+      return res.json();
+    },
+  });
+
   // Ajout des états pour l'année et le type sélectionnés
   const annees = Array.from(new Set(draftPicks?.map(pick => pick.annee))).sort((a, b) => b - a);
-  // Forcer les types à [1, 2] pour l'instant
-  const types = [1, 2];
   const [selectedYear, setSelectedYear] = useState(annees[0]);
-  const [selectedType, setSelectedType] = useState(types[0]);
+  const [selectedType, setSelectedType] = useState(types[0]?.id ?? 1);
   // Correction du sélecteur de ronde pour type 2 :
   // - Affiche "Toutes les rondes" (valeur 0) et chaque ronde réelle
   // - Utilise 0 pour signifier "toutes les rondes"
@@ -132,9 +140,13 @@ export default function Draft() {
                     setSelectedRound(0);
                   }}
                 >
-                  {types.map(type => (
-                    <option key={type} value={type}>Type {type}</option>
-                  ))}
+                  {isTypesLoading ? (
+                    <option>Chargement...</option>
+                  ) : (
+                    types.map(type => (
+                      <option key={type.id} value={type.id}>{type.nom}</option>
+                    ))
+                  )}
                 </select>
               </div>
               {selectedType === 2 && (
