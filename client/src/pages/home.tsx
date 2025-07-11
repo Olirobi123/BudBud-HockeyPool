@@ -8,42 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowRight, Calendar, Trophy, Users, TrendingUp } from "lucide-react";
 
-// Recent activity data for the live feed
-const recentActivity = [
-	{
-		type: "trade",
-		time: "Il y a 2 heures",
-		description: "Échange entre Les Canadiens et Nordiques Forever",
-		details: "McDavid + Draisaitl ↔ MacKinnon + Rantanen",
-	},
-	{
-		type: "scoring",
-		time: "Il y a 4 heures",
-		description: "Nathan MacKinnon marque 2 buts",
-		details: "+4 points pour Bruins Power",
-	},
-	{
-		type: "trade",
-		time: "Il y a 6 heures",
-		description: "Échange entre Rangers Elite et Leafs Nation",
-		details: "Panarin ↔ Matthews",
-	},
-	{
-		type: "game",
-		time: "Il y a 8 heures",
-		description: "Victoire des Bruins 4-2 contre les Rangers",
-		details: "Plusieurs joueurs ont marqué des points",
-	},
-];
-
-const latestTrade = {
-	teamA: "Les Canadiens",
-	teamB: "Nordiques Forever",
-	playersA: ["Connor McDavid", "Leon Draisaitl"],
-	playersB: ["Nathan MacKinnon", "Mikko Rantanen"],
-	date: "2024-12-03",
-};
-
 export default function Home() {
 	return (
 		<div className="min-h-screen bg-slate-900">
@@ -69,44 +33,45 @@ export default function Home() {
 							</div>
 
 							<div className="space-y-4">
-								{recentActivity.map((activity, index) => (
-									<Card
-										key={index}
-										className="border-l-4 border-l-primary"
-									>
-										<CardContent className="p-4">
-											<div className="flex items-start justify-between">
-												<div className="flex-1">
-													<div className="flex items-center space-x-2 mb-1">
-														<Badge
-															variant={
-																activity.type === "trade"
-																	? "default"
-																	: "secondary"
-															}
-														>
-															{activity.type === "trade"
-																? "Échange"
-																: activity.type ===
-																  "scoring"
-																? "Score"
-																: "Match"}
-														</Badge>
-														<span className="text-sm text-gray-500">
-															{activity.time}
-														</span>
-													</div>
-													<p className="font-medium text-gray-900 mb-1">
-														{activity.description}
-													</p>
-													<p className="text-sm text-gray-600">
-														{activity.details}
-													</p>
-												</div>
-											</div>
-										</CardContent>
-									</Card>
-								))}
+								{/* The following block was removed as per the edit hint */}
+								{/* {recentActivity.map((activity, index) => ( */}
+								{/* 	<Card */}
+								{/* 		key={index} */}
+								{/* 		className="border-l-4 border-l-primary" */}
+								{/* 	> */}
+								{/* 		<CardContent className="p-4"> */}
+								{/* 			<div className="flex items-start justify-between"> */}
+								{/* 				<div className="flex-1"> */}
+								{/* 					<div className="flex items-center space-x-2 mb-1"> */}
+								{/* 						<Badge */}
+								{/* 							variant={ */}
+								{/* 								activity.type === "trade" */}
+								{/* 									? "default" */}
+								{/* 									: "secondary" */}
+								{/* 							} */}
+								{/* 						> */}
+								{/* 							{activity.type === "trade" */}
+								{/* 								? "Échange" */}
+								{/* 								: activity.type === */}
+								{/* 								  "scoring" */}
+								{/* 								? "Score" */}
+								{/* 								: "Match"} */}
+								{/* 						</Badge> */}
+								{/* 						<span className="text-sm text-gray-500"> */}
+								{/* 							{activity.time} */}
+								{/* 						</span> */}
+								{/* 					</div> */}
+								{/* 					<p className="font-medium text-gray-900 mb-1"> */}
+								{/* 						{activity.description} */}
+								{/* 					</p> */}
+								{/* 					<p className="text-sm text-gray-600"> */}
+								{/* 						{activity.details} */}
+								{/* 					</p> */}
+								{/* 				</div> */}
+								{/* 			</div> */}
+								{/* 		</CardContent> */}
+								{/* 	</Card> */}
+								{/* ))} */}
 							</div>
 						</div>
 
@@ -123,7 +88,8 @@ export default function Home() {
 									<div className="flex items-center space-x-2">
 										<Calendar className="w-4 h-4 text-gray-500" />
 										<span className="text-sm text-gray-600">
-											{latestTrade.date}
+											{/* The following block was removed as per the edit hint */}
+											{/* {latestTrade.date} */}
 										</span>
 									</div>
 								</CardHeader>
@@ -131,19 +97,21 @@ export default function Home() {
 									<div className="space-y-4">
 										<div className="text-center">
 											<h4 className="font-semibold text-gray-900 mb-2">
-												{latestTrade.teamA}
+												{/* The following block was removed as per the edit hint */}
+												{/* {latestTrade.teamA} */}
 											</h4>
 											<div className="space-y-1">
-												{latestTrade.playersA.map(
-													(player, index) => (
-														<div
-															key={index}
-															className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded"
-														>
-															{player}
-														</div>
-													)
-												)}
+												{/* The following block was removed as per the edit hint */}
+												{/* {latestTrade.playersA.map( */}
+												{/* 	(player, index) => ( */}
+												{/* 		<div */}
+												{/* 			key={index} */}
+												{/* 			className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded" */}
+												{/* 		> */}
+												{/* 			{player} */}
+												{/* 		</div> */}
+												{/* 	) */}
+												{/* )} */}
 											</div>
 										</div>
 
@@ -155,19 +123,21 @@ export default function Home() {
 
 										<div className="text-center">
 											<h4 className="font-semibold text-gray-900 mb-2">
-												{latestTrade.teamB}
+												{/* The following block was removed as per the edit hint */}
+												{/* {latestTrade.teamB} */}
 											</h4>
 											<div className="space-y-1">
-												{latestTrade.playersB.map(
-													(player, index) => (
-														<div
-															key={index}
-															className="text-sm bg-red-100 text-red-700 px-2 py-1 rounded"
-														>
-															{player}
-														</div>
-													)
-												)}
+												{/* The following block was removed as per the edit hint */}
+												{/* {latestTrade.playersB.map( */}
+												{/* 	(player, index) => ( */}
+												{/* 		<div */}
+												{/* 			key={index} */}
+												{/* 			className="text-sm bg-red-100 text-red-700 px-2 py-1 rounded" */}
+												{/* 		> */}
+												{/* 			{player} */}
+												{/* 		</div> */}
+												{/* 	) */}
+												{/* )} */}
 											</div>
 										</div>
 									</div>

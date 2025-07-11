@@ -2,27 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Activity, Mail, Phone } from "lucide-react";
 import { Link } from "wouter";
 
-const footerLinks = {
-  pool: [
-    { label: "Équipes", href: "/equipes" },
-    { label: "Échanges", href: "/echanges" },
-    { label: "Repêchage", href: "/draft" },
-    { label: "Statistiques", href: "https://www.marqueur.com/hockey/mbr/tools/pool/index.php?nyx=190707", external: true },
-  ],
-  saison: [
-    { label: "Classement", href: "/equipes" },
-    { label: "Calendrier", href: "#" },
-    { label: "Résultats", href: "#" },
-    { label: "Playoffs", href: "#" },
-  ],
-  aide: [
-    { label: "Règlements", href: "#" },
-    { label: "Comment Jouer", href: "#" },
-    { label: "FAQ", href: "#" },
-    { label: "Contact", href: "#" },
-  ],
-};
-
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-white">
@@ -54,57 +33,21 @@ export default function Footer() {
           <div>
             <h5 className="font-semibold text-white mb-4">Pool de Hockey</h5>
             <ul className="space-y-2">
-              {footerLinks.pool.map((link, index) => (
-                <li key={index}>
-                  {link.external ? (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-300 hover:text-white text-sm transition-colors duration-200"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <Link href={link.href}>
-                      <span className="text-gray-300 hover:text-white text-sm transition-colors duration-200 cursor-pointer">
-                        {link.label}
-                      </span>
-                    </Link>
-                  )}
-                </li>
-              ))}
+              {/* The footerLinks object was removed, so this loop will not render any links */}
             </ul>
           </div>
           
           <div>
             <h5 className="font-semibold text-white mb-4">Saison</h5>
             <ul className="space-y-2">
-              {footerLinks.saison.map((link, index) => (
-                <li key={index}>
-                  <Link href={link.href}>
-                    <span className="text-gray-300 hover:text-white text-sm transition-colors duration-200 cursor-pointer">
-                      {link.label}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+              {/* The footerLinks object was removed, so this loop will not render any links */}
             </ul>
           </div>
           
           <div>
             <h5 className="font-semibold text-white mb-4">Aide</h5>
             <ul className="space-y-2">
-              {footerLinks.aide.map((link, index) => (
-                <li key={index}>
-                  <a
-                    href={link.href}
-                    className="text-gray-300 hover:text-white text-sm transition-colors duration-200"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              {/* The footerLinks object was removed, so this loop will not render any links */}
             </ul>
           </div>
         </div>

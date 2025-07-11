@@ -65,17 +65,6 @@ export default function Draft() {
   // Filtrer selon l'année et le type sélectionnés
   const currentYearPicks = draftPicks?.filter(pick => pick.annee === selectedYear && pick.type_id === selectedType);
   
-  // Calculer les statistiques du repêchage
-  const draftInfo = {
-    status: "completed",
-    date: "2024-09-15",
-    time: "19:00",
-    totalRounds: Math.max(...(currentYearPicks?.map(pick => pick.round) || [0])),
-    totalPicks: currentYearPicks?.length || 0,
-    currentRound: Math.max(...(currentYearPicks?.map(pick => pick.round) || [0])),
-    currentPick: (currentYearPicks?.length || 0)
-  };
-
   // Détermination des rondes disponibles pour le type 2
   const availableRounds = currentYearPicks && selectedType === 2
     ? Array.from(new Set(currentYearPicks.map(pick => pick.round))).sort((a, b) => a - b)
