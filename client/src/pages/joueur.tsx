@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import PlayerDetails from '@/types/IPlayerDetails';
 import Loading from '@/components/ui/loading';
 import { useLoading } from '@/lib/loading-context';
-import JoueurLayout from '@/components/joueur/joueur-layout';
+import JoueurLayout from '@/components/joueur/JoueurLayout';
 
 const fetchPlayerDetails = async (playerId: string): Promise<PlayerDetails> => {
   const response = await fetch(`/api/players/${playerId}`);

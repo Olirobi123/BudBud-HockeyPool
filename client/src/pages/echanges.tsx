@@ -1,7 +1,7 @@
 import { useEchanges } from '@/hooks/echanges/useEchanges';
 import { EchangeStats } from '@/components/echanges/EchangeStats';
 import { EchangeList } from '@/components/echanges/EchangeList';
-import EchangeForm from '@/components/forms/echange-form';
+import EchangeForm from '@/components/forms/EchangeForm';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Loading from '@/components/ui/loading';

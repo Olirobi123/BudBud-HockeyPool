@@ -91,7 +91,7 @@
 - [x] Refactor client/src/pages/home.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [x] Refactor client/src/components/player-search.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [x] Refactor client/src/components/navigation.tsx for clarity and maintainability (split large files, extract hooks/components)
-- [ ] Standardize file and folder naming conventions
+- [x] Standardize file and folder naming conventions
 - [ ] Centralize UI primitives in `components/ui`
 - [ ] Ensure all API calls go through hooks/services
 - [ ] **Restructure the server codebase:**

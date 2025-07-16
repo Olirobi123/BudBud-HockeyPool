@@ -2,11 +2,11 @@ import React from 'react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import PlayerDetails from '@/types/IPlayerDetails';
-import JoueurHeader from '@/components/joueur/joueur-header';
-import JoueurTabs from './joueur-tabs';
-import JoueurTabsOverview from './joueur-tabs-overview';
-import JoueurTabsStats from './joueur-tabs-stats';
-import JoueurTabsLastFive from './joueur-tabs-last-five';
+import JoueurHeader from '@/components/joueur/JoueurHeader';
+import JoueurTabs from './JoueurTabs';
+import JoueurTabsOverview from './JoueurTabsOverview';
+import JoueurTabsStats from './JoueurTabsStats';
+import JoueurTabsLastFive from './JoueurTabsLastFive';
 
 type Props = {
   player: PlayerDetails;
