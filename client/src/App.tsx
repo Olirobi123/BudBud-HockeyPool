@@ -1,17 +1,16 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
-import { Switch, Route } from "wouter";
-import { LoadingProvider } from "@/lib/loading-context";
-import Loading from "@/components/ui/loading";
-import { useLoading } from "@/lib/loading-context";
+import { QueryClientProvider } from '@tanstack/react-query';
+import { Switch, Route } from 'wouter';
+import { queryClient } from '@/lib/queryClient';
+import { LoadingProvider, useLoading } from '@/lib/loading-context';
+import Loading from '@/components/ui/loading';
 
 // Import des pages
-import Home from "@/pages/home";
-import Equipes from "@/pages/equipes";
-import Draft from "@/pages/draft";
-import Echanges from "@/pages/echanges";
-import Joueur from "@/pages/joueur";
-import NotFound from "@/pages/not-found";
+import Home from '@/pages/home';
+import Equipes from '@/pages/equipes';
+import Draft from '@/pages/draft';
+import Echanges from '@/pages/echanges';
+import Joueur from '@/pages/joueur';
+import NotFound from '@/pages/not-found';
 
 function LoadingOverlay() {
   const { isPageLoading } = useLoading();

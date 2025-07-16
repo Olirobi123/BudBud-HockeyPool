@@ -1,5 +1,7 @@
 ---
-alwaysApply: true
+description:  
+globs:    
+alwaysApply: false
 ---
 
 # Development Agent Workflow - Cursor Rules
@@ -132,3 +134,5 @@ Mark tasks complete only when:
 
 Remember: Build a cohesive, well-documented, and maintainable project. Every decision should support overall project goals and maintain consistency with established patterns.
 
+## Persistent Documentation Sync Rule
+- Whenever a to-do list item is marked as complete, the corresponding checklist in the documentation (Implementation.md) must also be updated to reflect the change. This applies to all future iterations and stages.

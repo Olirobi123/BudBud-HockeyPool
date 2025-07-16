@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Activity, Mail, Phone } from "lucide-react";
-import { Link } from "wouter";
+import { Activity, Mail, Phone } from 'lucide-react';
+import { Link } from 'wouter';
+import { Button } from '@/components/ui/button';
 
 export default function Footer() {
   return (
@@ -15,7 +15,7 @@ export default function Footer() {
               <h4 className="text-2xl font-bold text-white">38BudBud</h4>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed mb-6">
-              Pool de hockey moderne avec interface intuitive et suivi en temps réel 
+              Pool de hockey moderne avec interface intuitive et suivi en temps réel
               pour une expérience de jeu optimale.
             </p>
             <div className="flex flex-col space-y-2 text-sm">
@@ -29,21 +29,21 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          
+
           <div>
             <h5 className="font-semibold text-white mb-4">Pool de Hockey</h5>
             <ul className="space-y-2">
               {/* The footerLinks object was removed, so this loop will not render any links */}
             </ul>
           </div>
-          
+
           <div>
             <h5 className="font-semibold text-white mb-4">Saison</h5>
             <ul className="space-y-2">
               {/* The footerLinks object was removed, so this loop will not render any links */}
             </ul>
           </div>
-          
+
           <div>
             <h5 className="font-semibold text-white mb-4">Aide</h5>
             <ul className="space-y-2">
@@ -51,7 +51,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t border-slate-700 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">

@@ -1,14 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Users } from "lucide-react";
-import Navigation from "@/components/navigation";
-import Footer from "@/components/footer";
-import { useQuery } from "@tanstack/react-query";
-import Loading from "@/components/ui/loading";
-import { useLoading } from "@/lib/loading-context";
-import { useEffect, useRef } from "react";
-import Equipe from "@/types/IEquipes.ts";
+import { Users } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import Navigation from '@/components/navigation';
+import Footer from '@/components/footer';
+import Loading from '@/components/ui/loading';
+import { useLoading } from '@/lib/loading-context';
+import Equipe from '@/types/IEquipes.ts';
 
 // Fonctions pour récupérer les équipes depuis l'API
 const fetchAllEquipes = async (): Promise<Equipe[]> => {
@@ -30,21 +32,21 @@ const fetchEquipesActives = async (): Promise<Equipe[]> => {
 export default function Equipes() {
   const { setPageLoading } = useLoading();
   const hasLoaded = useRef(false);
-  const { 
-    data: equipes, 
-    isLoading: isLoadingAll, 
-    error: errorAll 
+  const {
+    data: equipes,
+    isLoading: isLoadingAll,
+    error: errorAll,
   } = useQuery<Equipe[]>({
     queryKey: ['equipes'],
-    queryFn: fetchAllEquipes
+    queryFn: fetchAllEquipes,
   });
 
-  const { 
-    data: equipesActives, 
-    isLoading: isLoadingActives 
+  const {
+    data: equipesActives,
+    isLoading: isLoadingActives,
   } = useQuery<Equipe[]>({
     queryKey: ['equipes-actives'],
-    queryFn: fetchEquipesActives
+    queryFn: fetchEquipesActives,
   });
 
   useEffect(() => {
@@ -61,15 +63,21 @@ export default function Equipes() {
       </div>
     );
   }
-  
-  if (errorAll) return <div>Erreur: {(errorAll as Error).message}</div>;
+
+  if (errorAll) {
+    return (
+      <div>
+        Erreur:
+        {(errorAll as Error).message}
+      </div>
+    );
+  }
   if (!equipes) return <div>Aucune équipe trouvée</div>;
-  
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
+
       <main className="pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
@@ -97,22 +105,22 @@ export default function Equipes() {
                     {equipe.nom}
                   </CardTitle>
                 </CardHeader>
-                
+
                 <CardContent className="pt-0">
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">Statut</span>
-                      <Badge 
-                        variant="secondary" 
-                        className={equipe.active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                      <Badge
+                        variant="secondary"
+                        className={equipe.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
                       >
-                        {equipe.active ? "Active" : "Inactive"}
+                        {equipe.active ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="w-full mt-4 hover:bg-primary hover:text-white"
                     >
                       Voir les Détails
@@ -124,7 +132,7 @@ export default function Equipes() {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

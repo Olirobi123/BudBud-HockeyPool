@@ -1,9 +1,9 @@
-import type { Express } from "express";
-import { createServer, type Server } from "http";
-import teamsRoutes from "./routes/teams";
-import echangesRoutes from "./routes/echanges";
-import playersRoutes from "./routes/players";
-import repechageRoutes from "./routes/repechage";
+import type { Express } from 'express';
+import { createServer, type Server } from 'http';
+import teamsRoutes from './routes/teams';
+import echangesRoutes from './routes/echanges';
+import playersRoutes from './routes/players';
+import repechageRoutes from './routes/repechage';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -17,10 +17,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les joueurs
   app.use('/api/players', playersRoutes);
   // NHL Player Search API Proxy
-  app.get("/api/search/players", async (req, res) => {
+  app.get('/api/search/players', async (req, res) => {
     try {
       const query = req.query.q as string;
-      
+
       if (!query || query.length < 2) {
         return res.json([]);
       }
@@ -30,15 +30,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         abortController.abort();
       }, 5000); // Timeout after 5 seconds
 
-      const encodedQuery = encodeURIComponent(query.trim() + " *");
+      const encodedQuery = encodeURIComponent(`${query.trim()} *`);
       const nhlApiUrl = `https://search.d3.nhle.com/api/v1/search/player?culture=en-us&limit=10&q=${encodedQuery}&active=true`;
-      
+
       const response = await fetch(nhlApiUrl, {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'User-Agent': 'Mozilla/5.0 (compatible; 38BudBud/1.0)',
         },
-        //signal: abortController.signal
+        // signal: abortController.signal
       });
 
       if (!response.ok) {

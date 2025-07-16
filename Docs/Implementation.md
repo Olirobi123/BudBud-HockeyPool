@@ -64,23 +64,33 @@
 
 ## Implementation Stages
 
+> **Workflow Rule:** Whenever a to-do list item is marked as complete, the corresponding checklist in this documentation (Implementation.md) must also be updated to reflect the change. This rule applies to all future iterations and stages.
+
 ### Stage 1: Foundation & Setup
 **Duration:** 2-3 days  
 **Dependencies:** None
 
 #### Sub-steps:
 - [x] Audit the codebase for dead code and hardcoded data
-- [ ] Remove all unused files, components, and data
-- [ ] Set up ESLint and Prettier with strict rules
-- [ ] Ensure TypeScript strict mode is enabled
-- [ ] Document current project structure
+- [x] Remove all unused files, components, and data
+- [x] Set up ESLint and Prettier with strict rules
+- [x] Ensure TypeScript strict mode is enabled
+- [x] Document current project structure
 
 ### Stage 2: Core Refactor & Cleanup
 **Duration:** 4-6 days  
 **Dependencies:** Stage 1 completion
 
 #### Sub-steps:
-- [ ] Refactor codebase for clarity and maintainability (split large files, extract hooks/components)
+- [x] Remove the following unused frontend files identified during Stage 1:
+    - client/src/components/features-section.tsx
+    - client/src/components/statistics-section.tsx
+    - client/src/components/contact-form.tsx
+- [x] Refactor client/src/pages/draft.tsx for clarity and maintainability (split large files, extract hooks/components)
+- [ ] Refactor client/src/pages/echanges.tsx for clarity and maintainability (split large files, extract hooks/components)
+- [ ] Refactor client/src/pages/home.tsx for clarity and maintainability (split large files, extract hooks/components)
+- [ ] Refactor client/src/components/player-search.tsx for clarity and maintainability (split large files, extract hooks/components)
+- [ ] Refactor client/src/components/navigation.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [ ] Remove all hardcoded data; replace with dynamic data or configuration
 - [ ] Standardize file and folder naming conventions
 - [ ] Centralize UI primitives in `components/ui`

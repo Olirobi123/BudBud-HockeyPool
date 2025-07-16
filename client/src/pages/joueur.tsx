@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { useRoute } from "wouter";
-import PlayerDetails from "@/types/IPlayerDetails";
-import Loading from "@/components/ui/loading";
-import { useLoading } from "@/lib/loading-context";
-import { useEffect, useRef } from "react";
-import JoueurLayout from "@/components/joueur/joueur-layout";
+import { useQuery } from '@tanstack/react-query';
+import { useRoute } from 'wouter';
+import { useEffect, useRef } from 'react';
+import PlayerDetails from '@/types/IPlayerDetails';
+import Loading from '@/components/ui/loading';
+import { useLoading } from '@/lib/loading-context';
+import JoueurLayout from '@/components/joueur/joueur-layout';
 
 const fetchPlayerDetails = async (playerId: string): Promise<PlayerDetails> => {
   const response = await fetch(`/api/players/${playerId}`);
@@ -18,13 +18,13 @@ const fetchPlayerDetails = async (playerId: string): Promise<PlayerDetails> => {
 export default function Joueur() {
   const { setPageLoading } = useLoading();
   const hasLoaded = useRef(false);
-  const [, params] = useRoute("/joueur/:id");
+  const [, params] = useRoute('/joueur/:id');
   const playerId = params?.id;
 
-  const { 
-    data: player, 
-    isLoading, 
-    error 
+  const {
+    data: player,
+    isLoading,
+    error,
   } = useQuery<PlayerDetails>({
     queryKey: ['player', playerId],
     queryFn: () => fetchPlayerDetails(playerId || ''),
@@ -46,7 +46,14 @@ export default function Joueur() {
     );
   }
 
-  if (error) return <div>Erreur: {(error as Error).message}</div>;
+  if (error) {
+    return (
+      <div>
+        Erreur:
+        {(error as Error).message}
+      </div>
+    );
+  }
   if (!player) return <div>Joueur non trouvé</div>;
 
   return (

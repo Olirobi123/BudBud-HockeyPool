@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ExternalLink } from "lucide-react";
-import { Link, useLocation } from "wouter";
-import PlayerSearch from "@/components/player-search";
+import { useState, useEffect } from 'react';
+import { Menu, ExternalLink } from 'lucide-react';
+import { Link, useLocation } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import PlayerSearch from '@/components/player-search';
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,34 +15,33 @@ export default function Navigation() {
       setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
-    { href: "/equipes", label: "Équipes" },
-    { href: "/echanges", label: "Échanges" },
-    { href: "/draft", label: "Repêchage" },
-    { 
-      href: "https://www.marqueur.com/hockey/mbr/tools/pool/index.php?nyx=190707", 
-      label: "Marqueur", 
-      external: true 
+    { href: '/equipes', label: 'Équipes' },
+    { href: '/echanges', label: 'Échanges' },
+    { href: '/draft', label: 'Repêchage' },
+    {
+      href: 'https://www.marqueur.com/hockey/mbr/tools/pool/index.php?nyx=190707',
+      label: 'Marqueur',
+      external: true,
     },
   ];
 
   const handlePlayerSelect = (player: any) => {
-    console.log("Joueur sélectionné:", player);
+    console.log('Joueur sélectionné:', player);
     setIsMobileMenuOpen(false);
     setLocation(`/joueur/${player.playerId}`);
-
   };
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-slate-900/95 backdrop-blur-sm shadow-lg border-b border-slate-700"
-          : "bg-slate-900 shadow-lg border-b border-slate-700"
+          ? 'bg-slate-900/95 backdrop-blur-sm shadow-lg border-b border-slate-700'
+          : 'bg-slate-900 shadow-lg border-b border-slate-700'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,8 +76,8 @@ export default function Navigation() {
                       <span
                         className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer ${
                           location === link.href
-                            ? "text-white bg-primary"
-                            : "text-gray-300 hover:text-white hover:bg-slate-800"
+                            ? 'text-white bg-primary'
+                            : 'text-gray-300 hover:text-white hover:bg-slate-800'
                         }`}
                       >
                         {link.label}
@@ -89,9 +88,9 @@ export default function Navigation() {
               </div>
             </div>
           </div>
-          
+
           <div className="hidden md:block">
-            <PlayerSearch 
+            <PlayerSearch
               onPlayerSelect={handlePlayerSelect}
               className="w-64"
             />
@@ -107,7 +106,7 @@ export default function Navigation() {
               <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-slate-900 border-slate-700">
                 <div className="flex flex-col space-y-4 mt-8">
                   <div className="mb-6">
-                    <PlayerSearch 
+                    <PlayerSearch
                       onPlayerSelect={handlePlayerSelect}
                       className="w-full"
                     />

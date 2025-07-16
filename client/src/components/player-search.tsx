@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Search, User, Loader2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useState, useRef, useEffect } from 'react';
+import { Search, User, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface NHLPlayer {
   playerId: string;
@@ -30,12 +30,12 @@ interface PlayerSearchProps {
   className?: string;
 }
 
-export default function PlayerSearch({ 
-  onPlayerSelect, 
-  placeholder = "Rechercher un joueur...",
-  className = ""
+export default function PlayerSearch({
+  onPlayerSelect,
+  placeholder = 'Rechercher un joueur...',
+  className = '',
 }: PlayerSearchProps) {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [, setLocation] = useLocation();
   const ref = useRef<HTMLDivElement>(null);
@@ -49,7 +49,7 @@ export default function PlayerSearch({
 
   const handleSelect = (player: NHLPlayer) => {
     setIsOpen(false);
-    setSearch("");
+    setSearch('');
     if (onPlayerSelect) {
       onPlayerSelect(player);
     } else {
@@ -65,23 +65,23 @@ export default function PlayerSearch({
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const { value } = e.target;
     setSearch(value);
     setIsOpen(value.length >= 2);
   };
 
   const getPositionColor = (position: string) => {
     switch (position) {
-      case "C": return "bg-blue-100 text-blue-800";
-      case "L": case "R": return "bg-green-100 text-green-800";
-      case "D": return "bg-purple-100 text-purple-800";
-      case "G": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case 'C': return 'bg-blue-100 text-blue-800';
+      case 'L': case 'R': return 'bg-green-100 text-green-800';
+      case 'D': return 'bg-purple-100 text-purple-800';
+      case 'G': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -141,7 +141,9 @@ export default function PlayerSearch({
               </div>
             ) : search.length >= 2 && !isLoading ? (
               <div className="p-4 text-center text-gray-500">
-                Aucun joueur trouvé pour "{search}"
+                Aucun joueur trouvé pour "
+                {search}
+                "
               </div>
             ) : null}
           </CardContent>

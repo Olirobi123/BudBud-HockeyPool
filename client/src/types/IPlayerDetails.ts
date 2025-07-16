@@ -46,7 +46,7 @@ export default interface PlayerDetails {
         shutouts?: number;
         savePctg?: number;
         goalsAgainstAvg?: number;
-        
+
       };
     };
   };

@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { ArrowLeftRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -14,14 +19,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeftRight } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+} from '@/components/ui/form';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Equipe {
   id: number;
@@ -32,22 +34,22 @@ interface Equipe {
 const echangeSchema = z.object({
   equipe_source_id: z.string(),
   equipe_destination_id: z.string(),
-  details: z.string().min(10, "Les détails doivent contenir au moins 10 caractères"),
+  details: z.string().min(10, 'Les détails doivent contenir au moins 10 caractères'),
 });
 
 export default function EchangeForm() {
   const [open, setOpen] = useState(false);
-  
+
   const form = useForm<z.infer<typeof echangeSchema>>({
     resolver: zodResolver(echangeSchema),
   });
 
   const { data: equipes } = useQuery<Equipe[]>({
-    queryKey: ["equipes-actives"],
+    queryKey: ['equipes-actives'],
     queryFn: async () => {
-      const response = await fetch("/api/teams/active");
+      const response = await fetch('/api/teams/active');
       if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des équipes");
+        throw new Error('Erreur lors de la récupération des équipes');
       }
       return response.json();
     },
@@ -55,10 +57,10 @@ export default function EchangeForm() {
 
   const onSubmit = async (values: z.infer<typeof echangeSchema>) => {
     try {
-      const response = await fetch("/api/echanges", {
-        method: "POST",
+      const response = await fetch('/api/echanges', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
       });
@@ -71,7 +73,7 @@ export default function EchangeForm() {
       // Recharger les données après la création
       window.location.reload();
     } catch (error) {
-      console.error("Erreur:", error);
+      console.error('Erreur:', error);
     }
   };
 
@@ -83,12 +85,12 @@ export default function EchangeForm() {
           Proposer un Échange
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Proposer un Échange</DialogTitle>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField

@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import {
+  createContext, useContext, useState, useCallback,
+} from 'react';
 
 interface LoadingContextType {
   setPageLoading: (loading: boolean) => void;
@@ -9,11 +11,10 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isPageLoading, setIsPageLoading] = useState(true);
-  
+
   const setPageLoading = useCallback((loading: boolean) => {
     if (!loading) {
-    
-        setIsPageLoading(false);
+      setIsPageLoading(false);
     } else {
       setIsPageLoading(true);
     }
