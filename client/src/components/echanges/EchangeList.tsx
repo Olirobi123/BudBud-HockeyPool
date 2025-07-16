@@ -3,12 +3,15 @@ import Echange from '@/types/IEchange';
 import { EchangeCard } from './EchangeCard';
 
 interface EchangeListProps {
-  echanges: Echange[];
+  echanges?: Echange[];
 }
 
 export const EchangeList: React.FC<EchangeListProps> = ({ echanges }) => {
+  // Defensive programming: ensure echanges is an array
+  const safeEchanges = Array.isArray(echanges) ? echanges : [];
+  
   // Grouper les échanges par mois
-  const echangesParMois = echanges.reduce((acc, echange) => {
+  const echangesParMois = safeEchanges.reduce((acc, echange) => {
     const mois = echange.date.substring(0, 7); // Format: YYYY-MM
     if (!acc[mois]) acc[mois] = [];
     acc[mois].push(echange);

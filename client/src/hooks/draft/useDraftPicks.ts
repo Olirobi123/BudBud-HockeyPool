@@ -6,7 +6,8 @@ const fetchDraftPicks = async (): Promise<DraftPick[]> => {
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération des choix de repêchage');
   }
-  return response.json();
+  const result = await response.json();
+  return result.data || [];
 };
 
 export function useDraftPicks() {

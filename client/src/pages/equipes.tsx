@@ -1,6 +1,4 @@
 import { Users } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
 import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/components/ui/card';
@@ -9,52 +7,26 @@ import { Button } from '@/components/ui/button';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Loading from '@/components/ui/loading';
-import { useLoading } from '@/lib/loading-context';
-import Equipe from '@/types/IEquipes.ts';
-
-// Fonctions pour récupérer les équipes depuis l'API
-const fetchAllEquipes = async (): Promise<Equipe[]> => {
-  const response = await fetch('/api/teams');
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des équipes');
-  }
-  return response.json();
-};
-
-const fetchEquipesActives = async (): Promise<Equipe[]> => {
-  const response = await fetch('/api/teams/active');
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des équipes actives');
-  }
-  return response.json();
-};
+import { useTeams } from '@/hooks/useTeams';
+import { useActiveTeams } from '@/hooks/useActiveTeams';
+import Equipe from '@/types/IEquipes';
+import { ErrorDisplay } from '@/components/ui/error-display';
+import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function Equipes() {
-  const { setPageLoading } = useLoading();
-  const hasLoaded = useRef(false);
   const {
     data: equipes,
     isLoading: isLoadingAll,
     error: errorAll,
-  } = useQuery<Equipe[]>({
-    queryKey: ['equipes'],
-    queryFn: fetchAllEquipes,
-  });
+  } = useTeams();
 
   const {
     data: equipesActives,
     isLoading: isLoadingActives,
-  } = useQuery<Equipe[]>({
-    queryKey: ['equipes-actives'],
-    queryFn: fetchEquipesActives,
-  });
+  } = useActiveTeams();
 
-  useEffect(() => {
-    if (!isLoadingAll && !isLoadingActives && !hasLoaded.current) {
-      hasLoaded.current = true;
-      setPageLoading(false);
-    }
-  }, [isLoadingAll, isLoadingActives, setPageLoading]);
+  // Gestion automatique du loading de la page
+  usePageLoading({ dependencies: [isLoadingAll, isLoadingActives] });
 
   if (isLoadingAll || isLoadingActives) {
     return (
@@ -66,9 +38,8 @@ export default function Equipes() {
 
   if (errorAll) {
     return (
-      <div>
-        Erreur:
-        {(errorAll as Error).message}
+      <div className="min-h-screen flex items-center justify-center">
+        <ErrorDisplay error={errorAll} onRetry={() => window.location.reload()} />
       </div>
     );
   }

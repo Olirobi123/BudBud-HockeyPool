@@ -1,23 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
 import { useRoute } from 'wouter';
-import { useEffect, useRef } from 'react';
-import PlayerDetails from '@/types/IPlayerDetails';
 import Loading from '@/components/ui/loading';
-import { useLoading } from '@/lib/loading-context';
 import JoueurLayout from '@/components/joueur/JoueurLayout';
-
-const fetchPlayerDetails = async (playerId: string): Promise<PlayerDetails> => {
-  const response = await fetch(`/api/players/${playerId}`);
-  if (!response.ok) {
-    console.log(response);
-    throw new Error('Erreur lors de la récupération des détails du joueur');
-  }
-  return response.json();
-};
+import { usePlayerDetails } from '@/hooks/usePlayerDetails';
+import { ErrorDisplay } from '@/components/ui/error-display';
+import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function Joueur() {
-  const { setPageLoading } = useLoading();
-  const hasLoaded = useRef(false);
   const [, params] = useRoute('/joueur/:id');
   const playerId = params?.id;
 
@@ -25,18 +13,10 @@ export default function Joueur() {
     data: player,
     isLoading,
     error,
-  } = useQuery<PlayerDetails>({
-    queryKey: ['player', playerId],
-    queryFn: () => fetchPlayerDetails(playerId || ''),
-    enabled: !!playerId,
-  });
+  } = usePlayerDetails(playerId || '');
 
-  useEffect(() => {
-    if (!isLoading && !hasLoaded.current) {
-      hasLoaded.current = true;
-      setPageLoading(false);
-    }
-  }, [isLoading, setPageLoading]);
+  // Gestion automatique du loading de la page
+  usePageLoading({ dependencies: [isLoading] });
 
   if (isLoading) {
     return (
@@ -48,9 +28,8 @@ export default function Joueur() {
 
   if (error) {
     return (
-      <div>
-        Erreur:
-        {(error as Error).message}
+      <div className="min-h-screen flex items-center justify-center">
+        <ErrorDisplay error={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }

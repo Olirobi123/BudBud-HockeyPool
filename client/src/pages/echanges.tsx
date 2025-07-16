@@ -1,28 +1,22 @@
 import { useEchanges } from '@/hooks/echanges/useEchanges';
+import { ErrorDisplay } from '@/components/ui/error-display';
 import { EchangeStats } from '@/components/echanges/EchangeStats';
 import { EchangeList } from '@/components/echanges/EchangeList';
 import EchangeForm from '@/components/forms/EchangeForm';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Loading from '@/components/ui/loading';
-import { useLoading } from '@/lib/loading-context';
-import { useEffect, useRef } from 'react';
+import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function Echanges() {
-  const { setPageLoading } = useLoading();
-  const hasLoaded = useRef(false);
   const {
     data: echanges,
     isLoading,
     error,
   } = useEchanges();
 
-  useEffect(() => {
-    if (!isLoading && !hasLoaded.current) {
-      hasLoaded.current = true;
-      setPageLoading(false);
-    }
-  }, [isLoading, setPageLoading]);
+  // Gestion automatique du loading de la page
+  usePageLoading({ dependencies: [isLoading] });
 
   if (isLoading) {
     return (
@@ -34,9 +28,8 @@ export default function Echanges() {
 
   if (error) {
     return (
-      <div>
-        Erreur:
-        {(error as Error).message}
+      <div className="min-h-screen flex items-center justify-center">
+        <ErrorDisplay error={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }

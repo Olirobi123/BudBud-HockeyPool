@@ -2,9 +2,9 @@ import React from 'react';
 import { DraftType } from '@/types/IDraft';
 
 interface DraftFiltersProps {
-  annees: number[];
-  equipes: string[];
-  types: DraftType[];
+  annees?: number[];
+  equipes?: string[];
+  types?: DraftType[];
   selectedYear: number;
   setSelectedYear: (year: number) => void;
   selectedType: number;
@@ -13,7 +13,7 @@ interface DraftFiltersProps {
   setSelectedRound: (round: number) => void;
   selectedEquipe: string;
   setSelectedEquipe: (equipe: string) => void;
-  availableRounds: number[];
+  availableRounds?: number[];
   isTypesLoading: boolean;
 }
 
@@ -31,7 +31,14 @@ export const DraftFilters: React.FC<DraftFiltersProps> = ({
   setSelectedEquipe,
   availableRounds,
   isTypesLoading,
-}) => (
+}) => {
+  // Defensive programming: ensure arrays are defined
+  const safeAnnees = Array.isArray(annees) ? annees : [];
+  const safeEquipes = Array.isArray(equipes) ? equipes : [];
+  const safeTypes = Array.isArray(types) ? types : [];
+  const safeAvailableRounds = Array.isArray(availableRounds) ? availableRounds : [];
+
+  return (
   <div className="flex flex-wrap gap-4 items-end bg-white rounded-lg shadow p-4 border border-gray-200 mb-4">
     <div>
       <label className="block text-xs font-semibold text-gray-700 mb-1 uppercase tracking-wide">Année</label>
@@ -40,7 +47,7 @@ export const DraftFilters: React.FC<DraftFiltersProps> = ({
         value={selectedYear}
         onChange={(e) => setSelectedYear(Number(e.target.value))}
       >
-        {annees.map((annee) => (
+        {safeAnnees.map((annee) => (
           <option key={annee} value={annee}>{annee}</option>
         ))}
       </select>
@@ -55,7 +62,7 @@ export const DraftFilters: React.FC<DraftFiltersProps> = ({
         {isTypesLoading ? (
           <option>Chargement...</option>
         ) : (
-          types.map((type) => (
+          safeTypes.map((type) => (
             <option key={type.id} value={type.id}>{type.nom}</option>
           ))
         )}
@@ -70,7 +77,7 @@ export const DraftFilters: React.FC<DraftFiltersProps> = ({
           onChange={(e) => setSelectedRound(Number(e.target.value))}
         >
           <option value={0}>Toutes les rondes</option>
-          {availableRounds.map((round) => (
+          {safeAvailableRounds.map((round) => (
             <option key={round} value={round}>
               Ronde{round}
             </option>
@@ -86,10 +93,11 @@ export const DraftFilters: React.FC<DraftFiltersProps> = ({
         onChange={(e) => setSelectedEquipe(e.target.value)}
       >
         <option value="">Toutes</option>
-        {equipes.map((equipe) => (
+        {safeEquipes.map((equipe) => (
           <option key={equipe} value={equipe}>{equipe}</option>
         ))}
       </select>
     </div>
   </div>
-); 
+  );
+}; 

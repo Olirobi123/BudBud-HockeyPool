@@ -6,7 +6,8 @@ const fetchEchanges = async (): Promise<Echange[]> => {
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération des échanges');
   }
-  return response.json();
+  const result = await response.json();
+  return result.data || [];
 };
 
 export function useEchanges() {

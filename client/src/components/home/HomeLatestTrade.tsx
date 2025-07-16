@@ -5,12 +5,13 @@ import { Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
 import Loading from '@/components/ui/loading';
+import { InlineError } from '@/components/ui/error-display';
 
 export const HomeLatestTrade: React.FC = () => {
   const { data: latestTrade, isLoading, error } = useLatestTrade();
 
   if (isLoading) return <Loading />;
-  if (error) return <div className="text-red-500">Erreur lors du chargement du dernier échange.</div>;
+  if (error) return <InlineError message="Erreur lors du chargement du dernier échange." />;
   if (!latestTrade) return <div>Aucun échange récent.</div>;
 
   return (

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useActiveTeams } from '@/hooks/useActiveTeams';
+import { useCreateEchange } from '@/hooks/echanges/useCreateEchange';
 import {
   Dialog,
   DialogContent,
@@ -44,34 +45,14 @@ export default function EchangeForm() {
     resolver: zodResolver(echangeSchema),
   });
 
-  const { data: equipes } = useQuery<Equipe[]>({
-    queryKey: ['equipes-actives'],
-    queryFn: async () => {
-      const response = await fetch('/api/teams/active');
-      if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des équipes');
-      }
-      return response.json();
-    },
-  });
+  const { data: equipes } = useActiveTeams();
+  const createEchange = useCreateEchange();
 
   const onSubmit = async (values: z.infer<typeof echangeSchema>) => {
     try {
-      const response = await fetch('/api/echanges', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la création de l'échange");
-      }
-
+      await createEchange.mutateAsync(values);
       setOpen(false);
-      // Recharger les données après la création
-      window.location.reload();
+      form.reset();
     } catch (error) {
       console.error('Erreur:', error);
     }

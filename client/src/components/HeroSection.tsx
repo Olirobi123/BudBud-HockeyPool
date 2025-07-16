@@ -1,40 +1,20 @@
 import {
   Trophy, Users, TrendingUp, Zap,
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useLoading } from '@/lib/loading-context';
-import Equipe from '@/types/IEquipes.ts';
+import { useActiveTeams } from '@/hooks/useActiveTeams';
+import { usePageLoading } from '@/hooks/usePageLoading';
 
 interface HeroSectionProps {
   onLoaded: () => void;
 }
 
-// Fonction pour récupérer les équipes depuis l'API
-const fetchEquipesActives = async (): Promise<Equipe[]> => {
-  const response = await fetch('/api/teams/active');
-  if (!response.ok) {
-    throw new Error('Erreur lors de la récupération des équipes');
-  }
-  return response.json();
-};
-
 export default function HeroSection() {
-  const { setPageLoading } = useLoading();
-  const hasLoaded = useRef(false);
-  const { data: equipesActives = [], isLoading } = useQuery<Equipe[]>({
-    queryKey: ['equipesActives'],
-    queryFn: fetchEquipesActives,
-  });
+  const { data: equipesActives = [], isLoading } = useActiveTeams();
 
-  useEffect(() => {
-    if (!isLoading && !hasLoaded.current) {
-      hasLoaded.current = true;
-      setPageLoading(false);
-    }
-  }, [isLoading, setPageLoading]);
+  // Gestion automatique du loading de la page
+  usePageLoading({ dependencies: [isLoading] });
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20 sm:py-32 mt-16">

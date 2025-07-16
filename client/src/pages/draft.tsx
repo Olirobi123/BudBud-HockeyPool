@@ -10,18 +10,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { useLoading } from '@/lib/loading-context';
 import Loading from '@/components/ui/loading';
+import { ErrorDisplay } from '@/components/ui/error-display';
 import { useDraftPicks } from '@/hooks/draft/useDraftPicks';
 import { useDraftTypes } from '@/hooks/draft/useDraftTypes';
 import { DraftPick, DraftType } from '@/types/IDraft';
 import { useDraftFilters } from '@/hooks/draft/useDraftFilters';
 import { DraftFilters } from '@/components/draft/DraftFilters';
 import { DraftTable } from '@/components/draft/DraftTable';
+import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function Draft() {
-  const { setPageLoading } = useLoading();
-  const hasLoaded = useRef(false);
 
   const {
     data: draftPicks,
@@ -47,12 +46,8 @@ export default function Draft() {
     filteredPicksEquipe,
   } = useDraftFilters(draftPicks, types);
 
-  useEffect(() => {
-    if (!isLoading && !hasLoaded.current) {
-      hasLoaded.current = true;
-      setPageLoading(false);
-    }
-  }, [isLoading, setPageLoading]);
+  // Gestion automatique du loading de la page
+  usePageLoading({ dependencies: [isLoading] });
 
   if (isLoading) {
     return (
@@ -64,9 +59,8 @@ export default function Draft() {
 
   if (error) {
     return (
-      <div>
-        Erreur:
-        {(error as Error).message}
+      <div className="min-h-screen flex items-center justify-center">
+        <ErrorDisplay error={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }

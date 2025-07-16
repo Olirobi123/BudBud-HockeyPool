@@ -6,7 +6,8 @@ const fetchDraftTypes = async (): Promise<DraftType[]> => {
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération des types de repêchage');
   }
-  return response.json();
+  const result = await response.json();
+  return result.data || [];
 };
 
 export function useDraftTypes() {

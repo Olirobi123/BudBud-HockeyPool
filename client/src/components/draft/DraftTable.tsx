@@ -2,10 +2,10 @@ import React from 'react';
 import { DraftPick } from '@/types/IDraft';
 
 interface DraftTableProps {
-  filteredPicksEquipe: DraftPick[];
+  filteredPicksEquipe?: DraftPick[];
   selectedType: number;
   selectedRound: number;
-  availableRounds: number[];
+  availableRounds?: number[];
 }
 
 export const DraftTable: React.FC<DraftTableProps> = ({
@@ -13,7 +13,12 @@ export const DraftTable: React.FC<DraftTableProps> = ({
   selectedType,
   selectedRound,
   availableRounds,
-}) => (
+}) => {
+  // Defensive programming: ensure arrays are defined
+  const safeFilteredPicksEquipe = Array.isArray(filteredPicksEquipe) ? filteredPicksEquipe : [];
+  const safeAvailableRounds = Array.isArray(availableRounds) ? availableRounds : [];
+
+  return (
   <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow">
     <table className="w-full text-sm">
       <thead className="bg-gray-100">
@@ -24,12 +29,12 @@ export const DraftTable: React.FC<DraftTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {filteredPicksEquipe && filteredPicksEquipe.length === 0 ? (
+        {safeFilteredPicksEquipe.length === 0 ? (
           <tr>
             <td colSpan={3} className="text-center py-6 text-gray-400">Aucun choix pour cette sélection</td>
           </tr>
-        ) : selectedType === 2 && filteredPicksEquipe ? (
-          availableRounds
+        ) : selectedType === 2 ? (
+          safeAvailableRounds
             .filter((round) => selectedRound === 0 || round === selectedRound)
             .map((round) => [
               <tr key={`header-round-${round}`} className="bg-gray-50 border-t-2 border-gray-300">
@@ -37,7 +42,7 @@ export const DraftTable: React.FC<DraftTableProps> = ({
                   Ronde{round}
                 </td>
               </tr>,
-              ...filteredPicksEquipe
+              ...safeFilteredPicksEquipe
                 .filter((pick) => pick.round === round)
                 .map((pick) => (
                   <tr key={pick.rang} className="border-b border-gray-100 hover:bg-gray-50 transition">
@@ -48,7 +53,7 @@ export const DraftTable: React.FC<DraftTableProps> = ({
                 )),
             ])
         ) : (
-          filteredPicksEquipe && filteredPicksEquipe.map((pick) => (
+          safeFilteredPicksEquipe.map((pick) => (
             <tr key={pick.rang} className="border-b border-gray-100 hover:bg-gray-50 transition">
               <td className="py-2 px-2 text-gray-800">{pick.rang}</td>
               <td className="py-2 px-2 text-gray-700">{pick.nom}</td>
@@ -59,4 +64,5 @@ export const DraftTable: React.FC<DraftTableProps> = ({
       </tbody>
     </table>
   </div>
-); 
+  );
+}; 

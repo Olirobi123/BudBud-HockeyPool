@@ -92,9 +92,9 @@
 - [x] Refactor client/src/components/player-search.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [x] Refactor client/src/components/navigation.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [x] Standardize file and folder naming conventions
-- [ ] Centralize UI primitives in `components/ui`
-- [ ] Ensure all API calls go through hooks/services
-- [ ] **Restructure the server codebase:**
+- [x] Centralize UI primitives in `components/ui`
+- [x] Ensure all API calls go through hooks/services
+- [x] **Restructure the server codebase:**
     - Create `controllers/` for request/response logic
     - Create `services/` for business logic and DB access
     - Create `models/` for data schemas/types
@@ -102,7 +102,7 @@
     - Create `types/` for backend TypeScript types
     - Create `utils/` for shared utility functions
     - Refactor existing route files to use controllers and services
-- [ ] Revoir et uniformiser la gestion du loading et des erreurs dans tous les composants/pages.
+- [x] Revoir et uniformiser la gestion du loading et des erreurs dans tous les composants/pages.
 
 ### Stage 3: UI/UX Consistency & Feature Alignment
 **Duration:** 5-7 days  
