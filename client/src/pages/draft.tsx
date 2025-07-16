@@ -8,8 +8,8 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import Navigation from '@/components/navigation';
-import Footer from '@/components/footer';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
 import { useLoading } from '@/lib/loading-context';
 import Loading from '@/components/ui/loading';
 import { useDraftPicks } from '@/hooks/draft/useDraftPicks';

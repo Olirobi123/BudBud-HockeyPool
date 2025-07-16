@@ -1,3 +1,14 @@
+export interface NHLPlayer {
+  playerId: string;
+  name: string;
+  positionCode: string;
+  teamAbbrev: string;
+  lastTeamId: string;
+  lastTeamAbbrev: string;
+  sweaterNumber: number;
+  active: boolean;
+}
+
 export default interface PlayerDetails {
   playerId: number;
   isActive: boolean;

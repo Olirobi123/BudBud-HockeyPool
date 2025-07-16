@@ -88,10 +88,9 @@
     - client/src/components/contact-form.tsx
 - [x] Refactor client/src/pages/draft.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [x] Refactor client/src/pages/echanges.tsx for clarity and maintainability (split large files, extract hooks/components)
-- [ ] Refactor client/src/pages/home.tsx for clarity and maintainability (split large files, extract hooks/components)
-- [ ] Refactor client/src/components/player-search.tsx for clarity and maintainability (split large files, extract hooks/components)
-- [ ] Refactor client/src/components/navigation.tsx for clarity and maintainability (split large files, extract hooks/components)
-- [ ] Remove all hardcoded data; replace with dynamic data or configuration
+- [x] Refactor client/src/pages/home.tsx for clarity and maintainability (split large files, extract hooks/components)
+- [x] Refactor client/src/components/player-search.tsx for clarity and maintainability (split large files, extract hooks/components)
+- [x] Refactor client/src/components/navigation.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [ ] Standardize file and folder naming conventions
 - [ ] Centralize UI primitives in `components/ui`
 - [ ] Ensure all API calls go through hooks/services
@@ -103,12 +102,14 @@
     - Create `types/` for backend TypeScript types
     - Create `utils/` for shared utility functions
     - Refactor existing route files to use controllers and services
+- [ ] Revoir et uniformiser la gestion du loading et des erreurs dans tous les composants/pages.
 
 ### Stage 3: UI/UX Consistency & Feature Alignment
 **Duration:** 5-7 days  
 **Dependencies:** Stage 2 completion
 
 #### Sub-steps:
+- [ ] Créer les routes API nécessaires pour alimenter le feed d’activité et le dernier échange sur la page d’accueil.
 - [ ] Audit all UI components for consistency (colors, spacing, typography)
 - [ ] Refactor draft page table to match player search table visually and functionally
 - [ ] Refactor "Échange" section UI for improved usability and consistency
