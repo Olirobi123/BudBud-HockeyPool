@@ -87,7 +87,7 @@
     - client/src/components/statistics-section.tsx
     - client/src/components/contact-form.tsx
 - [x] Refactor client/src/pages/draft.tsx for clarity and maintainability (split large files, extract hooks/components)
-- [ ] Refactor client/src/pages/echanges.tsx for clarity and maintainability (split large files, extract hooks/components)
+- [x] Refactor client/src/pages/echanges.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [ ] Refactor client/src/pages/home.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [ ] Refactor client/src/components/player-search.tsx for clarity and maintainability (split large files, extract hooks/components)
 - [ ] Refactor client/src/components/navigation.tsx for clarity and maintainability (split large files, extract hooks/components)
