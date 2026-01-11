@@ -7,6 +7,7 @@ import Loading from '@/components/ui/loading';
 // Import des pages
 import Home from '@/pages/home';
 import Equipes from '@/pages/equipes';
+import TeamDetails from '@/pages/team-details';
 import Draft from '@/pages/draft';
 import Echanges from '@/pages/echanges';
 import Joueur from '@/pages/joueur';
@@ -32,6 +33,7 @@ function App() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/equipes" component={Equipes} />
+          <Route path="/equipes/:id" component={TeamDetails} />
           <Route path="/draft" component={Draft} />
           <Route path="/echanges" component={Echanges} />
           <Route path="/joueur/:id" component={Joueur} />

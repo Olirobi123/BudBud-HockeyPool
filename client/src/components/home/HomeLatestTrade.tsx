@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading';
 import { InlineError } from '@/components/ui/error-display';
+import { EchangeCard } from '@/components/echanges/EchangeCard';
 
 export const HomeLatestTrade: React.FC = () => {
   const { data: latestTrade, isLoading, error } = useLatestTrade();
@@ -16,43 +17,28 @@ export const HomeLatestTrade: React.FC = () => {
   if (error) return <InlineError message="Erreur lors du chargement du dernier échange." />;
   if (!latestTrade) return <div>Aucun échange récent.</div>;
 
+  // Adapt HomeTrade to Echange format
+  const mappedTrade = {
+    id: parseInt(latestTrade.id, 10),
+    date: latestTrade.date,
+    equipe_source_id: 0, // Not needed for display
+    equipe_destination_id: 0, // Not needed for display
+    equipe_source_nom: latestTrade.teamA,
+    equipe_destination_nom: latestTrade.teamB,
+    details: `${latestTrade.playersA.join(', ')} | ${latestTrade.playersB.join(', ')}`,
+    statut_confirmer: true,
+  } as any; // Cast to any or Echange if imports allow (using simplified mapping)
+
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="text-lg">Échange Récent</CardTitle>
-        <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">{latestTrade.date}</span>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="text-center">
-            <h4 className="font-semibold text-foreground mb-2">{latestTrade.teamA}</h4>
-            <div className="space-y-1">
-              {latestTrade.playersA.map((player, index) => (
-                <div key={index} className="text-sm bg-primary/10 text-primary px-2 py-1 rounded">{player}</div>
-              ))}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-muted-foreground font-bold">↕</div>
-          </div>
-          <div className="text-center">
-            <h4 className="font-semibold text-foreground mb-2">{latestTrade.teamB}</h4>
-            <div className="space-y-1">
-              {latestTrade.playersB.map((player, index) => (
-                <div key={index} className="text-sm bg-accent/10 text-accent px-2 py-1 rounded">{player}</div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <Link href="/echanges">
-          <Button className="w-full mt-4 bg-primary hover:bg-primary/90 text-white">
+    <div className="space-y-6">
+      <EchangeCard echange={mappedTrade} compact={true} />
+      <div className="flex justify-center my-2">
+        <Link href="/echanges" className="w-10/12">
+          <Button className="w-full bg-gradient-to-r from-blue-400 to-cyan-400 text-slate-900 hover:from-blue-500 hover:to-cyan-500 font-bold shadow-md border-0 transition-all duration-200">
             Voir tous les Échanges
           </Button>
         </Link>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

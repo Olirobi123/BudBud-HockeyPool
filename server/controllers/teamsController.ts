@@ -40,6 +40,36 @@ export class TeamsController {
 
     sendSuccess(res, team);
   });
+
+  /**
+   * Récupérer le roster d'une équipe
+   */
+  getRoster = asyncHandler(async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      sendServerError(res, 'ID d\'équipe invalide');
+      return;
+    }
+
+    const roster = await teamsService.getTeamRoster(id);
+    sendSuccess(res, roster);
+  });
+
+  /**
+   * Récupérer le dernier échange d'une équipe
+   */
+  getLatestTrade = asyncHandler(async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      sendServerError(res, 'ID d\'équipe invalide');
+      return;
+    }
+
+    const trade = await teamsService.getTeamLatestTrade(id);
+    sendSuccess(res, trade);
+  });
 }
 
 export const teamsController = new TeamsController();

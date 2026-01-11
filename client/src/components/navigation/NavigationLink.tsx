@@ -37,7 +37,9 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
     <Link href={href}>
       <span
         className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer ${
-          active ? 'text-white bg-primary' : 'text-gray-300 hover:text-white hover:bg-slate-800'
+          active
+            ? 'bg-gradient-to-r from-blue-400 to-cyan-400 text-slate-900 font-bold shadow-md'
+            : 'text-gray-300 hover:text-white hover:bg-slate-800'
         } ${className}`}
         onClick={onClick}
       >

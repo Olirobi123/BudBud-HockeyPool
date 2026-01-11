@@ -66,6 +66,23 @@ export const QUERIES = {
     ORDER BY e.date DESC
     LIMIT 10
   `,
+  GET_LATEST_TRADE_BY_TEAM: `
+    SELECT
+      e.id,
+      e.date,
+      e.details,
+      e.equipe_source_id,
+      e.equipe_destination_id,
+      e.statut_confirmer,
+      src.nom as equipe_source_nom,
+      dest.nom as equipe_destination_nom
+    FROM ${TABLES.ECHANGES} e
+    JOIN ${TABLES.EQUIPES} src ON e.equipe_source_id = src.id
+    JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
+    WHERE e.equipe_source_id = $1 OR e.equipe_destination_id = $1
+    ORDER BY e.date DESC
+    LIMIT 1
+  `,
 
   // Joueurs
   GET_PLAYER_BY_ID: `SELECT * FROM ${TABLES.PLAYERS} WHERE id = $1`,

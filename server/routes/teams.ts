@@ -12,4 +12,10 @@ router.get('/active', teamsController.getActiveTeams);
 // Récupérer une équipe par son ID
 router.get('/:id', teamsController.getTeamById);
 
+// Récupérer le roster d'une équipe
+router.get('/:id/roster', teamsController.getRoster);
+
+// Récupérer le dernier échange d'une équipe
+router.get('/:id/latest-trade', teamsController.getLatestTrade);
+
 export default router;

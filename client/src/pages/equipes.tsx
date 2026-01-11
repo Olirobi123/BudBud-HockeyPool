@@ -89,13 +89,14 @@ export default function Equipes() {
                       </Badge>
                     </div>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-4 hover:bg-primary hover:text-white"
-                    >
-                      Voir les Détails
-                    </Button>
+                    <a href={`/equipes/${equipe.id}`}>
+                      <Button
+                        size="sm"
+                        className="w-full mt-4 bg-transparent border border-gray-200 text-gray-900 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-400 hover:to-cyan-400 hover:text-slate-900 hover:border-transparent hover:font-bold"
+                      >
+                        Voir les Détails
+                      </Button>
+                    </a>
                   </div>
                 </CardContent>
               </Card>
