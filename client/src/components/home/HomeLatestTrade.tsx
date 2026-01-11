@@ -32,12 +32,8 @@ export const HomeLatestTrade: React.FC = () => {
   return (
     <div className="space-y-6">
       <EchangeCard echange={mappedTrade} compact={true} />
-      <div className="flex justify-center my-2">
-        <Link href="/echanges" className="w-10/12">
-          <Button className="w-full bg-gradient-to-r from-blue-400 to-cyan-400 text-slate-900 hover:from-blue-500 hover:to-cyan-500 font-bold shadow-md border-0 transition-all duration-200">
-            Voir tous les Échanges
-          </Button>
-        </Link>
+      <div className="flex justify-center">
+       
       </div>
     </div>
   );
