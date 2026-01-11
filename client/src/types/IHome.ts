@@ -1,6 +1,6 @@
 export interface HomeActivity {
   id: string;
-  type: 'trade' | 'scoring' | 'match';
+  type: 'Échange' | 'scoring' | 'match';
   time: string; // e.g. 'il y a 2h'
   description: string;
   details?: string;

@@ -23,9 +23,10 @@ export function usePageLoading(options: UsePageLoadingOptions = {}) {
         }, delay);
 
         return () => clearTimeout(timer);
+      } else {
+        hasLoaded.current = true;
+        setPageLoading(false);
       }
-      hasLoaded.current = true;
-      setPageLoading(false);
     }
   }, [dependencies, delay, setPageLoading]);
 

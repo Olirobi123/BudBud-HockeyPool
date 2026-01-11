@@ -130,7 +130,6 @@ export class EchangesService {
 
       const echange = result.rows[0] as EchangeWithTeams;
       const { playersA, playersB } = parseTradeDetails(echange.details);
-      console.log(playersA, playersB);
 
       return {
         id: String(echange.id),
