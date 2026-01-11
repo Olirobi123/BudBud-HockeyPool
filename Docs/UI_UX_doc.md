@@ -1,9 +1,17 @@
 # UI/UX Documentation for 38BudBud
 
-## Design System Specifications
-- **Color Palette:** Use Tailwind's semantic color names for consistency.
-- **Typography:** Use Tailwind's font utilities; maintain consistent heading/body styles.
-- **Spacing:** Use Tailwind's spacing scale for padding, margin, and gaps.
+## Design System Reference
+
+**IMPORTANT:** Comprehensive design system specifications are now documented in [`/Docs/Design_System.md`](./Design_System.md).
+
+**Quick Reference:** See [`/Docs/Design_System_Cheatsheet.md`](./Design_System_Cheatsheet.md) for common patterns and quick lookup.
+
+---
+
+## Design System Specifications (High-Level)
+- **Color Palette:** Use semantic design tokens (e.g., `bg-primary`, `text-foreground`) defined in Design System.
+- **Typography:** Follow the type scale defined in Design System for consistent heading/body styles.
+- **Spacing:** Use Tailwind's spacing scale as documented in Design System for padding, margin, and gaps.
 - **Components:** All UI primitives must be stateless, reusable, and accept data via props.
 
 ## UI Component Guidelines
@@ -52,5 +60,7 @@
 **All documentation is interconnected and supports the overall implementation and refactor strategy. Update these docs as the project evolves.**
 
 ### Cross-References
-- See Implementation.md for the full implementation plan and task breakdown.
-- See project_structure.md for folder and component organization.
+- **Design System (NEW):** `/Docs/Design_System.md` - Comprehensive design system reference
+- **Design System Cheatsheet (NEW):** `/Docs/Design_System_Cheatsheet.md` - Quick reference guide
+- **Implementation Plan:** `/Docs/Implementation.md` - Full implementation plan and task breakdown
+- **Project Structure:** `/Docs/project_structure.md` - Folder and component organization

@@ -15,18 +15,21 @@ export const HomeActivityFeed: React.FC = () => {
   return (
     <div className="space-y-4">
       {data.map((activity, index) => (
-        <Card key={index} className="p-4">
-          <CardContent className="p-0">
+        <Card key={index}>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Badge variant="outline" className="bg-blue-50 text-blue-600">
+                <Badge
+                  variant={activity.type === 'Échange' ? 'default' : 'secondary'}
+                  className={activity.type === 'Échange' ? 'bg-green-100 text-green-700 hover:bg-green-200' : ''}
+                >
                   {activity.type}
                 </Badge>
                 <span className="text-sm font-medium">{activity.description}</span>
               </div>
-              <span className="text-xs text-gray-500">{activity.time}</span>
+              <span className="text-xs text-muted-foreground">{activity.time}</span>
             </div>
-            {activity.details && <p className="text-sm text-gray-600 mt-2">{activity.details}</p>}
+            {activity.details && <p className="text-sm text-muted-foreground mt-2">{activity.details}</p>}
           </CardContent>
         </Card>
       ))}

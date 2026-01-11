@@ -21,28 +21,28 @@ export const HomeLatestTrade: React.FC = () => {
       <CardHeader>
         <CardTitle className="text-lg">Échange Récent</CardTitle>
         <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600">{latestTrade.date}</span>
+          <Calendar className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">{latestTrade.date}</span>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-center">
-            <h4 className="font-semibold text-gray-900 mb-2">{latestTrade.teamA}</h4>
+            <h4 className="font-semibold text-foreground mb-2">{latestTrade.teamA}</h4>
             <div className="space-y-1">
               {latestTrade.playersA.map((player, index) => (
-                <div key={index} className="text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded">{player}</div>
+                <div key={index} className="text-sm bg-primary/10 text-primary px-2 py-1 rounded">{player}</div>
               ))}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-gray-400 font-bold">↕</div>
+            <div className="text-muted-foreground font-bold">↕</div>
           </div>
           <div className="text-center">
-            <h4 className="font-semibold text-gray-900 mb-2">{latestTrade.teamB}</h4>
+            <h4 className="font-semibold text-foreground mb-2">{latestTrade.teamB}</h4>
             <div className="space-y-1">
               {latestTrade.playersB.map((player, index) => (
-                <div key={index} className="text-sm bg-red-100 text-red-700 px-2 py-1 rounded">{player}</div>
+                <div key={index} className="text-sm bg-accent/10 text-accent px-2 py-1 rounded">{player}</div>
               ))}
             </div>
           </div>

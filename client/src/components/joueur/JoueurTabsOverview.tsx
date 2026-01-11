@@ -21,13 +21,13 @@ export default function JoueurTabsOverview({ player }: Props) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Date de naissance</p>
+              <p className="text-sm text-muted-foreground">Date de naissance</p>
               <p className="font-medium">
                 {format(new Date(player.birthDate), 'd MMMM yyyy', { locale: fr })}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Lieu de naissance</p>
+              <p className="text-sm text-muted-foreground">Lieu de naissance</p>
               <p className="font-medium">
                 {player.birthCity.default}
                 {player.birthStateProvince?.default ? `, ${player.birthStateProvince.default}` : ''}
@@ -36,7 +36,7 @@ export default function JoueurTabsOverview({ player }: Props) {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-gray-500">Taille</p>
+                <p className="text-sm text-muted-foreground">Taille</p>
                 <p className="font-medium">
                   {player.heightInCentimeters}
                   {' '}
@@ -44,7 +44,7 @@ export default function JoueurTabsOverview({ player }: Props) {
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-gray-500">Poids</p>
+                <p className="text-sm text-muted-foreground">Poids</p>
                 <p className="font-medium">
                   {player.weightInKilograms}
                   {' '}
@@ -53,7 +53,7 @@ export default function JoueurTabsOverview({ player }: Props) {
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Tire/Attrape</p>
+              <p className="text-sm text-muted-foreground">Tire/Attrape</p>
               <p className="font-medium">{player.shootsCatches}</p>
             </div>
           </CardContent>
@@ -65,11 +65,11 @@ export default function JoueurTabsOverview({ player }: Props) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Année</p>
+              <p className="text-sm text-muted-foreground">Année</p>
               <p className="font-medium">{player.draftDetails.year}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Position</p>
+              <p className="text-sm text-muted-foreground">Position</p>
               <p className="font-medium">
                 {player.draftDetails.round}
                 e ronde,
@@ -78,7 +78,7 @@ export default function JoueurTabsOverview({ player }: Props) {
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-500">Équipe</p>
+              <p className="text-sm text-muted-foreground">Équipe</p>
               <p className="font-medium">{player.draftDetails.teamAbbrev}</p>
             </div>
           </CardContent>
@@ -97,32 +97,32 @@ export default function JoueurTabsOverview({ player }: Props) {
                 {player.position === 'G' ? (
                   <>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Parties jouées</p>
+                      <p className="text-sm text-muted-foreground">Parties jouées</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.gamesPlayed}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Victoires</p>
+                      <p className="text-sm text-muted-foreground">Victoires</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.wins}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Jeux blancs</p>
+                      <p className="text-sm text-muted-foreground">Jeux blancs</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.shutouts}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">% d'arrêts</p>
+                      <p className="text-sm text-muted-foreground">% d'arrêts</p>
                       <p className="font-medium">
                         {((player.featuredStats.regularSeason.subSeason.savePctg ?? 0) * 100).toFixed(1)}
                         %
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Moyenne de buts</p>
+                      <p className="text-sm text-muted-foreground">Moyenne de buts</p>
                       <p className="font-medium">
                         {(player.featuredStats.regularSeason.subSeason.goalsAgainstAvg ?? 0).toFixed(2)}
                       </p>
                     </div>
                     <div className="col-span-2">
-                      <p className="text-sm text-gray-500 mb-1">Fiche</p>
+                      <p className="text-sm text-muted-foreground mb-1">Fiche</p>
                       <p className="font-medium">
                         {player.featuredStats.regularSeason.subSeason.wins}
                         -
@@ -135,27 +135,27 @@ export default function JoueurTabsOverview({ player }: Props) {
                 ) : (
                   <>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Matchs</p>
+                      <p className="text-sm text-muted-foreground">Matchs</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.gamesPlayed}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Points</p>
+                      <p className="text-sm text-muted-foreground">Points</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.points}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Buts</p>
+                      <p className="text-sm text-muted-foreground">Buts</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.goals}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">Passes</p>
+                      <p className="text-sm text-muted-foreground">Passes</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.assists}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">+/-</p>
+                      <p className="text-sm text-muted-foreground">+/-</p>
                       <p className="font-medium">{player.featuredStats.regularSeason.subSeason.plusMinus}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500">PPM</p>
+                      <p className="text-sm text-muted-foreground">PPM</p>
                       <p className="font-medium">
                         {(player.featuredStats.regularSeason.subSeason.points
                                   / player.featuredStats.regularSeason.subSeason.gamesPlayed).toFixed(2)}
@@ -174,7 +174,7 @@ export default function JoueurTabsOverview({ player }: Props) {
                 if (lastStats) {
                   return (
                     <div className="space-y-4">
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-muted-foreground">
                         Dernières statistiques (
                         {lastStats.season}
                         {' '}
@@ -187,31 +187,31 @@ export default function JoueurTabsOverview({ player }: Props) {
                         {player.position === 'G' ? (
                           <>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Parties jouées</p>
+                              <p className="text-sm text-muted-foreground">Parties jouées</p>
                               <p className="font-medium">{lastStats.gamesPlayed}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Victoires</p>
+                              <p className="text-sm text-muted-foreground">Victoires</p>
                               <p className="font-medium">{lastStats.wins}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Jeux blancs</p>
+                              <p className="text-sm text-muted-foreground">Jeux blancs</p>
                               <p className="font-medium">{lastStats.shutouts}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">% d'arrêts</p>
+                              <p className="text-sm text-muted-foreground">% d'arrêts</p>
                               <p className="font-medium">
                                 {lastStats.savePctg ? `${(lastStats.savePctg * 100).toFixed(1)}%` : '-'}
                               </p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Moyenne de buts</p>
+                              <p className="text-sm text-muted-foreground">Moyenne de buts</p>
                               <p className="font-medium">
                                 {lastStats.goalsAgainstAvg ? lastStats.goalsAgainstAvg.toFixed(2) : '-'}
                               </p>
                             </div>
                             <div className="col-span-2">
-                              <p className="text-sm text-gray-500 mb-1">Fiche</p>
+                              <p className="text-sm text-muted-foreground mb-1">Fiche</p>
                               <p className="font-medium">
                                 {lastStats.wins}
                                 -
@@ -224,23 +224,23 @@ export default function JoueurTabsOverview({ player }: Props) {
                         ) : (
                           <>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Matchs</p>
+                              <p className="text-sm text-muted-foreground">Matchs</p>
                               <p className="font-medium">{lastStats.gamesPlayed}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Points</p>
+                              <p className="text-sm text-muted-foreground">Points</p>
                               <p className="font-medium">{lastStats.points}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Buts</p>
+                              <p className="text-sm text-muted-foreground">Buts</p>
                               <p className="font-medium">{lastStats.goals}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Passes</p>
+                              <p className="text-sm text-muted-foreground">Passes</p>
                               <p className="font-medium">{lastStats.assists}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-sm text-gray-500">PPM</p>
+                              <p className="text-sm text-muted-foreground">PPM</p>
                               <p className="font-medium">
                                 {(lastStats.points / lastStats.gamesPlayed).toFixed(2)}
                               </p>
@@ -252,7 +252,7 @@ export default function JoueurTabsOverview({ player }: Props) {
                   );
                 }
                 return (
-                  <p className="text-gray-500">Aucune statistique NHL/NCAA disponible</p>
+                  <p className="text-muted-foreground">Aucune statistique NHL/NCAA disponible</p>
                 );
               })()
             )}

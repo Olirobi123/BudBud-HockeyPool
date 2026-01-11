@@ -6,10 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useActiveTeams } from '@/hooks/useActiveTeams';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
-interface HeroSectionProps {
-  onLoaded: () => void;
-}
-
 export default function HeroSection() {
   const { data: equipesActives = [], isLoading } = useActiveTeams();
 
@@ -39,7 +35,7 @@ export default function HeroSection() {
                 </span>
               </h1>
 
-              <p className="mt-6 text-xl text-gray-300 leading-relaxed max-w-2xl">
+              <p className="mt-6 text-xl text-white/90 leading-relaxed max-w-2xl">
                 Plateforme modernisée pour votre pool de hockey avec suivi en temps réel,
                 statistiques avancées et interface intuitive pour une expérience de jeu optimale.
               </p>
@@ -47,7 +43,7 @@ export default function HeroSection() {
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                  className="bg-gradient-to-r from-blue-400 to-cyan-400 text-slate-900 hover:from-blue-500 hover:to-cyan-500 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-bold"
                 >
                   <Trophy className="w-5 h-5 mr-2" />
                   Voir le Classement
@@ -55,7 +51,7 @@ export default function HeroSection() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-gray-400 hover:border-gray-300 text-gray-300 hover:text-white hover:bg-slate-800/50 transition-all duration-200"
+                  className="bg-slate-800/50 text-white border-slate-700 hover:bg-slate-800 hover:text-white backdrop-blur-sm transition-all duration-200"
                 >
                   <TrendingUp className="w-5 h-5 mr-2" />
                   Statistiques
@@ -66,27 +62,27 @@ export default function HeroSection() {
 
           <div className="lg:col-span-5 mt-12 lg:mt-0">
             <div className="grid grid-cols-2 gap-4 animate-fade-in">
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300">
+              <Card className="bg-blue-500/10 border-blue-400/20 backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300">
                 <CardContent className="p-6 text-center">
                   <Users className="w-8 h-8 text-blue-400 mx-auto mb-3" />
                   <div className="text-2xl font-bold text-white">{equipesActives.length || 0}</div>
-                  <div className="text-sm text-gray-400">Équipes Actives</div>
+                  <div className="text-sm text-blue-200">Équipes Actives</div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300">
+              <Card className="bg-blue-500/10 border-blue-400/20 backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300">
                 <CardContent className="p-6 text-center">
                   <Zap className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
                   <div className="text-2xl font-bold text-white">84</div>
-                  <div className="text-sm text-gray-400">Échanges Total</div>
+                  <div className="text-sm text-blue-200">Échanges Total</div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 col-span-2">
+              <Card className="bg-blue-500/10 border-blue-400/20 backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300 col-span-2">
                 <CardContent className="p-6 text-center">
                   <Trophy className="w-8 h-8 text-amber-400 mx-auto mb-3" />
                   <div className="text-2xl font-bold text-white">En cours</div>
-                  <div className="text-sm text-gray-400">Saison 2024-25 - Mise à jour quotidienne</div>
+                  <div className="text-sm text-blue-200">Saison 2024-25 - Mise à jour quotidienne</div>
                 </CardContent>
               </Card>
             </div>

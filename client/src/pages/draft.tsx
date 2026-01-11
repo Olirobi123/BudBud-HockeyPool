@@ -66,16 +66,17 @@ export default function Draft() {
   if (!draftPicks || draftPicks.length === 0) return <div>Aucun choix de repêchage trouvé</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <main className="pt-20 pb-12">
         <div className="max-w-5xl mx-auto px-2 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+            <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">
               Repêchage
+              {' '}
               {selectedYear}
             </h1>
-            <p className="text-gray-600 mb-6">Ordre de sélection et historique du repêchage</p>
+            <p className="text-muted-foreground mb-6">Ordre de sélection et historique du repêchage</p>
             {/* Use DraftFilters component */}
             <DraftFilters
               annees={annees}

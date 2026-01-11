@@ -61,7 +61,7 @@ export default function EchangeForm() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary hover:bg-primary/90 text-white">
+        <Button>
           <ArrowLeftRight className="w-4 h-4 mr-2" />
           Proposer un Échange
         </Button>

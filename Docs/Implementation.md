@@ -105,13 +105,13 @@
 - [x] Revoir et uniformiser la gestion du loading et des erreurs dans tous les composants/pages.
 
 ### Stage 3: UI/UX Consistency & Feature Alignment
-**Duration:** 5-7 days  
+**Duration:** 5-7 days
 **Dependencies:** Stage 2 completion
 
 #### Sub-steps:
 - [x] Créer les routes API nécessaires pour alimenter le feed d'activité et le dernier échange sur la page d'accueil.
-- [ ] Audit all UI components for consistency (colors, spacing, typography)
-- [ ] Refactor draft page table to match player search table visually and functionally
+- [x] Audit all UI components for consistency (colors, spacing, typography)
+- [x] Refactor draft page table to match player search table visually and functionally
 - [ ] Refactor "Échange" section UI for improved usability and consistency
 - [ ] Redesign landing page for clarity and relevance
 - [ ] Create dedicated team pages with consistent layout and navigation

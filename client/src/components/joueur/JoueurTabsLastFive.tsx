@@ -79,7 +79,7 @@ export default function JoueurTabsLastFive({ player }: Props) {
             </Table>
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500">Aucun match NHL disponible</p>
+              <p className="text-muted-foreground">Aucun match NHL disponible</p>
             </div>
           )}
         </CardContent>

@@ -36,13 +36,13 @@ export default function Echanges() {
   if (!echanges || echanges.length === 0) return <div>Aucun échange trouvé</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <main className="pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Historique des Échanges</h1>
-            <p className="text-gray-600">Tous les échanges de la ligue</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Échanges</h1>
+            <p className="text-muted-foreground">Tous les échanges de la ligue</p>
           </div>
           <EchangeStats echanges={echanges} />
           <div className="mb-6">

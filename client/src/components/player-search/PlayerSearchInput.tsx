@@ -20,17 +20,17 @@ export const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
   className = '',
 }) => (
   <div className={`relative ${className}`}>
-    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
     <Input
       type="text"
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="pl-9 bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-primary"
+      className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-muted-foreground focus:border-primary"
       onFocus={onFocus}
     />
     {isLoading && (
-      <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 animate-spin" />
+      <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 animate-spin" />
     )}
   </div>
 );

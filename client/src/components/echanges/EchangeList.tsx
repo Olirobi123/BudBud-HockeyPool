@@ -22,7 +22,7 @@ export const EchangeList: React.FC<EchangeListProps> = ({ echanges }) => {
     <div className="space-y-8">
       {Object.entries(echangesParMois).map(([mois, echangesDuMois]) => (
         <div key={mois}>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
             {new Intl.DateTimeFormat('fr-CA', { year: 'numeric', month: 'long' })
               .format(new Date(`${mois}-01`))}
           </h2>
