@@ -8,14 +8,8 @@ export const isValidId = (id: string | number): boolean => {
   return !isNaN(numId) && numId > 0;
 };
 
-export const sanitizeString = (str: string): string => {
-  return str.trim().replace(/[<>]/g, '');
-};
+export const sanitizeString = (str: string): string => str.trim().replace(/[<>]/g, '');
 
-export const formatDate = (date: Date): string => {
-  return date.toISOString().split('T')[0];
-};
+export const formatDate = (date: Date): string => date.toISOString().split('T')[0];
 
-export const delay = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}; 
+export const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));

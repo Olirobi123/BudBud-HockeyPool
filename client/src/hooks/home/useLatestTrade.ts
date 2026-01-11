@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { HomeTrade } from '@/types/IHome';
 
 const fetchLatestTrade = async (): Promise<HomeTrade | undefined> => {
-  // TODO: Brancher sur l'API réelle pour récupérer le dernier échange
-  return undefined;
+  const response = await fetch('/api/echanges/latest');
+  const json = await response.json();
+  return json.success ? json.data : undefined;
 };
 
 export function useLatestTrade() {
@@ -11,4 +12,4 @@ export function useLatestTrade() {
     queryKey: ['latestTrade'],
     queryFn: fetchLatestTrade,
   });
-} 
+}

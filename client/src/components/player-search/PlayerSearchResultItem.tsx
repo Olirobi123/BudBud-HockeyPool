@@ -34,4 +34,4 @@ export const PlayerSearchResultItem: React.FC<PlayerSearchResultItemProps> = ({ 
       </Badge>
     </div>
   </div>
-); 
+);

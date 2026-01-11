@@ -109,7 +109,7 @@
 **Dependencies:** Stage 2 completion
 
 #### Sub-steps:
-- [ ] Créer les routes API nécessaires pour alimenter le feed d’activité et le dernier échange sur la page d’accueil.
+- [x] Créer les routes API nécessaires pour alimenter le feed d'activité et le dernier échange sur la page d'accueil.
 - [ ] Audit all UI components for consistency (colors, spacing, typography)
 - [ ] Refactor draft page table to match player search table visually and functionally
 - [ ] Refactor "Échange" section UI for improved usability and consistency

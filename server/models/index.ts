@@ -34,6 +34,38 @@ export const QUERIES = {
     VALUES ($1, $2, $3, NOW())
     RETURNING *
   `,
+  GET_LATEST_ECHANGE: `
+    SELECT
+      e.id,
+      e.date,
+      e.details,
+      e.equipe_source_id,
+      e.equipe_destination_id,
+      e.statut_confirmer,
+      src.nom as equipe_source_nom,
+      dest.nom as equipe_destination_nom
+    FROM ${TABLES.ECHANGES} e
+    JOIN ${TABLES.EQUIPES} src ON e.equipe_source_id = src.id
+    JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
+    ORDER BY e.date DESC
+    LIMIT 1
+  `,
+  GET_RECENT_ECHANGES: `
+    SELECT
+      e.id,
+      e.date,
+      e.details,
+      e.equipe_source_id,
+      e.equipe_destination_id,
+      e.statut_confirmer,
+      src.nom as equipe_source_nom,
+      dest.nom as equipe_destination_nom
+    FROM ${TABLES.ECHANGES} e
+    JOIN ${TABLES.EQUIPES} src ON e.equipe_source_id = src.id
+    JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
+    ORDER BY e.date DESC
+    LIMIT 10
+  `,
 
   // Joueurs
   GET_PLAYER_BY_ID: `SELECT * FROM ${TABLES.PLAYERS} WHERE id = $1`,
@@ -51,4 +83,4 @@ export const QUERIES = {
     JOIN ${TABLES.EQUIPES} e ON r.equipe_id = e.id
     ORDER BY r.year DESC, r.round ASC, r.pick ASC
   `,
-} as const; 
+} as const;

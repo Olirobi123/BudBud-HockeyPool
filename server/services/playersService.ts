@@ -1,5 +1,6 @@
 export class PlayersService {
   private readonly NHL_API_BASE = 'https://api-web.nhle.com/v1';
+
   private readonly REQUEST_TIMEOUT = 5000;
 
   /**
@@ -36,14 +37,14 @@ export class PlayersService {
       return data;
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           throw new Error('Timeout lors de la récupération des données du joueur');
         }
         throw error;
       }
-      
+
       throw new Error('Erreur lors de la récupération des données du joueur');
     }
   }
@@ -58,4 +59,4 @@ export class PlayersService {
   }
 }
 
-export const playersService = new PlayersService(); 
+export const playersService = new PlayersService();

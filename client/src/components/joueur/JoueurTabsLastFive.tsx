@@ -29,51 +29,51 @@ export default function JoueurTabsLastFive({ player }: Props) {
                   <TableHead>Date</TableHead>
                   <TableHead>vs</TableHead>
                   {player.position === 'G' ? (
-                      <>
-                          <TableHead>DÉC</TableHead>
-                          <TableHead>BC</TableHead>
-                          <TableHead>ARR</TableHead>
-                          <TableHead>%</TableHead>
-                          <TableHead>TJ</TableHead>
-                        </>
-                    ) : (
-                        <>
-                              <TableHead>B</TableHead>
-                              <TableHead>P</TableHead>
-                              <TableHead>PTS</TableHead>
-                              <TableHead>+/-</TableHead>
-                              <TableHead>TJ</TableHead>
-                            </>
-                    )}
+                    <>
+                      <TableHead>DÉC</TableHead>
+                      <TableHead>BC</TableHead>
+                      <TableHead>ARR</TableHead>
+                      <TableHead>%</TableHead>
+                      <TableHead>TJ</TableHead>
+                    </>
+                  ) : (
+                    <>
+                      <TableHead>B</TableHead>
+                      <TableHead>P</TableHead>
+                      <TableHead>PTS</TableHead>
+                      <TableHead>+/-</TableHead>
+                      <TableHead>TJ</TableHead>
+                    </>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {player.last5Games.map((game) => (
                   <TableRow key={game.gameDate}>
-                      <TableCell>{format(new Date(game.gameDate), 'd MMM', { locale: fr })}</TableCell>
-                      <TableCell>
-                          {game.homeRoadFlag === 'H' ? 'vs' : '@'}
-                          {' '}
-                          {game.opponentAbbrev}
-                        </TableCell>
-                      {player.position === 'G' ? (
-                          <>
-                                <TableCell>{game.decision || '-'}</TableCell>
-                                <TableCell>{game.goalsAgainst}</TableCell>
-                                <TableCell>{game.shotsAgainst}</TableCell>
-                                <TableCell>{game.savePctg ? `${(game.savePctg * 100).toFixed(1)}%` : '-'}</TableCell>
-                                <TableCell>{game.toi}</TableCell>
-                              </>
-                        ) : (
-                              <>
-                                <TableCell>{game.goals}</TableCell>
-                                <TableCell>{game.assists}</TableCell>
-                                <TableCell>{game.points}</TableCell>
-                                <TableCell>{game.plusMinus}</TableCell>
-                                <TableCell>{game.toi}</TableCell>
-                              </>
-                        )}
-                    </TableRow>
+                    <TableCell>{format(new Date(game.gameDate), 'd MMM', { locale: fr })}</TableCell>
+                    <TableCell>
+                      {game.homeRoadFlag === 'H' ? 'vs' : '@'}
+                      {' '}
+                      {game.opponentAbbrev}
+                    </TableCell>
+                    {player.position === 'G' ? (
+                      <>
+                        <TableCell>{game.decision || '-'}</TableCell>
+                        <TableCell>{game.goalsAgainst}</TableCell>
+                        <TableCell>{game.shotsAgainst}</TableCell>
+                        <TableCell>{game.savePctg ? `${(game.savePctg * 100).toFixed(1)}%` : '-'}</TableCell>
+                        <TableCell>{game.toi}</TableCell>
+                      </>
+                    ) : (
+                      <>
+                        <TableCell>{game.goals}</TableCell>
+                        <TableCell>{game.assists}</TableCell>
+                        <TableCell>{game.points}</TableCell>
+                        <TableCell>{game.plusMinus}</TableCell>
+                        <TableCell>{game.toi}</TableCell>
+                      </>
+                    )}
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>

@@ -12,4 +12,4 @@ export function useNavigationScroll() {
   }, []);
 
   return isScrolled;
-} 
+}

@@ -21,7 +21,6 @@ import { DraftTable } from '@/components/draft/DraftTable';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function Draft() {
-
   const {
     data: draftPicks,
     isLoading,

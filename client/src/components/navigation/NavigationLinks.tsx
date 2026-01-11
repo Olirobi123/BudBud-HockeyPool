@@ -24,4 +24,4 @@ export const NavigationLinks: React.FC<NavigationLinksProps> = ({ navLinks, loca
       />
     ))}
   </div>
-); 
+);

@@ -10,7 +10,7 @@ interface EchangeStatsProps {
 export const EchangeStats: React.FC<EchangeStatsProps> = ({ echanges }) => {
   // Defensive programming: ensure echanges is an array
   const safeEchanges = Array.isArray(echanges) ? echanges : [];
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <Card>
@@ -31,4 +31,4 @@ export const EchangeStats: React.FC<EchangeStatsProps> = ({ echanges }) => {
       </Card>
     </div>
   );
-}; 
+};

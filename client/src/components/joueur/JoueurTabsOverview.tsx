@@ -41,7 +41,7 @@ export default function JoueurTabsOverview({ player }: Props) {
                   {player.heightInCentimeters}
                   {' '}
                   cm
-                        </p>
+                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-gray-500">Poids</p>
@@ -49,7 +49,7 @@ export default function JoueurTabsOverview({ player }: Props) {
                   {player.weightInKilograms}
                   {' '}
                   kg
-                        </p>
+                </p>
               </div>
             </div>
             <div className="space-y-1">
@@ -96,72 +96,72 @@ export default function JoueurTabsOverview({ player }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 {player.position === 'G' ? (
                   <>
-                      <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Parties jouées</p>
-                          <p className="font-medium">{player.featuredStats.regularSeason.subSeason.gamesPlayed}</p>
-                        </div>
-                      <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Victoires</p>
-                          <p className="font-medium">{player.featuredStats.regularSeason.subSeason.wins}</p>
-                        </div>
-                      <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Jeux blancs</p>
-                          <p className="font-medium">{player.featuredStats.regularSeason.subSeason.shutouts}</p>
-                        </div>
-                      <div className="space-y-1">
-                          <p className="text-sm text-gray-500">% d'arrêts</p>
-                          <p className="font-medium">
-                                {((player.featuredStats.regularSeason.subSeason.savePctg ?? 0) * 100).toFixed(1)}
-                                %
-                              </p>
-                        </div>
-                      <div className="space-y-1">
-                          <p className="text-sm text-gray-500">Moyenne de buts</p>
-                          <p className="font-medium">
-                                {(player.featuredStats.regularSeason.subSeason.goalsAgainstAvg ?? 0).toFixed(2)}
-                              </p>
-                        </div>
-                      <div className="col-span-2">
-                          <p className="text-sm text-gray-500 mb-1">Fiche</p>
-                          <p className="font-medium">
-                                {player.featuredStats.regularSeason.subSeason.wins}
-                                -
-                                {player.featuredStats.regularSeason.subSeason.losses}
-                                -
-                                {player.featuredStats.regularSeason.subSeason.otLosses}
-                              </p>
-                        </div>
-                    </>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Parties jouées</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.gamesPlayed}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Victoires</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.wins}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Jeux blancs</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.shutouts}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">% d'arrêts</p>
+                      <p className="font-medium">
+                        {((player.featuredStats.regularSeason.subSeason.savePctg ?? 0) * 100).toFixed(1)}
+                        %
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Moyenne de buts</p>
+                      <p className="font-medium">
+                        {(player.featuredStats.regularSeason.subSeason.goalsAgainstAvg ?? 0).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-sm text-gray-500 mb-1">Fiche</p>
+                      <p className="font-medium">
+                        {player.featuredStats.regularSeason.subSeason.wins}
+                        -
+                        {player.featuredStats.regularSeason.subSeason.losses}
+                        -
+                        {player.featuredStats.regularSeason.subSeason.otLosses}
+                      </p>
+                    </div>
+                  </>
                 ) : (
-                    <>
-                        <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Matchs</p>
-                              <p className="font-medium">{player.featuredStats.regularSeason.subSeason.gamesPlayed}</p>
-                            </div>
-                        <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Points</p>
-                              <p className="font-medium">{player.featuredStats.regularSeason.subSeason.points}</p>
-                            </div>
-                        <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Buts</p>
-                              <p className="font-medium">{player.featuredStats.regularSeason.subSeason.goals}</p>
-                            </div>
-                        <div className="space-y-1">
-                              <p className="text-sm text-gray-500">Passes</p>
-                              <p className="font-medium">{player.featuredStats.regularSeason.subSeason.assists}</p>
-                            </div>
-                        <div className="space-y-1">
-                              <p className="text-sm text-gray-500">+/-</p>
-                              <p className="font-medium">{player.featuredStats.regularSeason.subSeason.plusMinus}</p>
-                            </div>
-                        <div className="space-y-1">
-                              <p className="text-sm text-gray-500">PPM</p>
-                              <p className="font-medium">
-                                {(player.featuredStats.regularSeason.subSeason.points
+                  <>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Matchs</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.gamesPlayed}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Points</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.points}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Buts</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.goals}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">Passes</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.assists}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">+/-</p>
+                      <p className="font-medium">{player.featuredStats.regularSeason.subSeason.plusMinus}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500">PPM</p>
+                      <p className="font-medium">
+                        {(player.featuredStats.regularSeason.subSeason.points
                                   / player.featuredStats.regularSeason.subSeason.gamesPlayed).toFixed(2)}
-                              </p>
-                            </div>
-                      </>
+                      </p>
+                    </div>
+                  </>
                 )}
               </div>
             ) : (
@@ -175,79 +175,79 @@ export default function JoueurTabsOverview({ player }: Props) {
                   return (
                     <div className="space-y-4">
                       <div className="text-sm text-gray-500">
-                          Dernières statistiques (
-                                {lastStats.season}
-                          {' '}
-                          -
-                                {' '}
-                          {lastStats.leagueAbbrev}
-                          )
-                              </div>
+                        Dernières statistiques (
+                        {lastStats.season}
+                        {' '}
+                        -
+                        {' '}
+                        {lastStats.leagueAbbrev}
+                        )
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
-                          {player.position === 'G' ? (
-                              <>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Parties jouées</p>
-                                      <p className="font-medium">{lastStats.gamesPlayed}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Victoires</p>
-                                      <p className="font-medium">{lastStats.wins}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Jeux blancs</p>
-                                      <p className="font-medium">{lastStats.shutouts}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">% d'arrêts</p>
-                                      <p className="font-medium">
-                                        {lastStats.savePctg ? `${(lastStats.savePctg * 100).toFixed(1)}%` : '-'}
-                                      </p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Moyenne de buts</p>
-                                      <p className="font-medium">
-                                        {lastStats.goalsAgainstAvg ? lastStats.goalsAgainstAvg.toFixed(2) : '-'}
-                                      </p>
-                                    </div>
-                                    <div className="col-span-2">
-                                      <p className="text-sm text-gray-500 mb-1">Fiche</p>
-                                      <p className="font-medium">
-                                        {lastStats.wins}
-                                        -
-                                        {lastStats.losses}
-                                        -
-                                        {lastStats.otLosses || 0}
-                                      </p>
-                                    </div>
-                                  </>
-                            ) : (
-                                  <>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Matchs</p>
-                                      <p className="font-medium">{lastStats.gamesPlayed}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Points</p>
-                                      <p className="font-medium">{lastStats.points}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Buts</p>
-                                      <p className="font-medium">{lastStats.goals}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">Passes</p>
-                                      <p className="font-medium">{lastStats.assists}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                      <p className="text-sm text-gray-500">PPM</p>
-                                      <p className="font-medium">
-                                        {(lastStats.points / lastStats.gamesPlayed).toFixed(2)}
-                                      </p>
-                                    </div>
-                                  </>
-                            )}
-                        </div>
+                        {player.position === 'G' ? (
+                          <>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Parties jouées</p>
+                              <p className="font-medium">{lastStats.gamesPlayed}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Victoires</p>
+                              <p className="font-medium">{lastStats.wins}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Jeux blancs</p>
+                              <p className="font-medium">{lastStats.shutouts}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">% d'arrêts</p>
+                              <p className="font-medium">
+                                {lastStats.savePctg ? `${(lastStats.savePctg * 100).toFixed(1)}%` : '-'}
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Moyenne de buts</p>
+                              <p className="font-medium">
+                                {lastStats.goalsAgainstAvg ? lastStats.goalsAgainstAvg.toFixed(2) : '-'}
+                              </p>
+                            </div>
+                            <div className="col-span-2">
+                              <p className="text-sm text-gray-500 mb-1">Fiche</p>
+                              <p className="font-medium">
+                                {lastStats.wins}
+                                -
+                                {lastStats.losses}
+                                -
+                                {lastStats.otLosses || 0}
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Matchs</p>
+                              <p className="font-medium">{lastStats.gamesPlayed}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Points</p>
+                              <p className="font-medium">{lastStats.points}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Buts</p>
+                              <p className="font-medium">{lastStats.goals}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">Passes</p>
+                              <p className="font-medium">{lastStats.assists}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-500">PPM</p>
+                              <p className="font-medium">
+                                {(lastStats.points / lastStats.gamesPlayed).toFixed(2)}
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   );
                 }

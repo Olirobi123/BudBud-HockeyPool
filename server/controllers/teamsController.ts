@@ -25,14 +25,14 @@ export class TeamsController {
    */
   getTeamById = asyncHandler(async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       sendServerError(res, 'ID d\'équipe invalide');
       return;
     }
 
     const team = await teamsService.getTeamById(id);
-    
+
     if (!team) {
       sendNotFound(res, 'Équipe');
       return;
@@ -42,4 +42,4 @@ export class TeamsController {
   });
 }
 
-export const teamsController = new TeamsController(); 
+export const teamsController = new TeamsController();

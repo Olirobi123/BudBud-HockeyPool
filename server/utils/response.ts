@@ -40,4 +40,4 @@ export const sendServerError = (res: Response, message: string = 'Internal serve
     message,
     code: 'INTERNAL_ERROR',
   });
-}; 
+};

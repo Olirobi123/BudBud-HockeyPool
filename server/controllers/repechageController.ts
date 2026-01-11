@@ -40,7 +40,7 @@ export class RepechageController {
     }
 
     const choices = await repechageService.getChoicesByTypeAndYear(type, annee);
-    
+
     if (choices.length === 0) {
       sendNotFound(res, 'Aucun choix trouvé pour ce type et cette année');
       return;
@@ -50,4 +50,4 @@ export class RepechageController {
   });
 }
 
-export const repechageController = new RepechageController(); 
+export const repechageController = new RepechageController();

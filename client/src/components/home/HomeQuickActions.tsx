@@ -1,12 +1,14 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Trophy, Users, TrendingUp } from 'lucide-react';
 import { Link } from 'wouter';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Card, CardHeader, CardTitle, CardContent,
+} from '@/components/ui/card';
 
 export const HomeQuickActions: React.FC = () => (
   <Card>
-    <CardHeader> 
+    <CardHeader>
       <CardTitle className="text-lg">Actions Rapides</CardTitle>
     </CardHeader>
     <CardContent className="space-y-3">
@@ -35,4 +37,4 @@ export const HomeQuickActions: React.FC = () => (
       </a>
     </CardContent>
   </Card>
-); 
+);

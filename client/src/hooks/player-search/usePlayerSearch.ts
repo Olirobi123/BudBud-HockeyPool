@@ -62,4 +62,4 @@ export function usePlayerSearch(onPlayerSelect?: (player: NHLPlayer) => void) {
     handleSelect,
     handleInputChange,
   };
-} 
+}

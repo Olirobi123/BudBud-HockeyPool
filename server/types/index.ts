@@ -64,4 +64,22 @@ export interface ApiError {
   status: number;
   message: string;
   code?: string;
-} 
+}
+
+// Types pour la page d'accueil
+export interface HomeActivityItem {
+  id: string;
+  type: 'trade';
+  time: string;
+  description: string;
+  details?: string;
+}
+
+export interface HomeTradeResponse {
+  id: string;
+  date: string;
+  teamA: string;
+  playersA: string[];
+  teamB: string;
+  playersB: string[];
+}

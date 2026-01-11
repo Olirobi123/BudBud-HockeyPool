@@ -16,4 +16,4 @@ export function usePlayerDetails(playerId: string) {
     queryFn: () => fetchPlayerDetails(playerId),
     enabled: !!playerId,
   });
-} 
+}

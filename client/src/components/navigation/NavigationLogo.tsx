@@ -10,4 +10,4 @@ export const NavigationLogo: React.FC = () => (
       <h1 className="text-xl font-bold text-white">38BudBud</h1>
     </div>
   </Link>
-); 
+);

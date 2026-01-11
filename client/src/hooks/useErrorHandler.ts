@@ -14,7 +14,7 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
 
   const handleError = useCallback((error: Error | unknown) => {
     const errorObj = error instanceof Error ? error : new Error('Une erreur inconnue est survenue');
-    
+
     // Log l'erreur
     if (logError) {
       console.error('Error handled:', errorObj);
@@ -61,4 +61,4 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
     retry,
     hasError: error !== null,
   };
-} 
+}

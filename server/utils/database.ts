@@ -37,4 +37,4 @@ export const closeDatabaseConnection = async (): Promise<void> => {
   } catch (error) {
     console.error('Erreur lors de la fermeture de la connexion:', error);
   }
-}; 
+};

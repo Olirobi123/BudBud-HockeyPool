@@ -15,4 +15,4 @@ export function useActiveTeams() {
     queryKey: ['teams', 'active'],
     queryFn: fetchActiveTeams,
   });
-} 
+}

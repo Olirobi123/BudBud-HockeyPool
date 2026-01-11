@@ -22,14 +22,14 @@ export const HomeActivityFeed: React.FC = () => {
                 <Badge variant="outline" className="bg-blue-50 text-blue-600">
                   {activity.type}
                 </Badge>
-                                 <span className="text-sm font-medium">{activity.description}</span>
+                <span className="text-sm font-medium">{activity.description}</span>
               </div>
               <span className="text-xs text-gray-500">{activity.time}</span>
             </div>
-                         {activity.details && <p className="text-sm text-gray-600 mt-2">{activity.details}</p>}
+            {activity.details && <p className="text-sm text-gray-600 mt-2">{activity.details}</p>}
           </CardContent>
         </Card>
       ))}
     </div>
   );
-}; 
+};

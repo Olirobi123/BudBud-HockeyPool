@@ -15,4 +15,4 @@ export function useDraftTypes() {
     queryKey: ['typesRepechage'],
     queryFn: fetchDraftTypes,
   });
-} 
+}

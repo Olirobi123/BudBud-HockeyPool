@@ -1,7 +1,7 @@
 import React from 'react';
+import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
 import { NavigationLink } from './NavigationLink';
 import PlayerSearch from '@/components/PlayerSearch';
 
@@ -51,4 +51,4 @@ export const NavigationMobileMenu: React.FC<NavigationMobileMenuProps> = ({
       </div>
     </SheetContent>
   </Sheet>
-); 
+);

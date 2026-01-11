@@ -13,26 +13,25 @@ export function usePageLoading(options: UsePageLoadingOptions = {}) {
 
   useEffect(() => {
     // Si toutes les dépendances sont false (pas de loading)
-    const isLoading = dependencies.some(dep => dep === true);
-    
+    const isLoading = dependencies.some((dep) => dep === true);
+
     if (!isLoading && !hasLoaded.current) {
       if (delay > 0) {
         const timer = setTimeout(() => {
           hasLoaded.current = true;
           setPageLoading(false);
         }, delay);
-        
+
         return () => clearTimeout(timer);
-      } else {
-        hasLoaded.current = true;
-        setPageLoading(false);
       }
+      hasLoaded.current = true;
+      setPageLoading(false);
     }
   }, [dependencies, delay, setPageLoading]);
 
   // Reset hasLoaded when dependencies change to loading state
   useEffect(() => {
-    const isLoading = dependencies.some(dep => dep === true);
+    const isLoading = dependencies.some((dep) => dep === true);
     if (isLoading && hasLoaded.current) {
       hasLoaded.current = false;
     }
@@ -43,6 +42,6 @@ export function usePageLoading(options: UsePageLoadingOptions = {}) {
     setPageLoaded: (loaded: boolean) => {
       hasLoaded.current = loaded;
       setPageLoading(!loaded);
-    }
+    },
   };
-} 
+}

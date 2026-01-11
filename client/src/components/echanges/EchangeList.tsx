@@ -9,7 +9,7 @@ interface EchangeListProps {
 export const EchangeList: React.FC<EchangeListProps> = ({ echanges }) => {
   // Defensive programming: ensure echanges is an array
   const safeEchanges = Array.isArray(echanges) ? echanges : [];
-  
+
   // Grouper les échanges par mois
   const echangesParMois = safeEchanges.reduce((acc, echange) => {
     const mois = echange.date.substring(0, 7); // Format: YYYY-MM
@@ -35,4 +35,4 @@ export const EchangeList: React.FC<EchangeListProps> = ({ echanges }) => {
       ))}
     </div>
   );
-}; 
+};

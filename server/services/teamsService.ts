@@ -51,4 +51,4 @@ export class TeamsService {
   }
 }
 
-export const teamsService = new TeamsService(); 
+export const teamsService = new TeamsService();

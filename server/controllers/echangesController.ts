@@ -18,7 +18,7 @@ export class EchangesController {
    */
   createEchange = asyncHandler(async (req: Request, res: Response) => {
     const data: CreateEchangeRequest = req.body;
-    
+
     try {
       const echange = await echangesService.createEchange(data);
       sendSuccess(res, echange, 'Échange créé avec succès');
@@ -32,14 +32,14 @@ export class EchangesController {
    */
   getEchangeById = asyncHandler(async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       sendServerError(res, 'ID d\'échange invalide');
       return;
     }
 
     const echange = await echangesService.getEchangeById(id);
-    
+
     if (!echange) {
       sendServerError(res, 'Échange non trouvé');
       return;
@@ -47,6 +47,22 @@ export class EchangesController {
 
     sendSuccess(res, echange);
   });
+
+  /**
+   * Récupérer le dernier échange pour la page d'accueil
+   */
+  getLatestEchange = asyncHandler(async (req: Request, res: Response) => {
+    const trade = await echangesService.getLatestEchange();
+    sendSuccess(res, trade);
+  });
+
+  /**
+   * Récupérer l'activité récente (échanges) pour le feed d'accueil
+   */
+  getRecentActivity = asyncHandler(async (req: Request, res: Response) => {
+    const activity = await echangesService.getRecentActivity();
+    sendSuccess(res, activity);
+  });
 }
 
-export const echangesController = new EchangesController(); 
+export const echangesController = new EchangesController();

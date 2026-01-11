@@ -38,4 +38,4 @@ export class PlayersController {
   });
 }
 
-export const playersController = new PlayersController(); 
+export const playersController = new PlayersController();

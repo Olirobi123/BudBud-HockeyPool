@@ -15,4 +15,4 @@ export function useDraftPicks() {
     queryKey: ['draftPicks'],
     queryFn: fetchDraftPicks,
   });
-} 
+}

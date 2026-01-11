@@ -15,4 +15,4 @@ export function useTeams() {
     queryKey: ['teams'],
     queryFn: fetchTeams,
   });
-} 
+}

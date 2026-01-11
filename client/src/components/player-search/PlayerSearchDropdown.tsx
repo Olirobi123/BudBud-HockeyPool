@@ -36,10 +36,12 @@ export const PlayerSearchDropdown: React.FC<PlayerSearchDropdownProps> = ({
           </div>
         ) : !isLoading ? (
           <div className="p-4 text-center text-gray-500">
-            Aucun joueur trouvé pour "{search}"
+            Aucun joueur trouvé pour "
+            {search}
+            "
           </div>
         ) : null}
       </CardContent>
     </Card>
   );
-}; 
+};

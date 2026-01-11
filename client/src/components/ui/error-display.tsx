@@ -9,18 +9,18 @@ interface ErrorDisplayProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function ErrorDisplay({ 
-  error, 
-  onRetry, 
-  className = '', 
-  size = 'md' 
+export function ErrorDisplay({
+  error,
+  onRetry,
+  className = '',
+  size = 'md',
 }: ErrorDisplayProps) {
   const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
-  
+
   const sizeClasses = {
     sm: 'text-sm p-2',
     md: 'text-base p-4',
-    lg: 'text-lg p-6'
+    lg: 'text-lg p-6',
   };
 
   return (
@@ -29,9 +29,9 @@ export function ErrorDisplay({
       <AlertDescription className="flex items-center justify-between">
         <span>{errorMessage}</span>
         {onRetry && (
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onRetry}
             className="ml-4"
           >
@@ -45,12 +45,12 @@ export function ErrorDisplay({
 }
 
 // Composant pour erreurs inline simples
-export function InlineError({ 
-  message, 
-  className = '' 
-}: { 
-  message: string; 
-  className?: string; 
+export function InlineError({
+  message,
+  className = '',
+}: {
+  message: string;
+  className?: string;
 }) {
   return (
     <div className={`text-red-500 text-sm flex items-center ${className}`}>
@@ -58,4 +58,4 @@ export function InlineError({
       {message}
     </div>
   );
-} 
+}

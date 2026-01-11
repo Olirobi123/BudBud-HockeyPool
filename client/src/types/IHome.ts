@@ -13,4 +13,4 @@ export interface HomeTrade {
   playersA: string[];
   teamB: string;
   playersB: string[];
-} 
+}

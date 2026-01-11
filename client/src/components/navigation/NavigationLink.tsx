@@ -45,4 +45,4 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
       </span>
     </Link>
   );
-}; 
+};

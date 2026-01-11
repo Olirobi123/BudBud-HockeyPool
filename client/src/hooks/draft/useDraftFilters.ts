@@ -16,13 +16,13 @@ export function useDraftFilters(draftPicks: DraftPick[] = [], types: DraftType[]
   const currentYearPicks = useMemo(() => draftPicks.filter((pick) => pick.annee === selectedYear && pick.type_id === selectedType), [draftPicks, selectedYear, selectedType]);
 
   // Available rounds for type 2
-  const availableRounds = useMemo(() => selectedType === 2 ? Array.from(new Set(currentYearPicks.map((pick) => pick.round))).sort((a, b) => a - b) : [], [currentYearPicks, selectedType]);
+  const availableRounds = useMemo(() => (selectedType === 2 ? Array.from(new Set(currentYearPicks.map((pick) => pick.round))).sort((a, b) => a - b) : []), [currentYearPicks, selectedType]);
 
   // Filter by round
-  const filteredPicks = useMemo(() => selectedType === 2 && selectedRound !== 0 ? currentYearPicks.filter((pick) => pick.round === selectedRound) : currentYearPicks, [currentYearPicks, selectedType, selectedRound]);
+  const filteredPicks = useMemo(() => (selectedType === 2 && selectedRound !== 0 ? currentYearPicks.filter((pick) => pick.round === selectedRound) : currentYearPicks), [currentYearPicks, selectedType, selectedRound]);
 
   // Filter by team
-  const filteredPicksEquipe = useMemo(() => selectedEquipe ? filteredPicks.filter((pick) => pick.nom === selectedEquipe) : filteredPicks, [filteredPicks, selectedEquipe]);
+  const filteredPicksEquipe = useMemo(() => (selectedEquipe ? filteredPicks.filter((pick) => pick.nom === selectedEquipe) : filteredPicks), [filteredPicks, selectedEquipe]);
 
   // Handlers for filter changes
   const handleYearChange = (year: number) => setSelectedYear(year);
@@ -48,4 +48,4 @@ export function useDraftFilters(draftPicks: DraftPick[] = [], types: DraftType[]
     filteredPicksEquipe,
     types,
   };
-} 
+}

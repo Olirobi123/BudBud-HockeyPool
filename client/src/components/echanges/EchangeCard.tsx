@@ -63,4 +63,4 @@ export const EchangeCard: React.FC<EchangeCardProps> = ({ echange }) => (
       </div>
     </CardContent>
   </Card>
-); 
+);

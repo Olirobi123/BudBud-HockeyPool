@@ -1,9 +1,11 @@
 import React from 'react';
-import { useLatestTrade } from '@/hooks/home/useLatestTrade';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
+import { useLatestTrade } from '@/hooks/home/useLatestTrade';
+import {
+  Card, CardHeader, CardTitle, CardContent,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading';
 import { InlineError } from '@/components/ui/error-display';
 
@@ -53,4 +55,4 @@ export const HomeLatestTrade: React.FC = () => {
       </CardContent>
     </Card>
   );
-}; 
+};

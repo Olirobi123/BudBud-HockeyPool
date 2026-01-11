@@ -10,4 +10,4 @@ export interface DraftPick {
 export interface DraftType {
   id: number;
   nom: string;
-} 
+}
