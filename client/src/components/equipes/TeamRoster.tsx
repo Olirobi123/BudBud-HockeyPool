@@ -1,5 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users } from 'lucide-react';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
 
 interface TeamRosterProps {
   roster: any[]; // To be typed properly when roster implemented

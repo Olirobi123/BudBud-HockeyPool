@@ -3,8 +3,7 @@ import { ErrorDisplay } from '@/components/ui/error-display';
 import { EchangeStats } from '@/components/echanges/EchangeStats';
 import { EchangeList } from '@/components/echanges/EchangeList';
 import EchangeForm from '@/components/forms/EchangeForm';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
@@ -36,22 +35,16 @@ export default function Echanges() {
   if (!echanges || echanges.length === 0) return <div>Aucun échange trouvé</div>;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main className="pt-20 pb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Échanges</h1>
-            <p className="text-muted-foreground">Tous les échanges de la ligue</p>
-          </div>
-          <EchangeStats echanges={echanges} />
-          <div className="mb-6">
-            <EchangeForm />
-          </div>
-          <EchangeList echanges={echanges} />
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <Layout>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Échanges</h1>
+        <p className="text-muted-foreground">Tous les échanges de la ligue</p>
+      </div>
+      <EchangeStats echanges={echanges} />
+      <div className="mb-6">
+        <EchangeForm />
+      </div>
+      <EchangeList echanges={echanges} />
+    </Layout>
   );
 }

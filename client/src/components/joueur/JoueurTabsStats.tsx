@@ -76,9 +76,9 @@ export default function JoueurTabsStats({ player }: Props) {
                                 <p className="text-xl font-bold">
                                   {statsTotals.regular.wins}
                                   -
-                                      {statsTotals.regular.losses}
+                                  {statsTotals.regular.losses}
                                   -
-                                      {statsTotals.regular.otLosses}
+                                  {statsTotals.regular.otLosses}
                                 </p>
                               </div>
                               <div>
@@ -119,8 +119,8 @@ export default function JoueurTabsStats({ player }: Props) {
                               <div>
                                 <p className="text-sm font-medium">PPM</p>
                                 <p className="text-xl font-bold">
-                                      {(statsTotals.regular.points / statsTotals.regular.gamesPlayed).toFixed(2)}
-                                    </p>
+                                  {(statsTotals.regular.points / statsTotals.regular.gamesPlayed).toFixed(2)}
+                                </p>
                               </div>
                             </>
                           )}
@@ -147,9 +147,9 @@ export default function JoueurTabsStats({ player }: Props) {
                                 <p className="text-xl font-bold">
                                   {statsTotals.playoffs.wins}
                                   -
-                                      {statsTotals.playoffs.losses}
+                                  {statsTotals.playoffs.losses}
                                   -
-                                      {statsTotals.playoffs.otLosses}
+                                  {statsTotals.playoffs.otLosses}
                                 </p>
                               </div>
                               <div>
@@ -190,8 +190,8 @@ export default function JoueurTabsStats({ player }: Props) {
                               <div>
                                 <p className="text-sm font-medium">PPM</p>
                                 <p className="text-xl font-bold">
-                                      {(statsTotals.playoffs.points / statsTotals.playoffs.gamesPlayed).toFixed(2)}
-                                    </p>
+                                  {(statsTotals.playoffs.points / statsTotals.playoffs.gamesPlayed).toFixed(2)}
+                                </p>
                               </div>
                             </>
                           )}

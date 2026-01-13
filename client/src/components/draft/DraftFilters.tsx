@@ -101,7 +101,9 @@ export const DraftFilters: React.FC<DraftFiltersProps> = ({
               <SelectItem value="0">Toutes les rondes</SelectItem>
               {safeAvailableRounds.map((round) => (
                 <SelectItem key={round} value={String(round)}>
-                  Ronde {round}
+                  Ronde
+                  {' '}
+                  {round}
                 </SelectItem>
               ))}
             </SelectContent>

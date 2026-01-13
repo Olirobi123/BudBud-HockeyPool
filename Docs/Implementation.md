@@ -114,9 +114,9 @@
 - [x] Refactor draft page table to match player search table visually and functionally
 - [x] Refactor "Échange" section UI for improved usability and consistency
 - [x] Apply semantic tokens across content pages (home, equipes, team-details, echanges)
-- [ ] Redesign landing page for clarity and relevance
-- [ ] Create dedicated team pages with consistent layout and navigation
-- [ ] Ensure all pages use uniform layout and navigation components
+- [ ] Redesign landing page for clarity and relevance *(deferred - pending design decisions)*
+- [x] Create dedicated team pages with consistent layout and navigation
+- [x] Ensure all pages use uniform layout and navigation components *(implemented shared Layout component)*
 
 ### Stage 4: Polish, Testing & Optimization
 **Duration:** 2-3 days  

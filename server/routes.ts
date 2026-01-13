@@ -1,10 +1,10 @@
 import type { Express } from 'express';
 import { createServer, type Server } from 'http';
+import { NHLClient } from '@olirobi/nhl_api_client';
 import teamsRoutes from './routes/teams';
 import echangesRoutes from './routes/echanges';
 import playersRoutes from './routes/players';
 import repechageRoutes from './routes/repechage';
-import { NHLClient} from '@olirobi/nhl_api_client';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes

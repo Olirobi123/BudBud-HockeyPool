@@ -1,7 +1,7 @@
 import { AlertCircle, Home as HomeIcon } from 'lucide-react';
+import { Link } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from 'wouter';
 
 export default function NotFound() {
   return (
@@ -13,7 +13,7 @@ export default function NotFound() {
               <AlertCircle className="h-10 w-10 text-white" />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight text-white">Page introuvable</h1>
             <p className="text-slate-400">

@@ -1,11 +1,12 @@
 import React from 'react';
-import { Trophy, Users, TrendingUp } from 'lucide-react';
+import {
+  Trophy, Users, TrendingUp, ArrowLeftRight,
+} from 'lucide-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import {
   Card, CardHeader, CardTitle, CardContent,
 } from '@/components/ui/card';
-import { ArrowLeftRight } from 'lucide-react';
 
 export const HomeQuickActions: React.FC = () => (
   <Card>

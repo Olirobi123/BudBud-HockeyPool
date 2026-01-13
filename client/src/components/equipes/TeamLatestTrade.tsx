@@ -1,5 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeftRight } from 'lucide-react';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
 import { EchangeCard } from '@/components/echanges/EchangeCard';
 import { Echange } from '@/types';
 
@@ -40,7 +42,7 @@ export function TeamLatestTrade({ trade, isLoading }: TeamLatestTradeProps) {
         <ArrowLeftRight className="w-5 h-5" />
         Dernière Transaction
       </h3>
-      <EchangeCard echange={trade} compact={true} />
+      <EchangeCard echange={trade} compact />
     </div>
   );
 }

@@ -35,7 +35,7 @@ export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, compact = fal
           <h3 className="text-lg font-bold text-foreground mb-2 leading-tight">{echange.equipe_destination_nom}</h3>
         </div>
       </div>
-      
+
       <div className="mt-6 pt-0">
         <div className={`grid gap-6 ${compact ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
           <div className="space-y-2">

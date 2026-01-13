@@ -31,10 +31,8 @@ export const HomeLatestTrade: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <EchangeCard echange={mappedTrade} compact={true} />
-      <div className="flex justify-center">
-       
-      </div>
+      <EchangeCard echange={mappedTrade} compact />
+      <div className="flex justify-center" />
     </div>
   );
 };

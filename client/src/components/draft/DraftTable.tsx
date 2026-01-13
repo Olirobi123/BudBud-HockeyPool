@@ -49,7 +49,9 @@ export const DraftTable: React.FC<DraftTableProps> = ({
               .map((round) => [
                 <TableRow key={`header-round-${round}`} className="bg-muted border-t-2">
                   <TableCell colSpan={3} className="font-semibold text-muted-foreground uppercase tracking-wider">
-                    Ronde {round}
+                    Ronde
+                    {' '}
+                    {round}
                   </TableCell>
                 </TableRow>,
                 ...safeFilteredPicksEquipe

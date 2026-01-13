@@ -1,6 +1,6 @@
+import { Users, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, User } from 'lucide-react';
 import Equipe from '@/types/IEquipes';
 
 interface TeamHeaderProps {
@@ -18,7 +18,7 @@ export function TeamHeader({ team }: TeamHeaderProps) {
               <Users className="w-12 h-12 text-slate-400" />
             </div>
           </div>
-          
+
           <div className="flex-1 mt-4 md:mt-0 md:mb-2 text-center md:text-left">
             <h1 className="text-3xl font-bold text-gray-900">{team.nom}</h1>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-2 text-sm text-gray-600">
@@ -26,7 +26,7 @@ export function TeamHeader({ team }: TeamHeaderProps) {
                 <User className="w-4 h-4 mr-1" />
                 DG: Olivier (Placeholder)
               </span>
-              <Badge variant={team.active ? "default" : "secondary"}>
+              <Badge variant={team.active ? 'default' : 'secondary'}>
                 {team.active ? 'Active' : 'Inactive'}
               </Badge>
             </div>
