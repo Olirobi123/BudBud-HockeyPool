@@ -118,11 +118,114 @@
 - [x] Create dedicated team pages with consistent layout and navigation
 - [x] Ensure all pages use uniform layout and navigation components *(implemented shared Layout component)*
 
-### Stage 4: Polish, Testing & Optimization
-**Duration:** 2-3 days  
+### Stage 4: NHL API Integration & Roster Management
+**Duration:** 7-8 days
 **Dependencies:** Stage 3 completion
 
+#### Overview:
+Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_api_client, awards system, and player ownership display.
+
 #### Sub-steps:
+
+**Phase 1: Database & Core Infrastructure**
+- [ ] Create `joueurs` table (id, nhl_player_id, nom, prenom, position)
+- [ ] Create `effectifs` table (roster tracking - joueur_id, equipe_id, source, actif)
+- [ ] Add `joueur_id` column to `repechages` table
+- [ ] Populate `trophees` table with pool awards (Attaque, Défense, Général, etc.)
+- [ ] Add backend types to `server/types/index.ts` 
+- [ ] Add database queries to `server/models/index.ts` for all new tables
+
+**Phase 2: Player Management Service**
+- [ ] Create `server/services/joueursService.ts`
+  - `findOrCreatePlayer()` - Find/create player by NHL ID
+  - `updatePlayerFromNHL()` - Update player from NHL API
+  - `getCurrentTeam()` - Get player's current pool team
+
+**Phase 3: Roster Tracking Service**
+- [ ] Create `server/services/effectifsService.ts`
+  - `getTeamRoster()` - Get team's current roster
+  - `addPlayerToRoster()` - Add player to roster
+  - `transferPlayer()` - Transfer player between teams
+  - `getPlayerHistory()` - Get ownership history
+  - `getTeamRosterWithStats()` - Roster enriched with NHL stats
+- [ ] Update `server/services/repechageService.ts`
+  - Add `syncDraftPicksToRoster()` method
+- [ ] Update `server/services/echangesService.ts`
+  - Enhance `createEchange()` to update rosters
+
+**Phase 4: Roster API Endpoints**
+- [ ] Create `server/controllers/effectifsController.ts`
+- [ ] Create `server/routes/effectifs.ts`
+  - `GET /api/teams/:id/roster` - Team roster with stats
+  - `POST /api/effectifs/sync-draft` - Sync draft picks
+  - `POST /api/effectifs/sync-trades` - Sync trades
+  - `GET /api/joueurs/:nhlPlayerId/ownership` - Player's current team
+- [ ] Update `server/routes.ts` to register effectifs routes
+
+**Phase 5: NHL API Integration with nhl_api_client**
+- [ ] Update `server/services/playersService.ts`
+  - Replace direct NHL API `fetch()` with `nhlClient.players.get(id).stats()`
+  - Move player search from routes to service layer
+  - Implement proper error handling
+
+**Phase 6: Awards System**
+- [ ] Create `server/services/tropheesService.ts`
+  - `getAllTrophees()`, `getWinnersByYear()`, `createWinner()`, `getTeamTrophies()`
+- [ ] Create `server/controllers/tropheesController.ts`
+- [ ] Create `server/routes/trophees.ts`
+  - `GET /api/trophees`, `GET /api/trophees/winners/:year`
+  - `POST /api/trophees/winners`, `GET /api/teams/:id/trophies`
+
+**Phase 7: Frontend - Player Ownership Display**
+- [ ] Create `client/src/hooks/joueur/usePlayerOwnership.ts`
+- [ ] Update `client/src/components/joueur/JoueurHeader.tsx`
+  - Add ownership badge showing "Owned by Team X"
+  - Link badge to team page
+
+**Phase 8: Frontend - Team Roster Display**
+- [ ] Update `client/src/components/equipes/TeamRoster.tsx`
+  - Replace empty state with functional roster table
+  - Display: Player, Position, NHL Team, GP, G, A, Pts, Acquisition source
+  - Link player names to detail pages
+- [ ] Verify `client/src/hooks/useTeam.ts` fetches roster correctly
+
+**Phase 9: Frontend - Awards Section**
+- [ ] Add award types to `client/src/types/index.ts`
+- [ ] Create `client/src/hooks/useTrophees.ts`
+- [ ] Create `client/src/components/trophees/TropheesList.tsx`
+- [ ] Create `client/src/components/trophees/TropheeCard.tsx`
+- [ ] Create `client/src/components/equipes/TeamTrophies.tsx`
+- [ ] Create `client/src/pages/trophees.tsx`
+- [ ] Add "Trophées" link to navigation
+
+**Phase 10: **
+- [ ] Create `client/src/pages/trophees.tsx`
+- [ ] Add "Trophées" link to navigation
+- [ ] Create `client/src/pages/trophees.tsx`
+- [ ] Add "Trophées" link to navigation
+
+#### Verification Steps:
+1. Database migration runs successfully
+2. `GET /api/teams/1/roster` returns roster with NHL stats
+3. `GET /api/joueurs/:nhlId/ownership` returns correct team
+4. Player detail pages show ownership badge
+5. Team roster tables display correctly with stats
+6. Awards CRUD operations work
+7. New draft picks auto-create roster entries
+8. New trades update player ownership
+
+#### Critical Files:
+- `server/services/effectifsService.ts` (new)
+- `server/services/playersService.ts` (modify)
+- `client/src/components/equipes/TeamRoster.tsx` (modify)
+- `client/src/components/joueur/JoueurHeader.tsx` (modify)
+
+### Stage 5: Polish, Testing & Optimization
+**Duration:** 2-3 days
+**Dependencies:** Stage 4 completion
+
+#### Sub-steps:
+- [ ] Consider splitting the project into multiple repositories (frontend, backend, shared)
 - [ ] Conduct comprehensive manual and automated testing
 - [ ] Optimize performance (bundle size, lazy loading, etc.)
 - [ ] Enhance accessibility (a11y) and responsive design
@@ -141,3 +244,4 @@
 - [ESLint Documentation](https://eslint.org/)
 - [Prettier Documentation](https://prettier.io/)
 - [Vite Documentation](https://vitejs.dev/) 
+- [NHL API Documentation](https://github.com/olirobi123/nhl-api-client)
