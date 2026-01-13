@@ -4,6 +4,7 @@ import teamsRoutes from './routes/teams';
 import echangesRoutes from './routes/echanges';
 import playersRoutes from './routes/players';
 import repechageRoutes from './routes/repechage';
+import { NHLClient} from '@olirobi/nhl_api_client';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -30,24 +31,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         abortController.abort();
       }, 5000); // Timeout after 5 seconds
 
-      const encodedQuery = encodeURIComponent(`${query.trim()} *`);
-      const nhlApiUrl = `https://search.d3.nhle.com/api/v1/search/player?culture=en-us&limit=10&q=${encodedQuery}&active=true`;
+      const playerName = query.trim();
+      const nhlClient = new NHLClient();
+      const response = await nhlClient.players.search(playerName);
 
-      const response = await fetch(nhlApiUrl, {
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; 38BudBud/1.0)',
-        },
-        // signal: abortController.signal
-      });
-
-      if (!response.ok) {
-        console.error(`NHL API error: ${response.status}`);
-        return res.status(response.status).json({ error: 'Failed to fetch player data' });
+      if (!response) {
+        return res.status(500).json({ error: 'Unexpected error. Failed to fetch player data' });
       }
 
-      const data = await response.json();
-      res.json(Array.isArray(data) ? data : []);
+      res.json(response);
     } catch (error) {
       console.error('Player search error:', error);
       res.status(500).json({ error: 'Internal server error' });

@@ -26,7 +26,7 @@ export const HomeQuickActions: React.FC = () => (
         </Button>
       </Link>
       <Link href="/echanges" className="w-full justify-start">
-        <Button  variant="outline" className="w-full justify-start">
+        <Button variant="outline" className="w-full justify-start">
           <ArrowLeftRight className="w-4 h-4 mr-2" />
           Voir tous les Échanges
         </Button>
