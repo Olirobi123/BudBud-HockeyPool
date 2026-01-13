@@ -112,7 +112,8 @@
 - [x] Créer les routes API nécessaires pour alimenter le feed d'activité et le dernier échange sur la page d'accueil.
 - [x] Audit all UI components for consistency (colors, spacing, typography)
 - [x] Refactor draft page table to match player search table visually and functionally
-- [ ] Refactor "Échange" section UI for improved usability and consistency
+- [x] Refactor "Échange" section UI for improved usability and consistency
+- [x] Apply semantic tokens across content pages (home, equipes, team-details, echanges)
 - [ ] Redesign landing page for clarity and relevance
 - [ ] Create dedicated team pages with consistent layout and navigation
 - [ ] Ensure all pages use uniform layout and navigation components

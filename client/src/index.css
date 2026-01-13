@@ -23,6 +23,8 @@
   --accent-foreground: 210 20% 98%; /* #F8FAFC */
   --destructive: 0 84% 60%; /* #EF4444 */
   --destructive-foreground: 210 20% 98%; /* #F8FAFC */
+  --success: 142 76% 36%; /* #22C55E - Green for active/live indicators */
+  --success-foreground: 210 20% 98%; /* #F8FAFC */
   --ring: 217 91% 60%; /* #3B82F6 */
   --radius: 0.5rem;
   

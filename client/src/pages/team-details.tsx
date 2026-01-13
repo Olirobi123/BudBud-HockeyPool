@@ -37,7 +37,7 @@ export default function TeamDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       <main className="pt-20 pb-12">

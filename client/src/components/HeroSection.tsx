@@ -23,8 +23,8 @@ export default function HeroSection() {
           <div className="lg:col-span-7">
             <div className="animate-slide-up">
               <div className="flex items-center space-x-2 mb-6">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-green-400 text-sm font-medium">En direct - Saison 2024-25</span>
+                <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
+                <span className="text-success text-sm font-medium">En direct - Saison 2024-25</span>
               </div>
 
               <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">

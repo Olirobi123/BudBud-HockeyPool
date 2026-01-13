@@ -21,7 +21,7 @@ export const HomeActivityFeed: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <Badge
                   variant={activity.type === 'Échange' ? 'default' : 'secondary'}
-                  className={activity.type === 'Échange' ? 'bg-green-100 text-green-700 hover:bg-green-200' : ''}
+                  className={activity.type === 'Échange' ? 'bg-success/10 text-success hover:bg-success/20' : ''}
                 >
                   {activity.type}
                 </Badge>
