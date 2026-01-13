@@ -168,6 +168,9 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [ ] Create `client/src/components/trophees/TropheesList.tsx`
 - [ ] Create `client/src/components/trophees/TropheeCard.tsx`
 - [ ] Create `client/src/components/equipes/TeamTrophies.tsx`
+- [ ] Review UI plan to see clever way to display trophies
+- [ ] Add different icons for each award type
+- [ ] Général trophies are the most important so they should have a bigger presence or priority
 - [ ] Add "Trophées" to team page
 
 
