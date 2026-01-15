@@ -5,6 +5,7 @@ import teamsRoutes from './routes/teams';
 import echangesRoutes from './routes/echanges';
 import playersRoutes from './routes/players';
 import repechageRoutes from './routes/repechage';
+import scoresRoutes from './routes/scores';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -17,6 +18,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/echanges', echangesRoutes);
   // Routes pour les joueurs
   app.use('/api/players', playersRoutes);
+
+  // Routes pour les scores NHL
+  app.use('/api/scores', scoresRoutes);
+
   // NHL Player Search API Proxy
   app.get('/api/search/players', async (req, res) => {
     try {

@@ -1,5 +1,6 @@
 import React from 'react';
 import Navigation from '@/components/Navigation';
+import LiveScoresTicker from '@/components/LiveScoresTicker';
 import Footer from '@/components/Footer';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +22,7 @@ export default function Layout({
   hideFooter = false,
   hideNavigation = false,
   bgClassName = 'bg-background',
-  mainPadding = 'pt-20 pb-12',
+  mainPadding = 'pt-4 pb-12',
   containerPadding = 'px-4 sm:px-6 lg:px-8',
   beforeContainer,
   mainClassName,
@@ -31,6 +32,7 @@ export default function Layout({
   return (
     <div className={cn('min-h-screen', bgClassName)}>
       {!hideNavigation && <Navigation />}
+      {!hideNavigation && <div className="pt-16 bg-slate-900"><LiveScoresTicker /></div>}
 
       {beforeContainer}
 

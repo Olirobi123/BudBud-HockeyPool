@@ -3,3 +3,4 @@ export type { default as Echange } from './IEchange';
 export type { default as PlayerDetails, NHLPlayer } from './IPlayerDetails';
 export type { default as Home } from './IHome';
 export type { default as Draft } from './IDraft';
+export type { GameScore, TeamWithScore, GameClock, Period, ScoreResponse } from './IScores';

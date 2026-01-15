@@ -103,6 +103,14 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 
 #### Sub-steps:
 
+**Phase 0: Live NHL Scores Ticker**
+- [x] Add `/api/scores` endpoint using nhl_api_client (`server/routes/scores.ts`)
+- [x] Create scores service (`server/services/scoresService.ts`)
+- [x] Create `IScores.ts` types (re-export from @olirobi/nhl_api_client)
+- [x] Create `useNHLScores.ts` hook
+- [x] Create `LiveScoresTicker.tsx` component
+- [x] Integrate ticker into `Layout.tsx`
+
 **Phase 1: Database & Core Infrastructure**
 - [ ] Create `joueurs` table (id, nhl_player_id, nom, prenom, position)
 - [ ] Create `effectifs` table (roster tracking - joueur_id, equipe_id, source, actif)
