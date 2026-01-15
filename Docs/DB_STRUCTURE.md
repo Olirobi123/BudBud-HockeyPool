@@ -40,17 +40,22 @@
 - **Taille totale** : 24 kB
 
 #### Colonnes
-| Nom   | Type                | Null | Par défaut                                      |
-|-------|---------------------|------|-------------------------------------------------|
-| id    | integer             | Non  | nextval('equipes_id_seq'::regclass)             |
-| nom   | character varying   | Non  | -                                               |
-| active| boolean             | Oui  | true                                            |
+| Nom            | Type                | Null | Par défaut                                      |
+|----------------|---------------------|------|-------------------------------------------------|
+| id             | integer             | Non  | nextval('equipes_id_seq'::regclass)             |
+| nom            | character varying   | Non  | -                                               |
+| active         | boolean             | Oui  | true                                            |
+| nhl_player_ids | integer[]           | Oui  | -                                               |
 
 #### Index
 - `equipes_pkey` (16 kB) : UNIQUE sur `id`
+- `idx_equipes_nhl_player_ids_gin` (optionnel) : GIN index sur `nhl_player_ids` pour les opérations sur tableaux
 
 #### Contraintes
 - `PRIMARY KEY (id)`
+
+#### Notes
+- `nhl_player_ids` : Tableau d'IDs de joueurs NHL représentant l'effectif de l'équipe (Option B - approche par tableau)
 
 ---
 
@@ -67,16 +72,23 @@
 | type_id    | integer             | Oui  | -                                               |
 | equipe_id  | integer             | Oui  | -                                               |
 | joueur     | character varying   | Non  | -                                               |
+| joueur_id  | integer             | Oui  | -                                               |
 | rang       | integer             | Non  | -                                               |
 | round      | integer             | Oui  | -                                               |
 
 #### Index
 - `repechages_pkey` (16 kB) : UNIQUE sur `id`
+- `idx_repechages_joueur_id` : Index sur `joueur_id` pour les jointures avec `joueurs`
 
 #### Contraintes
 - `PRIMARY KEY (id)`
 - `FOREIGN KEY (type_id)` → `types_repechage(id)`
 - `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
+
+#### Notes
+- `joueur` : Colonne VARCHAR conservée pour compatibilité ascendante (peut être dépréciée plus tard)
+- `joueur_id` : Lien vers la table `joueurs` pour une meilleure intégrité des données
 
 ---
 
@@ -121,9 +133,51 @@
 #### Contraintes
 - `PRIMARY KEY (id)`
 
+#### Données initiales
+| id | nom      |
+|----|----------|
+| 1  | Général  |
+| 2  | Attaque  |
+| 3  | Défense  |
+| 4  | Gardien  |
+| 5  | Playoffs |
+
 ---
 
-### 6. `types_repechage`
+### 6. `joueurs`
+- **Taille de la table** : Variable (nouvelle table)
+- **Taille des index** : Variable
+- **Taille totale** : Variable
+
+#### Colonnes
+| Nom            | Type                | Null | Par défaut                                      |
+|----------------|---------------------|------|-------------------------------------------------|
+| id             | integer             | Non  | nextval('joueurs_id_seq'::regclass)             |
+| nhl_player_id  | integer             | Non  | -                                               |
+| nom            | character varying   | Non  | -                                               |
+| prenom         | character varying   | Non  | -                                               |
+| position       | character varying   | Non  | -                                               |
+| created_at     | timestamp           | Oui  | NOW()                                           |
+| updated_at     | timestamp           | Oui  | NOW()                                           |
+
+#### Index
+- `joueurs_pkey` : UNIQUE sur `id`
+- `idx_joueurs_nhl_player_id` : UNIQUE sur `nhl_player_id` pour les recherches rapides depuis l'API NHL
+- `idx_joueurs_position` : Index sur `position` pour le filtrage des effectifs
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `UNIQUE (nhl_player_id)`
+
+#### Notes
+- **But** : Registre central des joueurs liant les joueurs NHL aux joueurs du pool
+- `nhl_player_id` : Identifiant unique du joueur dans l'API NHL (contrainte UNIQUE pour garantir un seul enregistrement par joueur NHL)
+- `position` : Valeurs possibles : 'C', 'LW', 'RW', 'D', 'G'
+- `nom` et `prenom` : Stockés pour l'affichage (peuvent être synchronisés depuis l'API NHL)
+
+---
+
+### 7. `types_repechage`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 16 kB
 - **Taille totale** : 24 kB
@@ -157,8 +211,10 @@
 - `echanges` → `equipes` (equipe_source_id, equipe_destination_id)
 - `repechages` → `types_repechage` (type_id)
 - `repechages` → `equipes` (equipe_id)
+- `repechages` → `joueurs` (joueur_id)
 - `trophee_gagnants` → `trophees` (trophee_id)
 - `trophee_gagnants` → `equipes` (equipe_id)
+- `joueurs` → `equipes` (via `nhl_player_ids` array dans `equipes`)
 
 ---
 
@@ -176,5 +232,4 @@
 - Les contraintes d’unicité et de clé primaire sont listées.
 
 ---
-
-*Dernière mise à jour automatique : juillet 2025* 
+*Dernière mise à jour : janvier 2026 * 
