@@ -64,34 +64,34 @@ function GameCard({ game }: GameCardProps): JSX.Element {
   return (
     <div
       className={cn(
-        'flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-slate-800/50 border border-slate-700/50',
+        'flex items-center gap-2 sm:gap-2 px-2.5 sm:px-3 py-2 sm:py-2 rounded-lg bg-slate-800/50 border border-slate-700/50',
         'flex-shrink-0',
         live && 'border-red-500/50 bg-slate-800/70',
       )}
     >
       {/* Away Team */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         <img
           src={awayTeam.logo}
           alt={awayTeam.abbrev}
-          className="w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 object-contain"
+          className="w-7 h-7 sm:w-7 sm:h-7 flex-shrink-0 object-contain"
         />
-        <span className="text-[10px] sm:text-xs font-medium text-slate-200 whitespace-nowrap">{awayTeam.abbrev}</span>
-        <span className="text-[10px] sm:text-xs font-bold text-white">{awayTeam.score ?? '-'}</span>
+        <span className="text-xs sm:text-xs font-medium text-slate-200 whitespace-nowrap">{awayTeam.abbrev}</span>
+        <span className="text-xs sm:text-xs font-bold text-white">{awayTeam.score ?? '-'}</span>
       </div>
 
       {/* Separator / Game State */}
       <div className="flex flex-col items-center justify-center flex-shrink-0">
-        <span className="text-[8px] sm:text-[10px] text-slate-400">@</span>
+        <span className="text-[10px] sm:text-[10px] text-slate-400">@</span>
         <div className="flex items-center gap-1.5">
           {live && (
-            <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2 flex-shrink-0">
+            <span className="relative flex h-2 w-2 sm:h-2 sm:w-2 flex-shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-red-500" />
+              <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2 sm:w-2 bg-red-500" />
             </span>
           )}
           <span className={cn(
-            'text-[8px] sm:text-[10px] font-medium whitespace-nowrap',
+            'text-[10px] sm:text-[10px] font-medium whitespace-nowrap',
             live ? 'text-red-400' : 'text-slate-400',
           )}
           >
@@ -101,13 +101,13 @@ function GameCard({ game }: GameCardProps): JSX.Element {
       </div>
 
       {/* Home Team */}
-      <div className="flex items-center gap-1">
-        <span className="text-[10px] sm:text-xs font-bold text-white">{homeTeam.score ?? '-'}</span>
-        <span className="text-[10px] sm:text-xs font-medium text-slate-200 whitespace-nowrap">{homeTeam.abbrev}</span>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs sm:text-xs font-bold text-white">{homeTeam.score ?? '-'}</span>
+        <span className="text-xs sm:text-xs font-medium text-slate-200 whitespace-nowrap">{homeTeam.abbrev}</span>
         <img
           src={homeTeam.logo}
           alt={homeTeam.abbrev}
-          className="w-6 h-6 sm:w-7 sm:h-7 flex-shrink-0 object-contain"
+          className="w-7 h-7 sm:w-7 sm:h-7 flex-shrink-0 object-contain"
         />
       </div>
     </div>
