@@ -113,32 +113,32 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 
 **Phase 1: Database & Core Infrastructure** ✅ **COMPLETED**
 - [x] Create `joueurs` table (id, nhl_player_id, nom, prenom, position, created_at, updated_at)
-- [x] ~~Create `effectifs` table~~ **DECISION: Used array approach instead**
-  - [x] Add `nhl_player_ids INTEGER[]` column to `equipes` table (Option B - array approach)
-  - **Rationale:** Simpler structure, faster reads, sufficient for current needs. Historical tracking can be added later if needed.
+- [x] ~~Create `effectifs` table~~ **DECISION: Using junction table approach**
+  - [x] Create `equipe_joueurs` junction table (equipe_id, joueur_id) with UNIQUE constraint on joueur_id
+  - **Rationale:** Proper relational design, efficient JOINs, referential integrity via foreign keys.
 - [x] Add `joueur_id` column to `repechages` table with foreign key constraint
-- [x] Create indexes: `idx_joueurs_nhl_player_id`, `idx_joueurs_position`, `idx_repechages_joueur_id`
+- [x] Create indexes: `idx_joueurs_nhl_player_id`, `idx_joueurs_position`, `idx_repechages_joueur_id`, `idx_equipe_joueurs_equipe_id`, `idx_equipe_joueurs_joueur_id`
 - [x] Populate `trophees` table with pool awards (Général, Attaque, Défense, Gardien, Playoffs)
 - [x] Update Docs/DB_STRUCTURE.md with new schema documentation
-- [ ] Add backend types to `server/types/index.ts` *(deferred to Phase 2)*
-- [ ] Add database queries to `server/models/index.ts` for all new tables *(deferred to Phase 2)*
+- [x] Add backend types to `server/types/index.ts` (`Joueur`, `EquipeJoueur` interfaces)
+- [x] Add database queries to `server/models/index.ts` (`GET_TEAM_ROSTER`, `ADD_PLAYER_TO_ROSTER`)
 
 **Phase 2: Player Management Service** 🚀 **READY TO START**
 - [ ] Create `server/services/joueursService.ts`
   - `findPlayer()` - Find player by NHL ID (@olirobi/nhl_api_client players module get function)
-  - `getCurrentTeam()` - Get player's current pool team (query `equipes` where `nhl_player_ids` array contains player's NHL ID)
+  - `getCurrentTeam()` - Get player's current pool team (JOIN `equipe_joueurs` and `equipes` via joueur_id)
   - `createPlayer()` - Create new player record in `joueurs` table
   - `getPlayerById()` - Get player by internal ID
   - `getPlayerByNhlId()` - Get player by NHL player ID
 
 **Phase 3: Roster Tracking Service**
 - [ ] Modify `server/services/teamsService.ts`
-  - `getTeamRoster()` - Get team's current roster using `nhl_player_ids` array from `equipes` table
-    - Query `joueurs` table where `nhl_player_id = ANY(equipes.nhl_player_ids)`
+  - `getTeamRoster()` - Get team's current roster via `equipe_joueurs` junction table
+    - JOIN `equipe_joueurs` with `joueurs` WHERE `equipe_id = $1`
     - Return array of player objects with basic info
   - `getTeamRosterWithStats()` - Roster enriched with NHL stats (call NHL API for each player)
-  - `addPlayerToRoster()` - Add player to team's `nhl_player_ids` array
-  - `removePlayerFromRoster()` - Remove player from team's `nhl_player_ids` array
+  - `addPlayerToRoster()` - INSERT into `equipe_joueurs` (with ON CONFLICT to handle transfers)
+  - `removePlayerFromRoster()` - DELETE from `equipe_joueurs` WHERE equipe_id AND joueur_id
 - [ ] Update `server/services/repechageService.ts`
   - Add `syncDraftPicksToRoster()` method
 - [ ] Update `server/services/echangesService.ts`
