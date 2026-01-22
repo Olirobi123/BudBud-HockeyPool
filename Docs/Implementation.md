@@ -101,11 +101,6 @@
 
 #### Overview:
 Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_api_client, awards system, and player ownership display.
-
-#### Progress Summary:
-- ✅ **Phase 1 Complete:** Database schema established (`joueurs` table, `nhl_player_ids` array in `equipes`, `joueur_id` in `repechages`, `trophees` populated)
-- 🚀 **Next:** Phase 2 - Player Management Service
-
 #### Sub-steps:
 
 **Phase 0: Live NHL Scores Ticker**
