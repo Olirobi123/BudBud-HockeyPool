@@ -55,7 +55,7 @@
 - `PRIMARY KEY (id)`
 
 #### Notes
-- `nhl_player_ids` : Tableau d'IDs de joueurs NHL représentant l'effectif de l'équipe (Option B - approche par tableau)
+- `nhl_player_ids` : **DEPRECIE** - Tableau d'IDs de joueurs NHL (remplace par la table de jonction `equipe_joueurs`)
 
 ---
 
@@ -144,7 +144,36 @@
 
 ---
 
-### 6. `joueurs`
+### 6. `equipe_joueurs` (Table de jonction)
+
+Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_ids`).
+
+#### Colonnes
+| Nom        | Type    | Null | Par defaut                                      |
+|------------|---------|------|-------------------------------------------------|
+| id         | integer | Non  | nextval('equipe_joueurs_id_seq'::regclass)      |
+| equipe_id  | integer | Non  | -                                               |
+| joueur_id  | integer | Non  | -                                               |
+
+#### Index
+- `equipe_joueurs_pkey` : UNIQUE sur `id`
+- `idx_equipe_joueurs_equipe_id` : Index sur `equipe_id` pour les recherches par equipe
+- `idx_equipe_joueurs_joueur_id` : Index sur `joueur_id` pour les recherches par joueur
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id) REFERENCES equipes(id) ON DELETE CASCADE`
+- `FOREIGN KEY (joueur_id) REFERENCES joueurs(id) ON DELETE CASCADE`
+- `UNIQUE (joueur_id)` - Un joueur ne peut etre que sur une equipe
+
+#### Notes
+- Remplace l'approche par tableau `equipes.nhl_player_ids`
+- Permet des jointures efficaces pour recuperer les effectifs
+- La contrainte UNIQUE sur `joueur_id` garantit qu'un joueur n'est que sur une seule equipe
+
+---
+
+### 7. `joueurs`
 - **Taille de la table** : Variable (nouvelle table)
 - **Taille des index** : Variable
 - **Taille totale** : Variable
@@ -177,7 +206,7 @@
 
 ---
 
-### 7. `types_repechage`
+### 8. `types_repechage`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 16 kB
 - **Taille totale** : 24 kB
@@ -214,7 +243,8 @@
 - `repechages` → `joueurs` (joueur_id)
 - `trophee_gagnants` → `trophees` (trophee_id)
 - `trophee_gagnants` → `equipes` (equipe_id)
-- `joueurs` → `equipes` (via `nhl_player_ids` array dans `equipes`)
+- `equipe_joueurs` → `equipes` (equipe_id) - Table de jonction pour les effectifs
+- `equipe_joueurs` → `joueurs` (joueur_id) - Table de jonction pour les effectifs
 
 ---
 

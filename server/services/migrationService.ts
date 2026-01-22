@@ -33,7 +33,6 @@ export class MigrationService {
   async populateTeamRoster(teamId: number, playerNames: string[]): Promise<PopulateRosterResult> {
     const playersAdded: PlayerResult[] = [];
     const errors: PlayerError[] = [];
-    const nhlPlayerIds: number[] = [];
 
     // Process each player name
     for (const playerName of playerNames) {
@@ -60,19 +59,29 @@ export class MigrationService {
         const prenom = nameParts[0];
         const nom = nameParts.slice(1).join(' ');
 
-        // Insert/Update player in joueurs table
-        await pool.query(
+        // Insert/Update player in joueurs table and get the joueur_id
+        const joueurResult = await pool.query(
           `INSERT INTO joueurs (nhl_player_id, nom, prenom, position)
            VALUES ($1, $2, $3, $4)
            ON CONFLICT (nhl_player_id) DO UPDATE SET
              nom = EXCLUDED.nom,
              prenom = EXCLUDED.prenom,
              position = EXCLUDED.position
-           RETURNING id, nhl_player_id`,
-          [nhlPlayerId, nom, prenom, position]
+           RETURNING id`,
+          [nhlPlayerId, nom, prenom, position],
         );
 
-        nhlPlayerIds.push(nhlPlayerId);
+        const joueurId = joueurResult.rows[0].id as number;
+
+        // Insert into junction table (links player to team)
+        await pool.query(
+          `INSERT INTO equipe_joueurs (equipe_id, joueur_id)
+           VALUES ($1, $2)
+           ON CONFLICT (joueur_id) DO UPDATE SET
+             equipe_id = EXCLUDED.equipe_id`,
+          [teamId, joueurId],
+        );
+
         playersAdded.push({
           name: player.name,
           nhlPlayerId,
@@ -82,14 +91,6 @@ export class MigrationService {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         errors.push({ name: playerName, error: errorMessage });
       }
-    }
-
-    // Update team roster with collected NHL player IDs
-    if (nhlPlayerIds.length > 0) {
-      await pool.query(
-        `UPDATE equipes SET nhl_player_ids = $1 WHERE id = $2`,
-        [nhlPlayerIds, teamId]
-      );
     }
 
     return {

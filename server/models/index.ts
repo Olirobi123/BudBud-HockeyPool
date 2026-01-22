@@ -5,6 +5,8 @@ export const TABLES = {
   ECHANGES: 'echanges',
   PLAYERS: 'players',
   REPECHAGE: 'repechage',
+  JOUEURS: 'joueurs',
+  EQUIPE_JOUEURS: 'equipe_joueurs',
 } as const;
 
 export const QUERIES = {
@@ -90,7 +92,7 @@ export const QUERIES = {
 
   // Repêchage
   GET_REPECHAGE_DATA: `
-    SELECT 
+    SELECT
       r.*,
       p.nom as player_nom,
       p.prenom as player_prenom,
@@ -99,5 +101,21 @@ export const QUERIES = {
     JOIN ${TABLES.PLAYERS} p ON r.joueur_id = p.id
     JOIN ${TABLES.EQUIPES} e ON r.equipe_id = e.id
     ORDER BY r.year DESC, r.round ASC, r.pick ASC
+  `,
+
+  // Roster queries
+  GET_TEAM_ROSTER: `
+    SELECT j.*
+    FROM ${TABLES.EQUIPE_JOUEURS} ej
+    JOIN ${TABLES.JOUEURS} j ON ej.joueur_id = j.id
+    WHERE ej.equipe_id = $1
+    ORDER BY j.position, j.nom
+  `,
+  ADD_PLAYER_TO_ROSTER: `
+    INSERT INTO ${TABLES.EQUIPE_JOUEURS} (equipe_id, joueur_id)
+    VALUES ($1, $2)
+    ON CONFLICT (joueur_id) DO UPDATE SET
+      equipe_id = EXCLUDED.equipe_id
+    RETURNING *
   `,
 } as const;

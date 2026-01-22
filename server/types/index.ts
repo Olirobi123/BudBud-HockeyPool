@@ -45,6 +45,22 @@ export interface RepechageData {
   updated_at?: Date;
 }
 
+export interface Joueur {
+  id: number;
+  nhl_player_id: number;
+  nom: string;
+  prenom: string;
+  position: string;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+export interface EquipeJoueur {
+  id: number;
+  equipe_id: number;
+  joueur_id: number;
+}
+
 // Types pour les requêtes API
 export interface CreateEchangeRequest {
   equipe_source_id: string;

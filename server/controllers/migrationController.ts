@@ -40,7 +40,7 @@ export class MigrationController {
     } catch (error) {
       sendServerError(
         res,
-        error instanceof Error ? error.message : 'Error populating roster'
+        error instanceof Error ? error.message : 'Error populating roster',
       );
     }
   });
