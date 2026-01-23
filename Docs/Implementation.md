@@ -149,9 +149,6 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [ ] Create `server/controllers/effectifsController.ts`
 - [ ] Create `server/routes/effectifs.ts`
   - `GET /api/teams/:id/roster` - Team roster with stats
-  - `POST /api/effectifs/sync-draft` - Sync draft picks
-  - `POST /api/effectifs/sync-trades` - Sync trades
-  - [x] ~~`GET /api/joueurs/:nhlPlayerId/ownership`~~ Moved to `GET /api/players/:nhlId/ownership`
 - [ ] Update `server/routes.ts` to register effectifs routes
 
 **Phase 5: NHL API Integration with nhl_api_client** ✅ **COMPLETED**
@@ -179,6 +176,7 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [ ] Update `client/src/components/joueur/JoueurHeader.tsx`
   - Add ownership badge showing "Owned by Team X"
   - Link badge to team page
+  - Use ownership endpoint data to display player's current team
 
 **Phase 8: Frontend - Team Roster Display**
 - [ ] Update `client/src/components/equipes/TeamRoster.tsx`
