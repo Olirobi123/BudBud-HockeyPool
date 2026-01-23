@@ -142,13 +142,8 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
   - `getTeamRoster()` - Get team's current roster via `equipe_joueurs` junction table
     - JOIN `equipe_joueurs` with `joueurs` WHERE `equipe_id = $1`
     - Return array of player objects with basic info
-  - `getTeamRosterWithStats()` - Roster enriched with NHL stats (call NHL API for each player)
-  - `addPlayerToRoster()` - INSERT into `equipe_joueurs` (with ON CONFLICT to handle transfers)
-  - `removePlayerFromRoster()` - DELETE from `equipe_joueurs` WHERE equipe_id AND joueur_id
-- [ ] Update `server/services/repechageService.ts`
-  - Add `syncDraftPicksToRoster()` method
-- [ ] Update `server/services/echangesService.ts`
-  - Enhance `createEchange()` to update rosters **Might delay this to after launch**
+  - `getTeamRosterWithStats()` - Roster enriched with NHL stats (call NHL API for each player). Only get Goals, Assists, Points, Games Played for skaters. Goalies Saves percentage, Games played, Goals against, Wins.
+
 
 **Phase 4: Roster API Endpoints**
 - [ ] Create `server/controllers/effectifsController.ts`
