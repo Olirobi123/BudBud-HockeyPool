@@ -106,3 +106,24 @@ export interface HomeTradeResponse {
   teamB: string;
   playersB: string[];
 }
+
+// Stats for skaters (C, LW, RW, D)
+export interface SkaterStats {
+  gamesPlayed: number;
+  goals: number;
+  assists: number;
+  points: number;
+}
+
+// Stats for goalies (G)
+export interface GoalieStats {
+  gamesPlayed: number;
+  savePctg: number;
+  goalsAgainstAvg: number;
+  wins: number;
+}
+
+// Roster player with NHL stats
+export interface RosterPlayerWithStats extends Joueur {
+  nhlStats: SkaterStats | GoalieStats | null;
+}

@@ -57,6 +57,21 @@ export class TeamsController {
   });
 
   /**
+   * Récupérer le roster d'une équipe avec les stats NHL
+   */
+  getRosterWithStats = asyncHandler(async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      sendServerError(res, 'ID d\'équipe invalide');
+      return;
+    }
+
+    const roster = await teamsService.getTeamRosterWithStats(id);
+    sendSuccess(res, roster);
+  });
+
+  /**
    * Récupérer le dernier échange d'une équipe
    */
   getLatestTrade = asyncHandler(async (req: Request, res: Response) => {

@@ -128,9 +128,4 @@ export const QUERIES = {
     JOIN ${TABLES.EQUIPES} e ON ej.equipe_id = e.id
     WHERE ej.joueur_id = $1
   `,
-  CREATE_JOUEUR: `
-    INSERT INTO ${TABLES.JOUEURS} (nhl_player_id, nom, prenom, position)
-    VALUES ($1, $2, $3, $4)
-    RETURNING *
-  `,
 } as const;

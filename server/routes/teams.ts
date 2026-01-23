@@ -15,6 +15,9 @@ router.get('/:id', teamsController.getTeamById);
 // Récupérer le roster d'une équipe
 router.get('/:id/roster', teamsController.getRoster);
 
+// Récupérer le roster d'une équipe avec stats NHL
+router.get('/:id/roster/stats', teamsController.getRosterWithStats);
+
 // Récupérer le dernier échange d'une équipe
 router.get('/:id/latest-trade', teamsController.getLatestTrade);
 

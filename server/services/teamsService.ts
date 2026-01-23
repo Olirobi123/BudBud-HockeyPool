@@ -1,6 +1,60 @@
+import { NHLClient, PlayerStatsResponse } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
-import { Equipe, Echange } from '../types';
+import {
+  Equipe,
+  Echange,
+  Joueur,
+  RosterPlayerWithStats,
+  SkaterStats,
+  GoalieStats,
+} from '../types';
 import { QUERIES } from '../models';
+
+/**
+ * Extract relevant stats from NHL API response based on player position.
+ * Only returns stats from NHL regular season (filters out AHL, etc.)
+ */
+function extractStats(
+  statsResponse: PlayerStatsResponse,
+  position: string,
+): SkaterStats | GoalieStats {
+  // Use seasonTotals to ensure we get NHL stats only
+  // gameTypeId 2 = regular season, leagueAbbrev 'NHL' = NHL league
+  const nhlSeasons = statsResponse.seasonTotals?.filter(
+    (s) => s.leagueAbbrev === 'NHL' && s.gameTypeId === 2,
+  );
+
+  // Return zeros if no NHL season found
+  if (!nhlSeasons || nhlSeasons.length === 0) {
+    if (position === 'G') {
+      return { gamesPlayed: 0, savePctg: 0, goalsAgainstAvg: 0, wins: 0 };
+    }
+    return { gamesPlayed: 0, goals: 0, assists: 0, points: 0 };
+  }
+
+  // Get the most recent NHL season (highest season number)
+  const currentSeason = nhlSeasons.reduce((latest, current) => {
+    const currentSeasonNum = current.season ?? 0;
+    const latestSeasonNum = latest.season ?? 0;
+    return currentSeasonNum > latestSeasonNum ? current : latest;
+  });
+
+  if (position === 'G') {
+    return {
+      gamesPlayed: currentSeason.gamesPlayed ?? 0,
+      savePctg: currentSeason.savePctg ?? 0,
+      goalsAgainstAvg: currentSeason.goalsAgainstAvg ?? 0,
+      wins: currentSeason.wins ?? 0,
+    };
+  }
+
+  return {
+    gamesPlayed: currentSeason.gamesPlayed ?? 0,
+    goals: currentSeason.goals ?? 0,
+    assists: currentSeason.assists ?? 0,
+    points: currentSeason.points ?? 0,
+  };
+}
 
 export class TeamsService {
   /**
@@ -51,19 +105,46 @@ export class TeamsService {
   }
 
   /**
-   * Récupérer le roster d'une équipe
-   * Note: Retourne un tableau vide pour le moment car la relation n'est pas encore en place
+   * Récupérer le roster d'une équipe (données DB uniquement)
    */
-  async getTeamRoster(teamId: number): Promise<any[]> {
+  async getTeamRoster(teamId: number): Promise<Joueur[]> {
     try {
-      // TODO: Implémenter la requête DB une fois la colonne equipe_id ajoutée à la table players
-      // const result = await pool.query(QUERIES.GET_PLAYERS_BY_TEAM_ID, [teamId]);
-      // return result.rows;
-      return [];
+      const result = await pool.query(QUERIES.GET_TEAM_ROSTER, [teamId]);
+      return result.rows as Joueur[];
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Erreur lors de la récupération du roster:', error);
       throw new Error('Erreur lors de la récupération du roster');
     }
+  }
+
+  /**
+   * Récupérer le roster d'une équipe avec les stats NHL
+   */
+  async getTeamRosterWithStats(teamId: number): Promise<RosterPlayerWithStats[]> {
+    const roster = await this.getTeamRoster(teamId);
+    const nhlClient = new NHLClient();
+
+    const enrichedRoster = await Promise.all(
+      roster.map(async (player): Promise<RosterPlayerWithStats> => {
+        try {
+          const stats = await nhlClient.players.get(player.nhl_player_id).stats();
+          return {
+            ...player,
+            nhlStats: extractStats(stats, player.position),
+          };
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`Erreur lors de la récupération des stats pour le joueur ${player.id}:`, error);
+          return {
+            ...player,
+            nhlStats: null,
+          };
+        }
+      }),
+    );
+
+    return enrichedRoster;
   }
 
   /**
