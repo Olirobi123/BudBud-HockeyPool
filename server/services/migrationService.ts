@@ -49,8 +49,11 @@ export class MigrationService {
           continue;
         }
 
-        // Take the first result
-        const player = searchResults[0];
+        // Look for exact name match first, otherwise take first result
+        const exactMatch = searchResults.find(
+          (p) => p.name.toLowerCase() === playerName.trim().toLowerCase(),
+        );
+        const player = exactMatch ?? searchResults[0];
         const nhlPlayerId = parseInt(player.playerId, 10);
         const position = player.positionCode ?? 'C'; // Default to C if not available
 

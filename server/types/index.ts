@@ -1,5 +1,12 @@
 // Types principaux pour le backend
 
+// Re-export NHL API client types for consistency
+export type {
+  PlayerStatsResponse,
+  PlayerSearchResult,
+  PlayerSearchResponse,
+} from '@olirobi/nhl_api_client';
+
 export interface Equipe {
   id: number;
   nom: string;

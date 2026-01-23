@@ -1,62 +1,113 @@
-export class PlayersService {
-  private readonly NHL_API_BASE = 'https://api-web.nhle.com/v1';
+import { Pool } from 'pg';
+import { NHLClient, PlayerStatsResponse, PlayerSearchResult } from '@olirobi/nhl_api_client';
+import pool from '../config/database';
+import { QUERIES } from '../models';
+import { Joueur, Equipe } from '../types';
 
-  private readonly REQUEST_TIMEOUT = 5000;
+export class PlayersService {
+  private nhlClient: NHLClient;
+
+  private pool: Pool;
+
+  constructor(dbPool: Pool) {
+    this.pool = dbPool;
+    this.nhlClient = new NHLClient();
+  }
 
   /**
    * Récupérer les détails d'un joueur depuis l'API NHL
    */
-  async getPlayerById(id: string): Promise<any> {
-    // Validation de l'ID
+  async getAPIPlayerByNHLId(id: string): Promise<PlayerStatsResponse> {
     if (!/^\d+$/.test(id)) {
       throw new Error('ID de joueur invalide');
     }
 
-    const abortController = new AbortController();
-    const timeoutId = setTimeout(() => {
-      abortController.abort();
-    }, this.REQUEST_TIMEOUT);
-
     try {
-      const response = await fetch(`${this.NHL_API_BASE}/player/${id}/landing`, {
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; 38BudBud/1.0)',
-        },
-        signal: abortController.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        console.log(`NHL API error: ${response.status}`);
-        throw new Error('Erreur lors de la récupération des données du joueur');
-      }
-
-      const data = await response.json();
-      return data;
+      const playerData = await this.nhlClient.players.get(parseInt(id, 10)).stats();
+      return playerData;
     } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          throw new Error('Timeout lors de la récupération des données du joueur');
-        }
-        throw error;
-      }
-
+      // eslint-disable-next-line no-console
+      console.error('Erreur lors de la récupération des données du joueur:', error);
       throw new Error('Erreur lors de la récupération des données du joueur');
     }
   }
 
   /**
-   * Rechercher des joueurs (peut être étendu pour d'autres sources)
+   * Rechercher des joueurs via l'API NHL
    */
-  async searchPlayers(query: string): Promise<any[]> {
-    // Pour l'instant, cette méthode peut être utilisée pour des recherches futures
-    // ou pour interfacer avec une base de données locale de joueurs
-    throw new Error('Méthode de recherche non implémentée');
+  async searchPlayers(query: string): Promise<PlayerSearchResult[]> {
+    if (query.trim().length < 2) {
+      return [];
+    }
+
+    try {
+      const response = await this.nhlClient.players.search(query.trim());
+      return response.players ?? [];
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erreur lors de la recherche de joueurs:', error);
+      throw new Error('Erreur lors de la recherche de joueurs');
+    }
+  }
+
+  /**
+   * Récupérer un joueur de la table locale par son ID interne
+   */
+  async getPlayerById(id: number): Promise<Joueur | null> {
+    try {
+      const result = await this.pool.query(QUERIES.GET_JOUEUR_BY_ID, [id]);
+      return result.rows.length > 0 ? (result.rows[0] as Joueur) : null;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erreur lors de la récupération du joueur:', error);
+      throw new Error('Erreur lors de la récupération du joueur');
+    }
+  }
+
+  /**
+   * Récupérer un joueur de la table locale par son ID NHL
+   */
+  async getPlayerByNhlId(nhlId: number): Promise<Joueur | null> {
+    try {
+      const result = await this.pool.query(QUERIES.GET_JOUEUR_BY_NHL_ID, [nhlId]);
+      return result.rows.length > 0 ? (result.rows[0] as Joueur) : null;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erreur lors de la récupération du joueur par NHL ID:', error);
+      throw new Error('Erreur lors de la récupération du joueur');
+    }
+  }
+
+  /**
+   * Récupérer l'équipe du pool qui possède ce joueur
+   */
+  async getCurrentTeam(joueurId: number): Promise<Equipe | null> {
+    try {
+      const result = await this.pool.query(QUERIES.GET_JOUEUR_CURRENT_TEAM, [joueurId]);
+      return result.rows.length > 0 ? (result.rows[0] as Equipe) : null;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erreur lors de la récupération de l\'équipe du joueur:', error);
+      throw new Error('Erreur lors de la récupération de l\'équipe du joueur');
+    }
+  }
+
+  /**
+   * Récupérer l'équipe propriétaire d'un joueur par son NHL ID
+   */
+  async getOwnershipByNhlId(nhlId: number): Promise<Equipe | null> {
+    try {
+      const joueur = await this.getPlayerByNhlId(nhlId);
+      if (!joueur) {
+        return null;
+      }
+      return await this.getCurrentTeam(joueur.id);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Erreur lors de la récupération de la propriété du joueur:', error);
+      throw new Error('Erreur lors de la récupération de la propriété du joueur');
+    }
   }
 }
 
-export const playersService = new PlayersService();
+export const playersService = new PlayersService(pool);

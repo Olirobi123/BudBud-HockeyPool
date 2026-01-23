@@ -5,9 +5,10 @@ import { NHLPlayer } from '@/types/IPlayerDetails';
 
 async function searchPlayers(query: string): Promise<NHLPlayer[]> {
   if (!query || query.length < 2) return [];
-  const response = await fetch(`/api/search/players?q=${encodeURIComponent(query)}`);
+  const response = await fetch(`/api/players/search?q=${encodeURIComponent(query)}`);
   if (!response.ok) throw new Error('Erreur de recherche');
-  return response.json();
+  const result = await response.json();
+  return result.data ?? [];
 }
 
 export function usePlayerSearch(onPlayerSelect?: (player: NHLPlayer) => void) {

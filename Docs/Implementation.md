@@ -97,7 +97,7 @@
 ### Stage 4: NHL API Integration & Roster Management
 **Duration:** 7-8 days  
 **Dependencies:** Stage 3 completion  
-**Status:** Phase 1 ✅ Complete | Phase 2-9 🚀 Ready to start
+**Status:** Phase 1-2 ✅ Complete | Phase 5 (partial) ✅ | Phase 3-4, 6-9 🚀 Ready to start
 
 #### Overview:
 Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_api_client, awards system, and player ownership display.
@@ -123,13 +123,19 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [x] Add backend types to `server/types/index.ts` (`Joueur`, `EquipeJoueur` interfaces)
 - [x] Add database queries to `server/models/index.ts` (`GET_TEAM_ROSTER`, `ADD_PLAYER_TO_ROSTER`)
 
-**Phase 2: Player Management Service** 🚀 **READY TO START**
-- [ ] Create `server/services/joueursService.ts`
-  - `findPlayer()` - Find player by NHL ID (@olirobi/nhl_api_client players module get function)
-  - `getCurrentTeam()` - Get player's current pool team (JOIN `equipe_joueurs` and `equipes` via joueur_id)
-  - `createPlayer()` - Create new player record in `joueurs` table
-  - `getPlayerById()` - Get player by internal ID
-  - `getPlayerByNhlId()` - Get player by NHL player ID
+**Phase 2: Player Management Service** ✅ **COMPLETED**
+- [x] Extended `server/services/playersService.ts` (using dependency injection pattern)
+  - `getAPIPlayerByNHLId()` - Fetch player from NHL API via nhlClient
+  - `searchPlayers()` - Search players via NHL API
+  - `getPlayerById()` - Get player from local `joueurs` table by internal ID
+  - `getPlayerByNhlId()` - Get player from local table by NHL player ID
+  - `getCurrentTeam()` - Get player's current pool team via junction table
+  - `getOwnershipByNhlId()` - Get pool team owner by NHL ID
+- [x] Added queries to `server/models/index.ts`
+  - `GET_JOUEUR_BY_ID`, `GET_JOUEUR_BY_NHL_ID`, `GET_JOUEUR_CURRENT_TEAM`, `CREATE_JOUEUR`
+- [x] Updated `server/controllers/playersController.ts` with new endpoints
+- [x] Updated `server/routes/players.ts` with new routes
+  - `GET /search`, `GET /:nhlId/ownership`, `GET /nhl/:nhlId`, `GET /bd/:id`
 
 **Phase 3: Roster Tracking Service**
 - [ ] Modify `server/services/teamsService.ts`
@@ -150,14 +156,21 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
   - `GET /api/teams/:id/roster` - Team roster with stats
   - `POST /api/effectifs/sync-draft` - Sync draft picks
   - `POST /api/effectifs/sync-trades` - Sync trades
-  - `GET /api/joueurs/:nhlPlayerId/ownership` - Player's current team
+  - [x] ~~`GET /api/joueurs/:nhlPlayerId/ownership`~~ Moved to `GET /api/players/:nhlId/ownership`
 - [ ] Update `server/routes.ts` to register effectifs routes
 
-**Phase 5: NHL API Integration with nhl_api_client**
-- [ ] Update `server/services/playersService.ts`
-  - Replace direct NHL API `fetch()` with `nhlClient.players.get(id)`
-  - Move player search from routes to service layer **Very important**
-  - Implement proper error handling **See github docs**
+**Phase 5: NHL API Integration with nhl_api_client** ✅ **COMPLETED**
+- [x] Update `server/services/playersService.ts`
+  - Replaced direct NHL API `fetch()` with `nhlClient.players.get(id).stats()`
+  - Moved player search from routes to service layer
+  - Removed duplicate search endpoint from `server/routes.ts`
+  - Implemented error handling with try-catch and proper error messages
+  - Using typed imports: `PlayerStatsResponse`, `PlayerSearchResult` from NHL client
+- [x] Unified frontend/backend types
+  - `client/src/types/IPlayerDetails.ts` re-exports from `@olirobi/nhl_api_client`
+  - `server/types/index.ts` re-exports `PlayerStatsResponse`, `PlayerSearchResult`, `PlayerSearchResponse`
+  - `PlayerDetails` = `PlayerStatsResponse`, `NHLPlayer` = `PlayerSearchResult`
+  - Fixed `client/src/types/index.ts` exports for `IHome` and `IDraft`
 
 **Phase 6: Awards System**
 - [ ] Create `server/services/tropheesService.ts`
