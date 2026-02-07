@@ -97,7 +97,7 @@
 ### Stage 4: NHL API Integration & Roster Management
 **Duration:** 7-8 days  
 **Dependencies:** Stage 3 completion  
-**Status:** Phase 0-5 ✅ Complete | Phase 6-9 🚀 Ready to start
+**Status:** Phase 0-5 ✅ Complete | Phase 7-8 ✅ Complete | Phase 6, 9 🚀 Ready to start
 
 #### Overview:
 Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_api_client, awards system, and player ownership display.
@@ -172,19 +172,23 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [ ] Create `server/routes/trophees.ts`
   - `GET /api/trophees`, `GET /api/trophees/winners/:year`
 
-**Phase 7: Frontend - Player Ownership Display**
-- [ ] Create `client/src/hooks/joueur/usePlayerOwnership.ts`
-- [ ] Update `client/src/components/joueur/JoueurHeader.tsx`
-  - Add ownership badge showing "Owned by Team X"
-  - Link badge to team page
-  - Use ownership endpoint data to display player's current team
+**Phase 7: Frontend - Player Ownership Display** ✅ **COMPLETED**
+- [x] Create `client/src/hooks/joueur/usePlayerOwnership.ts`
+- [x] Update `client/src/components/joueur/JoueurHeader.tsx`
+  - Add ownership badge showing pool team name
+  - Link badge to team page (`/equipe/:id`)
+  - Skeleton loader during fetch, hidden when player is unowned
 
-**Phase 8: Frontend - Team Roster Display**
-- [ ] Update `client/src/components/equipes/TeamRoster.tsx`
-  - Replace empty state with functional roster table
-  - Display: Player, Position, NHL Team, GP, G, A, Pts
+**Phase 8: Frontend - Team Roster Display** ✅ **COMPLETED**
+- [x] Update `client/src/components/equipes/TeamRoster.tsx`
+  - Functional roster table with skaters and goalies sections
+  - Display: Player, Position, GP, G, A, Pts (skaters) / W, SV%, GAA (goalies)
   - Link player names to detail pages
-- [ ] Verify `client/src/hooks/useTeam.ts` fetches roster correctly
+  - Active player limits: top 12 forwards, top 6 defensemen count for points
+  - Inactive players shown with reduced opacity and dashed separator
+  - Total points row per position group (active players only)
+- [x] Backend `isActive` flag computed in `teamsService.getTeamRosterWithStats()`
+- [x] Verify `client/src/hooks/useTeam.ts` fetches roster correctly
 
 **Phase 9: Frontend - Awards Section**
 - [ ] Add award types to `client/src/types/index.ts`
