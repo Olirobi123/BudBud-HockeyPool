@@ -1,7 +1,6 @@
 import { Link } from 'wouter';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { usePlayerOwnership } from '@/hooks/joueur/usePlayerOwnership';
 import PlayerDetails from '@/types/IPlayerDetails';
 
