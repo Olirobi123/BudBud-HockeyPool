@@ -39,14 +39,16 @@ export default function JoueurHeader({ player }: Props) {
             <Badge variant="outline" className="text-white border-white">
               {player.position}
             </Badge>
-            {ownershipLoading && <Skeleton className="h-6 w-24 rounded-full" />}
-            {ownership != null && (
+            {!ownershipLoading && ownership != null && (
               <Link href={`/equipes/${ownership.id}`}>
                 <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer">
                   {ownership.nom}
                 </Badge>
               </Link>
             )}
+            {!ownershipLoading && ownership == null && 
+              <Badge className="bg-secondary text-primary-foreground hover:bg-slate-500 cursor-pointer">Agent libre</Badge>
+            }
           </div>
         </div>
       </div>
