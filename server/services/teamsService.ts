@@ -132,6 +132,7 @@ export class TeamsService {
           return {
             ...player,
             nhlStats: extractStats(stats, player.position),
+            teamLogo: stats.teamLogo,
           };
         } catch (error) {
           // eslint-disable-next-line no-console
@@ -139,12 +140,37 @@ export class TeamsService {
           return {
             ...player,
             nhlStats: null,
+            teamLogo: undefined,
           };
         }
       }),
     );
 
-    return enrichedRoster;
+    // Mark active players: top 12 forwards and top 6 defensemen by points
+    const FORWARD_POSITIONS = ['C', 'L', 'R'];
+    const MAX_ACTIVE_FORWARDS = 12;
+    const MAX_ACTIVE_DEFENSEMEN = 6;
+
+    const getPoints = (player: RosterPlayerWithStats): number => {
+      if (player.nhlStats && 'points' in player.nhlStats) {
+        return player.nhlStats.points;
+      }
+      return 0;
+    };
+
+    const forwards = enrichedRoster
+      .filter((p) => FORWARD_POSITIONS.includes(p.position))
+      .sort((a, b) => getPoints(b) - getPoints(a))
+      .map((p, index) => ({ ...p, isActive: index < MAX_ACTIVE_FORWARDS }));
+
+    const defensemen = enrichedRoster
+      .filter((p) => p.position === 'D')
+      .sort((a, b) => getPoints(b) - getPoints(a))
+      .map((p, index) => ({ ...p, isActive: index < MAX_ACTIVE_DEFENSEMEN }));
+
+    const goalies = enrichedRoster.filter((p) => p.position === 'G');
+
+    return [...forwards, ...defensemen, ...goalies];
   }
 
   /**

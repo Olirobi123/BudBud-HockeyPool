@@ -41,8 +41,8 @@ export class PlayersService {
     }
 
     try {
-      const response = await this.nhlClient.players.search(query.trim());
-      return response.players ?? [];
+      const response = await this.nhlClient.players.search(query.trim()) as PlayerSearchResult[];
+      return response ?? [];
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erreur lors de la recherche de joueurs:', error);

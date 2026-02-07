@@ -97,7 +97,7 @@
 ### Stage 4: NHL API Integration & Roster Management
 **Duration:** 7-8 days  
 **Dependencies:** Stage 3 completion  
-**Status:** Phase 1-2 ✅ Complete | Phase 5 (partial) ✅ | Phase 3-4, 6-9 🚀 Ready to start
+**Status:** Phase 0-5 ✅ Complete | Phase 6-9 🚀 Ready to start
 
 #### Overview:
 Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_api_client, awards system, and player ownership display.
@@ -137,19 +137,20 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [x] Updated `server/routes/players.ts` with new routes
   - `GET /search`, `GET /:nhlId/ownership`, `GET /nhl/:nhlId`, `GET /bd/:id`
 
-**Phase 3: Roster Tracking Service**
-- [ ] Modify `server/services/teamsService.ts`
+**Phase 3: Roster Tracking Service** ✅ **COMPLETED**
+- [x] Modify `server/services/teamsService.ts`
   - `getTeamRoster()` - Get team's current roster via `equipe_joueurs` junction table
     - JOIN `equipe_joueurs` with `joueurs` WHERE `equipe_id = $1`
     - Return array of player objects with basic info
   - `getTeamRosterWithStats()` - Roster enriched with NHL stats (call NHL API for each player). Only get Goals, Assists, Points, Games Played for skaters. Goalies Saves percentage, Games played, Goals against, Wins.
 
 
-**Phase 4: Roster API Endpoints**
-- [ ] Create `server/controllers/effectifsController.ts`
-- [ ] Create `server/routes/effectifs.ts`
-  - `GET /api/teams/:id/roster` - Team roster with stats
-- [ ] Update `server/routes.ts` to register effectifs routes
+**Phase 4: Roster API Endpoints** ✅ **COMPLETED**
+- [x] Roster endpoint exists in `server/routes/teams.ts` (`GET /api/teams/:id/roster`)
+- [x] Controller method exists in `server/controllers/teamsController.ts` (`getRoster`)
+- [x] Implement `getTeamRoster()` in `server/services/teamsService.ts` to query `equipe_joueurs` junction table
+- [x] Add `getTeamRosterWithStats()` to enrich roster with NHL stats
+- [x] Added `GET /:id/roster/stats` route for stats-enriched roster
 
 **Phase 5: NHL API Integration with nhl_api_client** ✅ **COMPLETED**
 - [x] Update `server/services/playersService.ts`
@@ -181,7 +182,7 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 **Phase 8: Frontend - Team Roster Display**
 - [ ] Update `client/src/components/equipes/TeamRoster.tsx`
   - Replace empty state with functional roster table
-  - Display: Player, Position, NHL Team, GP, G, A, Pts, Acquisition source
+  - Display: Player, Position, NHL Team, GP, G, A, Pts
   - Link player names to detail pages
 - [ ] Verify `client/src/hooks/useTeam.ts` fetches roster correctly
 
@@ -208,7 +209,7 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 8. New trades update player ownership
 
 #### Critical Files:
-- `server/services/effectifsService.ts` (new)
+- `server/services/teamsService.ts` (modify)
 - `server/services/playersService.ts` (modify)
 - `client/src/components/equipes/TeamRoster.tsx` (modify)
 - `client/src/components/joueur/JoueurHeader.tsx` (modify)

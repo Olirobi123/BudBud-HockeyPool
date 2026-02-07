@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Equipe, Echange } from '@/types';
+import { Equipe, Echange, RosterPlayerWithStats } from '@/types';
 
 const fetchTeam = async (id: number): Promise<Equipe> => {
   const response = await fetch(`/api/teams/${id}`);
@@ -10,8 +10,8 @@ const fetchTeam = async (id: number): Promise<Equipe> => {
   return result.data;
 };
 
-const fetchTeamRoster = async (id: number): Promise<any[]> => {
-  const response = await fetch(`/api/teams/${id}/roster`);
+const fetchTeamRoster = async (id: number): Promise<RosterPlayerWithStats[]> => {
+  const response = await fetch(`/api/teams/${id}/roster/stats`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération du roster');
   }
@@ -37,10 +37,12 @@ export function useTeam(id: number) {
 }
 
 export function useTeamRoster(id: number) {
-  return useQuery<any[]>({
+  return useQuery<RosterPlayerWithStats[]>({
     queryKey: ['team-roster', id],
     queryFn: () => fetchTeamRoster(id),
     enabled: !!id,
+    staleTime: 10 * 60 * 1000,  // 10 min - won't refetch while fresh
+    gcTime: 30 * 60 * 1000,     // 30 min - keep in cache after unmount
   });
 }
 

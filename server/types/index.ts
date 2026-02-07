@@ -126,4 +126,6 @@ export interface GoalieStats {
 // Roster player with NHL stats
 export interface RosterPlayerWithStats extends Joueur {
   nhlStats: SkaterStats | GoalieStats | null;
+  teamLogo?: string;
+  isActive?: boolean;
 }
