@@ -176,7 +176,7 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [x] Create `client/src/hooks/joueur/usePlayerOwnership.ts`
 - [x] Update `client/src/components/joueur/JoueurHeader.tsx`
   - Add ownership badge showing pool team name
-  - Link badge to team page (`/equipe/:id`)
+  - Link badge to team page (`/equipes/:id`)
   - Skeleton loader during fetch, hidden when player is unowned
 
 **Phase 8: Frontend - Team Roster Display** ✅ **COMPLETED**

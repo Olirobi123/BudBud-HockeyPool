@@ -41,7 +41,7 @@ export default function JoueurHeader({ player }: Props) {
             </Badge>
             {ownershipLoading && <Skeleton className="h-6 w-24 rounded-full" />}
             {ownership != null && (
-              <Link href={`/equipe/${ownership.id}`}>
+              <Link href={`/equipes/${ownership.id}`}>
                 <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer">
                   {ownership.nom}
                 </Badge>
