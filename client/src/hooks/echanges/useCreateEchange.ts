@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Echange from '@/types/IEchange';
+import { BACKEND_URL } from '@/lib/apiConfig';
 
 interface CreateEchangeData {
   equipe_source_id: string;
@@ -8,7 +9,7 @@ interface CreateEchangeData {
 }
 
 const createEchange = async (data: CreateEchangeData): Promise<Echange> => {
-  const response = await fetch('/api/echanges', {
+  const response = await fetch(`${BACKEND_URL}/api/echanges`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

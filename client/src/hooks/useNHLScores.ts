@@ -1,5 +1,6 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { GameScore } from '@/types';
+import { BACKEND_URL } from '@/lib/apiConfig';
 
 interface ApiResponse {
   success: boolean;
@@ -7,7 +8,7 @@ interface ApiResponse {
 }
 
 const fetchNHLScores = async (): Promise<GameScore[]> => {
-  const response = await fetch('/api/scores');
+  const response = await fetch(`${BACKEND_URL}/api/scores`);
   const json: ApiResponse = await response.json();
   return json.success === true ? json.data : [];
 };

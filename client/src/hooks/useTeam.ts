@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { Equipe, Echange, RosterPlayerWithStats } from '@/types';
+import { BACKEND_URL } from '@/lib/apiConfig';
 
 const fetchTeam = async (id: number): Promise<Equipe> => {
-  const response = await fetch(`/api/teams/${id}`);
+  const response = await fetch(`${BACKEND_URL}/api/teams/${id}`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération de l\'équipe');
   }
@@ -11,7 +12,7 @@ const fetchTeam = async (id: number): Promise<Equipe> => {
 };
 
 const fetchTeamRoster = async (id: number): Promise<RosterPlayerWithStats[]> => {
-  const response = await fetch(`/api/teams/${id}/roster/stats`);
+  const response = await fetch(`${BACKEND_URL}/api/teams/${id}/roster/stats`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération du roster');
   }
@@ -20,7 +21,7 @@ const fetchTeamRoster = async (id: number): Promise<RosterPlayerWithStats[]> => 
 };
 
 const fetchTeamLatestTrade = async (id: number): Promise<Echange | null> => {
-  const response = await fetch(`/api/teams/${id}/latest-trade`);
+  const response = await fetch(`${BACKEND_URL}/api/teams/${id}/latest-trade`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération du dernier échange');
   }

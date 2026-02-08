@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { NHLPlayer } from '@/types/IPlayerDetails';
+import { BACKEND_URL } from '@/lib/apiConfig';
 
 async function searchPlayers(query: string): Promise<NHLPlayer[]> {
   if (!query || query.length < 2) return [];
-  const response = await fetch(`/api/players/search?q=${encodeURIComponent(query)}`);
+  const response = await fetch(`${BACKEND_URL}/api/players/search?q=${encodeURIComponent(query)}`);
   if (!response.ok) throw new Error('Erreur de recherche');
   const result = await response.json();
   return result.data ?? [];

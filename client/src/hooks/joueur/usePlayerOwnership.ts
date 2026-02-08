@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { Equipe } from '@/types';
+import { BACKEND_URL } from '@/lib/apiConfig';
 
 const fetchPlayerOwnership = async (nhlId: string): Promise<Equipe | null> => {
-  const response = await fetch(`/api/players/${nhlId}/ownership`);
+  const response = await fetch(`${BACKEND_URL}/api/players/${nhlId}/ownership`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération de la propriété du joueur');
   }
