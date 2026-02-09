@@ -47,14 +47,14 @@ export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {
       />
       <div className="flex-1 min-w-0">
         <p className={cn(
-          'font-semibold truncate',
+          'font-semibold',
           isGeneral && 'text-amber-700 dark:text-amber-400',
         )}
         >
           {trophee.trophee_nom}
         </p>
         {trophee.equipe_nom && (
-          <p className="text-sm text-muted-foreground truncate">
+          <p className="text-sm text-muted-foreground">
             {trophee.equipe_nom}
           </p>
         )}

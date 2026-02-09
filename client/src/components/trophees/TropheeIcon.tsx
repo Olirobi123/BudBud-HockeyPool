@@ -1,6 +1,6 @@
 import {
   Trophy,
-  Crosshair,
+  Swords,
   Shield,
   CircleDot,
   Flame,
@@ -17,7 +17,7 @@ interface TropheeIconProps {
 
 const iconMap: Record<string, LucideIcon> = {
   Général: Trophy,
-  Attaque: Crosshair,
+  Attaque: Swords,
   Défense: Shield,
   Gardien: CircleDot,
   Playoffs: Flame,
