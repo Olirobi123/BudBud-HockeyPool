@@ -13,9 +13,33 @@ interface TropheeCardProps {
   compact?: boolean;
 }
 
+function formatYearRanges(years: number[]): string {
+  if (years.length === 0) return '';
+  if (years.length === 1) return String(years[0]);
+
+  const sorted = [...years].sort((a, b) => b - a);
+  const ranges: string[] = [];
+  let rangeStart = sorted[0];
+  let rangeEnd = sorted[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === rangeEnd - 1) {
+      rangeEnd = sorted[i];
+    } else {
+      ranges.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeEnd}-${rangeStart}`);
+      rangeStart = sorted[i];
+      rangeEnd = sorted[i];
+    }
+  }
+  ranges.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeEnd}-${rangeStart}`);
+
+  return ranges.join(', ');
+}
+
 export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {
   const isGeneral = trophee.trophee_nom === 'Général';
-  const sortedYears = [...trophee.annees].sort((a, b) => b - a);
+  const count = trophee.annees.length;
+  const yearsDisplay = formatYearRanges(trophee.annees);
 
   if (compact) {
     return (
@@ -32,13 +56,14 @@ export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {
         >
           {trophee.trophee_nom}
         </span>
-        <div className="flex gap-1 flex-wrap">
-          {sortedYears.map((annee) => (
-            <Badge key={annee} variant="secondary" className="text-xs">
-              {annee}
-            </Badge>
-          ))}
-        </div>
+        {count > 1 && (
+          <Badge variant="secondary" className="text-xs">
+            ×{count}
+          </Badge>
+        )}
+        <span className="text-xs text-muted-foreground">
+          {yearsDisplay}
+        </span>
       </div>
     );
   }
@@ -56,31 +81,29 @@ export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {
         size={isGeneral ? 'lg' : 'md'}
       />
       <div className="flex-1 min-w-0">
-        <p className={cn(
-          'font-semibold',
-          isGeneral && 'text-amber-700 dark:text-amber-400',
-        )}
-        >
-          {trophee.trophee_nom}
-        </p>
-        {trophee.equipe_nom && (
-          <p className="text-sm text-muted-foreground">
-            {trophee.equipe_nom}
-          </p>
-        )}
-      </div>
-      <div className="flex gap-1 flex-wrap justify-end">
-        {sortedYears.map((annee) => (
-          <Badge
-            key={annee}
-            variant="secondary"
-            className={cn(
-              isGeneral && 'bg-amber-500/20 text-amber-700 dark:text-amber-400',
-            )}
+        <div className="flex items-center gap-2">
+          <p className={cn(
+            'font-semibold',
+            isGeneral && 'text-amber-700 dark:text-amber-400',
+          )}
           >
-            {annee}
-          </Badge>
-        ))}
+            {trophee.trophee_nom}
+          </p>
+          {count > 1 && (
+            <Badge
+              variant="secondary"
+              className={cn(
+                'text-xs',
+                isGeneral && 'bg-amber-500/20 text-amber-700 dark:text-amber-400',
+              )}
+            >
+              ×{count}
+            </Badge>
+          )}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {yearsDisplay}
+        </p>
       </div>
     </div>
   );
