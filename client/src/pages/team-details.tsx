@@ -53,10 +53,10 @@ export default function TeamDetails() {
           <TeamRoster roster={roster || []} isLoading={isLoadingRoster} />
         </div>
 
-        {/* Sidebar: Latest Trade & Info */}
+        {/* Sidebar: Trophies & Latest Trade */}
         <div className="space-y-6">
-          <TeamLatestTrade trade={latestTrade || null} isLoading={isLoadingTrade} />
           <TeamTrophies teamId={id} />
+          <TeamLatestTrade trade={latestTrade || null} isLoading={isLoadingTrade} />
         </div>
       </div>
     </Layout>
