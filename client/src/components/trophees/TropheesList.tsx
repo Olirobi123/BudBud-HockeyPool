@@ -1,11 +1,30 @@
 import { Trophy } from 'lucide-react';
 import { TropheeGagnant } from '@/types';
-import { TropheeCard } from './TropheeCard';
+import { TropheeCard, GroupedTrophee } from './TropheeCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TropheesListProps {
   trophees: TropheeGagnant[];
   isLoading?: boolean;
+}
+
+function groupTrophees(trophees: TropheeGagnant[]): GroupedTrophee[] {
+  const grouped = new Map<string, GroupedTrophee>();
+
+  for (const t of trophees) {
+    const existing = grouped.get(t.trophee_nom);
+    if (existing) {
+      existing.annees.push(t.annee);
+    } else {
+      grouped.set(t.trophee_nom, {
+        trophee_nom: t.trophee_nom,
+        annees: [t.annee],
+        equipe_nom: t.equipe_nom,
+      });
+    }
+  }
+
+  return Array.from(grouped.values());
 }
 
 function TropheesSkeleton() {
@@ -34,19 +53,20 @@ export function TropheesList({ trophees, isLoading }: TropheesListProps) {
     );
   }
 
-  const generalTrophees = trophees.filter((t) => t.trophee_nom === 'Général');
-  const otherTrophees = trophees.filter((t) => t.trophee_nom !== 'Général');
+  const groupedTrophees = groupTrophees(trophees);
+  const generalTrophees = groupedTrophees.filter((t) => t.trophee_nom === 'Général');
+  const otherTrophees = groupedTrophees.filter((t) => t.trophee_nom !== 'Général');
 
   return (
     <div className="space-y-3">
       {generalTrophees.map((trophee) => (
-        <TropheeCard key={trophee.id} trophee={trophee} />
+        <TropheeCard key={trophee.trophee_nom} trophee={trophee} />
       ))}
 
       {otherTrophees.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {otherTrophees.map((trophee) => (
-            <TropheeCard key={trophee.id} trophee={trophee} />
+            <TropheeCard key={trophee.trophee_nom} trophee={trophee} />
           ))}
         </div>
       )}

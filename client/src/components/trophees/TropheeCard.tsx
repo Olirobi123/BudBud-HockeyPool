@@ -1,15 +1,21 @@
-import { TropheeGagnant } from '@/types';
 import { TropheeIcon } from './TropheeIcon';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
+export interface GroupedTrophee {
+  trophee_nom: string;
+  annees: number[];
+  equipe_nom?: string;
+}
+
 interface TropheeCardProps {
-  trophee: TropheeGagnant;
+  trophee: GroupedTrophee;
   compact?: boolean;
 }
 
 export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {
   const isGeneral = trophee.trophee_nom === 'Général';
+  const sortedYears = [...trophee.annees].sort((a, b) => b - a);
 
   if (compact) {
     return (
@@ -26,9 +32,13 @@ export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {
         >
           {trophee.trophee_nom}
         </span>
-        <Badge variant="secondary" className="text-xs">
-          {trophee.annee}
-        </Badge>
+        <div className="flex gap-1 flex-wrap">
+          {sortedYears.map((annee) => (
+            <Badge key={annee} variant="secondary" className="text-xs">
+              {annee}
+            </Badge>
+          ))}
+        </div>
       </div>
     );
   }
@@ -59,14 +69,19 @@ export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {
           </p>
         )}
       </div>
-      <Badge
-        variant="secondary"
-        className={cn(
-          isGeneral && 'bg-amber-500/20 text-amber-700 dark:text-amber-400',
-        )}
-      >
-        {trophee.annee}
-      </Badge>
+      <div className="flex gap-1 flex-wrap justify-end">
+        {sortedYears.map((annee) => (
+          <Badge
+            key={annee}
+            variant="secondary"
+            className={cn(
+              isGeneral && 'bg-amber-500/20 text-amber-700 dark:text-amber-400',
+            )}
+          >
+            {annee}
+          </Badge>
+        ))}
+      </div>
     </div>
   );
 }
