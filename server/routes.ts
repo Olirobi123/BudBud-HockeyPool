@@ -5,6 +5,7 @@ import echangesRoutes from './routes/echanges';
 import playersRoutes from './routes/players';
 import repechageRoutes from './routes/repechage';
 import scoresRoutes from './routes/scores';
+import healthRoutes from './routes/health';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -21,6 +22,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Routes pour les scores NHL
   app.use('/api/scores', scoresRoutes);
+
+  // Routes pour le health check
+  app.use('/api/health', healthRoutes);
 
   const httpServer = createServer(app);
 
