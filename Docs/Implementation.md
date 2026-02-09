@@ -170,7 +170,7 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
   - `getTeamTrophies()`
 - [ ] Create `server/controllers/tropheesController.ts`
 - [ ] Create `server/routes/trophees.ts`
-  - `GET /api/trophees`, `GET /api/trophees/winners/:year`
+  - `GET /api/trophees`, `GET /api/trophees/gagnants/:year`
 
 **Phase 7: Frontend - Player Ownership Display** ✅ **COMPLETED**
 - [x] Create `client/src/hooks/joueur/usePlayerOwnership.ts`

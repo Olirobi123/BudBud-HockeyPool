@@ -104,7 +104,6 @@
 | trophee_id | integer             | Oui  | -                                               |
 | annee      | integer             | Non  | -                                               |
 | equipe_id  | integer             | Oui  | -                                               |
-| joueur     | character varying   | Oui  | -                                               |
 
 #### Index
 - `trophee_gagnants_pkey` (8192 bytes) : UNIQUE sur `id`
