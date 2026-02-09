@@ -8,3 +8,4 @@ export type {
 } from './IScores';
 export type { Joueur, RosterPlayerWithStats, SkaterStats, GoalieStats } from './IRoster';
 export { isGoalieStats, isSkaterStats } from './IRoster';
+export type { Trophee, TropheeGagnant, TropheeType } from './ITrophee';

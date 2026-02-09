@@ -7,6 +7,7 @@ import { usePageLoading } from '@/hooks/usePageLoading';
 import { TeamHeader } from '@/components/equipes/TeamHeader';
 import { TeamRoster } from '@/components/equipes/TeamRoster';
 import { TeamLatestTrade } from '@/components/equipes/TeamLatestTrade';
+import { TeamTrophies } from '@/components/equipes/TeamTrophies';
 import { Button } from '@/components/ui/button';
 
 import NotFound from '@/pages/not-found';
@@ -52,8 +53,9 @@ export default function TeamDetails() {
           <TeamRoster roster={roster || []} isLoading={isLoadingRoster} />
         </div>
 
-        {/* Sidebar: Latest Trade & Info */}
+        {/* Sidebar: Trophies & Latest Trade */}
         <div className="space-y-6">
+          <TeamTrophies teamId={id} />
           <TeamLatestTrade trade={latestTrade || null} isLoading={isLoadingTrade} />
         </div>
       </div>
