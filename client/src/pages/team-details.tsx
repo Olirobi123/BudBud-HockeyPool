@@ -7,6 +7,7 @@ import { usePageLoading } from '@/hooks/usePageLoading';
 import { TeamHeader } from '@/components/equipes/TeamHeader';
 import { TeamRoster } from '@/components/equipes/TeamRoster';
 import { TeamLatestTrade } from '@/components/equipes/TeamLatestTrade';
+import { TeamTrophies } from '@/components/equipes/TeamTrophies';
 import { Button } from '@/components/ui/button';
 
 import NotFound from '@/pages/not-found';
@@ -55,6 +56,7 @@ export default function TeamDetails() {
         {/* Sidebar: Latest Trade & Info */}
         <div className="space-y-6">
           <TeamLatestTrade trade={latestTrade || null} isLoading={isLoadingTrade} />
+          <TeamTrophies teamId={id} />
         </div>
       </div>
     </Layout>

@@ -89,6 +89,24 @@ export interface ApiError {
   code?: string;
 }
 
+// Types pour les trophées
+export interface Trophee {
+  id: number;
+  nom: string;
+}
+
+export interface TropheeGagnant {
+  id: number;
+  trophee_id: number;
+  annee: number;
+  equipe_id: number;
+}
+
+export interface TropheeGagnantWithDetails extends TropheeGagnant {
+  trophee_nom: string;
+  equipe_nom?: string;
+}
+
 // Types pour la page d'accueil
 export interface HomeActivityItem {
   id: string;
