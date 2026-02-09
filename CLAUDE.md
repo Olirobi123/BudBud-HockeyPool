@@ -47,6 +47,7 @@ Before implementing features, consult in this order:
 3. `/Docs/project_structure.md` - File naming and folder structure
 4. `/Docs/UI_UX_doc.md` - Design system and responsive requirements
 5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (6 tables: equipes, echanges, repechages, types_repechage, trophees, trophee_gagnants)
+6. `/Docs/Git_Workflow.md` - Branching strategy and deployment process
 
 ## Key Constraints
 
@@ -56,6 +57,38 @@ Before implementing features, consult in this order:
 - Path alias: `@/*` maps to `client/src/*`
 - Mobile-first responsive design
 - Document errors in `/Docs/Bug_tracking.md`
+
+## Git Workflow
+
+### Branch Strategy
+- **main** - Production (deployed to production environment)
+- **acceptation** - Staging/QA (deployed to staging environment)
+- **dev** - Development integration branch
+- **feature/*** - Feature branches (created from `dev`)
+
+### Agent Workflow (IMPORTANT)
+When implementing a new feature or fix:
+
+1. **Always create a feature branch** from `dev`:
+   ```bash
+   git checkout dev
+   git pull origin dev
+   git checkout -b feature/descriptive-name
+   ```
+
+2. **Make commits** following conventional commit style
+
+3. **When the feature is ready**, create a Pull Request:
+   - Target branch: `dev`
+   - Use `gh pr create` to create the PR
+   - Include a clear description of changes
+
+4. **Never push directly** to `main`, `acceptation`, or `dev`
+
+### Promotion Flow
+```
+feature/* → dev → acceptation → main
+```
 
 ## Current Development Status
 
