@@ -1,39 +1,11 @@
 import { TropheeIcon } from './TropheeIcon';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-
-export interface GroupedTrophee {
-  trophee_nom: string;
-  annees: number[];
-  equipe_nom?: string;
-}
+import { cn, formatYearRanges } from '@/lib/utils';
+import { GroupedTrophee } from '@/types';
 
 interface TropheeCardProps {
   trophee: GroupedTrophee;
   compact?: boolean;
-}
-
-function formatYearRanges(years: number[]): string {
-  if (years.length === 0) return '';
-  if (years.length === 1) return String(years[0]);
-
-  const sorted = [...years].sort((a, b) => b - a);
-  const ranges: string[] = [];
-  let rangeStart = sorted[0];
-  let rangeEnd = sorted[0];
-
-  for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i] === rangeEnd - 1) {
-      rangeEnd = sorted[i];
-    } else {
-      ranges.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeEnd}-${rangeStart}`);
-      rangeStart = sorted[i];
-      rangeEnd = sorted[i];
-    }
-  }
-  ranges.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeEnd}-${rangeStart}`);
-
-  return ranges.join(', ');
 }
 
 export function TropheeCard({ trophee, compact = false }: TropheeCardProps) {

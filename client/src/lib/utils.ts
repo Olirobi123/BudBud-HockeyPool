@@ -14,6 +14,29 @@ export function formatDate(dateStr: string) {
   }).format(date);
 }
 
+export function formatYearRanges(years: number[]): string {
+  if (years.length === 0) return '';
+  if (years.length === 1) return String(years[0]);
+
+  const sorted = [...years].sort((a, b) => b - a);
+  const ranges: string[] = [];
+  let rangeStart = sorted[0];
+  let rangeEnd = sorted[0];
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === rangeEnd - 1) {
+      rangeEnd = sorted[i];
+    } else {
+      ranges.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeEnd}-${rangeStart}`);
+      rangeStart = sorted[i];
+      rangeEnd = sorted[i];
+    }
+  }
+  ranges.push(rangeStart === rangeEnd ? String(rangeStart) : `${rangeEnd}-${rangeStart}`);
+
+  return ranges.join(', ');
+}
+
 export function getPositionColor(position: string) {
   switch (position) {
     case 'C': return 'bg-blue-100 text-blue-800';
