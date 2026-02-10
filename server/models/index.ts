@@ -7,6 +7,8 @@ export const TABLES = {
   REPECHAGE: 'repechage',
   JOUEURS: 'joueurs',
   EQUIPE_JOUEURS: 'equipe_joueurs',
+  TROPHEES: 'trophees',
+  TROPHEE_GAGNANTS: 'trophee_gagnants',
 } as const;
 
 export const QUERIES = {
@@ -127,5 +129,47 @@ export const QUERIES = {
     FROM ${TABLES.EQUIPE_JOUEURS} ej
     JOIN ${TABLES.EQUIPES} e ON ej.equipe_id = e.id
     WHERE ej.joueur_id = $1
+  `,
+
+  // Trophées queries
+  GET_ALL_TROPHEES: `SELECT * FROM ${TABLES.TROPHEES} ORDER BY id`,
+  GET_ALL_WINNERS: `
+    SELECT
+      tg.id,
+      tg.trophee_id,
+      tg.annee,
+      tg.equipe_id,
+      t.nom as trophee_nom,
+      e.nom as equipe_nom
+    FROM ${TABLES.TROPHEE_GAGNANTS} tg
+    JOIN ${TABLES.TROPHEES} t ON tg.trophee_id = t.id
+    JOIN ${TABLES.EQUIPES} e ON tg.equipe_id = e.id
+    ORDER BY tg.annee DESC, t.id
+  `,
+  GET_WINNERS_BY_YEAR: `
+    SELECT
+      tg.id,
+      tg.trophee_id,
+      tg.annee,
+      tg.equipe_id,
+      t.nom as trophee_nom,
+      e.nom as equipe_nom
+    FROM ${TABLES.TROPHEE_GAGNANTS} tg
+    JOIN ${TABLES.TROPHEES} t ON tg.trophee_id = t.id
+    JOIN ${TABLES.EQUIPES} e ON tg.equipe_id = e.id
+    WHERE tg.annee = $1
+    ORDER BY t.id
+  `,
+  GET_TEAM_TROPHIES: `
+    SELECT
+      tg.id,
+      tg.trophee_id,
+      tg.annee,
+      tg.equipe_id,
+      t.nom as trophee_nom
+    FROM ${TABLES.TROPHEE_GAGNANTS} tg
+    JOIN ${TABLES.TROPHEES} t ON tg.trophee_id = t.id
+    WHERE tg.equipe_id = $1
+    ORDER BY tg.annee DESC, t.id
   `,
 } as const;

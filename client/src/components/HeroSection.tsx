@@ -4,10 +4,12 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useActiveTeams } from '@/hooks/useActiveTeams';
+import { useEchanges } from '@/hooks/echanges/useEchanges';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function HeroSection() {
   const { data: equipesActives = [], isLoading } = useActiveTeams();
+  const { data: echanges = [] } = useEchanges();
 
   // Gestion automatique du loading de la page
   usePageLoading({ dependencies: [isLoading] });
@@ -24,7 +26,7 @@ export default function HeroSection() {
             <div className="animate-slide-up">
               <div className="flex items-center space-x-2 mb-6">
                 <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
-                <span className="text-success text-sm font-medium">En direct - Saison 2024-25</span>
+                <span className="text-success text-sm font-medium">En direct - Saison 2025-26</span>
               </div>
 
               <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
@@ -73,7 +75,7 @@ export default function HeroSection() {
               <Card className="bg-blue-500/10 border-blue-400/20 backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300">
                 <CardContent className="p-6 text-center">
                   <Zap className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-white">84</div>
+                  <div className="text-2xl font-bold text-white">{echanges.length}</div>
                   <div className="text-sm text-blue-200">Échanges Total</div>
                 </CardContent>
               </Card>
@@ -82,7 +84,7 @@ export default function HeroSection() {
                 <CardContent className="p-6 text-center">
                   <Trophy className="w-8 h-8 text-amber-400 mx-auto mb-3" />
                   <div className="text-2xl font-bold text-white">En cours</div>
-                  <div className="text-sm text-blue-200">Saison 2024-25 - Mise à jour quotidienne</div>
+                  <div className="text-sm text-blue-200">Saison 2025-26 - Mise à jour quotidienne</div>
                 </CardContent>
               </Card>
             </div>

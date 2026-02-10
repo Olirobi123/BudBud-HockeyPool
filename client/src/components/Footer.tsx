@@ -1,6 +1,4 @@
-import { Activity, Mail, Phone } from 'lucide-react';
-import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
+import { Activity, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -25,31 +23,11 @@ export default function Footer() {
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <Activity className="w-4 h-4" />
-                <span>Saison 2024-25</span>
+                <span>Saison 2025-26</span>
               </div>
             </div>
           </div>
 
-          <div>
-            <h5 className="font-semibold text-white mb-4">Pool de Hockey</h5>
-            <ul className="space-y-2">
-              {/* The footerLinks object was removed, so this loop will not render any links */}
-            </ul>
-          </div>
-
-          <div>
-            <h5 className="font-semibold text-white mb-4">Saison</h5>
-            <ul className="space-y-2">
-              {/* The footerLinks object was removed, so this loop will not render any links */}
-            </ul>
-          </div>
-
-          <div>
-            <h5 className="font-semibold text-white mb-4">Aide</h5>
-            <ul className="space-y-2">
-              {/* The footerLinks object was removed, so this loop will not render any links */}
-            </ul>
-          </div>
         </div>
 
         <div className="border-t border-slate-700 mt-12 pt-8">

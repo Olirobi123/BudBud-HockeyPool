@@ -8,10 +8,29 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import PlayerDetails from '@/types/IPlayerDetails';
+import { formatSeason } from '@/lib/utils';
 
 type Props = {
   player: PlayerDetails;
 };
+
+interface StatsTotals {
+  gamesPlayed: number;
+  goals?: number;
+  assists?: number;
+  points?: number;
+  wins?: number;
+  losses?: number;
+  otLosses?: number;
+  shutouts?: number;
+  savePctg?: number;
+  goalsAgainstAvg?: number;
+}
+
+interface StatsAccumulator {
+  regular: StatsTotals;
+  playoffs: StatsTotals;
+}
 
 export default function JoueurTabsStats({ player }: Props) {
   return (
@@ -23,36 +42,41 @@ export default function JoueurTabsStats({ player }: Props) {
         <CardContent>
           <div className="space-y-6">
             {(() => {
-              const statsTotals = player.seasonTotals.reduce((acc, curr) => {
+              const initial: StatsAccumulator = {
+                regular: { gamesPlayed: 0 },
+                playoffs: { gamesPlayed: 0 },
+              };
+
+              const statsTotals = (player.seasonTotals ?? []).reduce((acc, curr) => {
                 const key = curr.gameTypeId === 3 ? 'playoffs' : 'regular';
                 if (curr.leagueAbbrev === 'NHL') {
                   if (player.position === 'G') {
                     acc[key] = {
-                      gamesPlayed: (acc[key]?.gamesPlayed || 0) + (curr.gamesPlayed || 0),
-                      wins: (acc[key]?.wins || 0) + (curr.wins || 0),
-                      losses: (acc[key]?.losses || 0) + (curr.losses || 0),
-                      otLosses: (acc[key]?.otLosses || 0) + (curr.otLosses || 0),
-                      shutouts: (acc[key]?.shutouts || 0) + (curr.shutouts || 0),
-                      savePctg: acc[key]?.savePctg
+                      gamesPlayed: (acc[key].gamesPlayed || 0) + (curr.gamesPlayed || 0),
+                      wins: (acc[key].wins || 0) + (curr.wins || 0),
+                      losses: (acc[key].losses || 0) + (curr.losses || 0),
+                      otLosses: (acc[key].otLosses || 0) + (curr.otLosses || 0),
+                      shutouts: (acc[key].shutouts || 0) + (curr.shutouts || 0),
+                      savePctg: acc[key].savePctg
                         ? ((acc[key].savePctg * acc[key].gamesPlayed + (curr.savePctg || 0) * (curr.gamesPlayed || 0))
                                        / (acc[key].gamesPlayed + (curr.gamesPlayed || 0)))
                         : curr.savePctg,
-                      goalsAgainstAvg: acc[key]?.goalsAgainstAvg
+                      goalsAgainstAvg: acc[key].goalsAgainstAvg
                         ? ((acc[key].goalsAgainstAvg * acc[key].gamesPlayed + (curr.goalsAgainstAvg || 0) * (curr.gamesPlayed || 0))
                                        / (acc[key].gamesPlayed + (curr.gamesPlayed || 0)))
                         : curr.goalsAgainstAvg,
                     };
                   } else {
                     acc[key] = {
-                      gamesPlayed: (acc[key]?.gamesPlayed || 0) + (curr.gamesPlayed || 0),
-                      goals: (acc[key]?.goals || 0) + (curr.goals || 0),
-                      assists: (acc[key]?.assists || 0) + (curr.assists || 0),
-                      points: (acc[key]?.points || 0) + (curr.points || 0),
+                      gamesPlayed: (acc[key].gamesPlayed || 0) + (curr.gamesPlayed || 0),
+                      goals: (acc[key].goals || 0) + (curr.goals || 0),
+                      assists: (acc[key].assists || 0) + (curr.assists || 0),
+                      points: (acc[key].points || 0) + (curr.points || 0),
                     };
                   }
                 }
                 return acc;
-              }, { regular: {}, playoffs: {} } as Record<string, any>);
+              }, initial);
 
               return (
                 <>
@@ -74,16 +98,16 @@ export default function JoueurTabsStats({ player }: Props) {
                               <div>
                                 <p className="text-sm font-medium">V-D-DP</p>
                                 <p className="text-xl font-bold">
-                                  {statsTotals.regular.wins}
+                                  {statsTotals.regular.wins ?? 0}
                                   -
-                                  {statsTotals.regular.losses}
+                                  {statsTotals.regular.losses ?? 0}
                                   -
-                                  {statsTotals.regular.otLosses}
+                                  {statsTotals.regular.otLosses ?? 0}
                                 </p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">BL</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.shutouts}</p>
+                                <p className="text-xl font-bold">{statsTotals.regular.shutouts ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">%ARR</p>
@@ -106,20 +130,22 @@ export default function JoueurTabsStats({ player }: Props) {
                               </div>
                               <div>
                                 <p className="text-sm font-medium">B</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.goals}</p>
+                                <p className="text-xl font-bold">{statsTotals.regular.goals ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">P</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.assists}</p>
+                                <p className="text-xl font-bold">{statsTotals.regular.assists ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">PTS</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.points}</p>
+                                <p className="text-xl font-bold">{statsTotals.regular.points ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">PPM</p>
                                 <p className="text-xl font-bold">
-                                  {(statsTotals.regular.points / statsTotals.regular.gamesPlayed).toFixed(2)}
+                                  {statsTotals.regular.gamesPlayed
+                                    ? ((statsTotals.regular.points ?? 0) / statsTotals.regular.gamesPlayed).toFixed(2)
+                                    : '0.00'}
                                 </p>
                               </div>
                             </>
@@ -145,16 +171,16 @@ export default function JoueurTabsStats({ player }: Props) {
                               <div>
                                 <p className="text-sm font-medium">V-D-DP</p>
                                 <p className="text-xl font-bold">
-                                  {statsTotals.playoffs.wins}
+                                  {statsTotals.playoffs.wins ?? 0}
                                   -
-                                  {statsTotals.playoffs.losses}
+                                  {statsTotals.playoffs.losses ?? 0}
                                   -
-                                  {statsTotals.playoffs.otLosses}
+                                  {statsTotals.playoffs.otLosses ?? 0}
                                 </p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">BL</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.shutouts}</p>
+                                <p className="text-xl font-bold">{statsTotals.playoffs.shutouts ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">%ARR</p>
@@ -177,20 +203,22 @@ export default function JoueurTabsStats({ player }: Props) {
                               </div>
                               <div>
                                 <p className="text-sm font-medium">B</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.goals}</p>
+                                <p className="text-xl font-bold">{statsTotals.playoffs.goals ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">P</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.assists}</p>
+                                <p className="text-xl font-bold">{statsTotals.playoffs.assists ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">PTS</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.points}</p>
+                                <p className="text-xl font-bold">{statsTotals.playoffs.points ?? 0}</p>
                               </div>
                               <div>
                                 <p className="text-sm font-medium">PPM</p>
                                 <p className="text-xl font-bold">
-                                  {(statsTotals.playoffs.points / statsTotals.playoffs.gamesPlayed).toFixed(2)}
+                                  {statsTotals.playoffs.gamesPlayed
+                                    ? ((statsTotals.playoffs.points ?? 0) / statsTotals.playoffs.gamesPlayed).toFixed(2)
+                                    : '0.00'}
                                 </p>
                               </div>
                             </>
@@ -231,9 +259,9 @@ export default function JoueurTabsStats({ player }: Props) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {player.seasonTotals
+                      {(player.seasonTotals ?? [])
                         .sort((a, b) => {
-                          const seasonDiff = b.season - a.season;
+                          const seasonDiff = (b.season ?? 0) - (a.season ?? 0);
                           if (seasonDiff !== 0) return seasonDiff;
                           return (b.gameTypeId || 0) - (a.gameTypeId || 0);
                         })
@@ -248,9 +276,9 @@ export default function JoueurTabsStats({ player }: Props) {
                                             : ''
                                         }
                           >
-                            <TableCell>{season.season}</TableCell>
+                            <TableCell>{formatSeason(season.season)}</TableCell>
                             <TableCell>{season.leagueAbbrev}</TableCell>
-                            <TableCell>{season.teamName.default}</TableCell>
+                            <TableCell>{season.teamName?.default ?? '-'}</TableCell>
                             <TableCell>
                               <Badge variant={season.gameTypeId === 3 ? 'destructive' : 'default'}>
                                 {season.gameTypeId === 3 ? 'Séries' : 'Régulière'}

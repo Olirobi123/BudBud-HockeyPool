@@ -166,11 +166,11 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
   - Fixed `client/src/types/index.ts` exports for `IHome` and `IDraft`
 
 **Phase 6: Awards System**
-- [ ] Create `server/services/tropheesService.ts`
+- [x] Create `server/services/tropheesService.ts`
   - `getTeamTrophies()`
-- [ ] Create `server/controllers/tropheesController.ts`
-- [ ] Create `server/routes/trophees.ts`
-  - `GET /api/trophees`, `GET /api/trophees/winners/:year`
+- [x] Create `server/controllers/tropheesController.ts`
+- [x] Create `server/routes/trophees.ts`
+  - `GET /api/trophees`, `GET /api/trophees/gagnants/:year`
 
 **Phase 7: Frontend - Player Ownership Display** ✅ **COMPLETED**
 - [x] Create `client/src/hooks/joueur/usePlayerOwnership.ts`
@@ -191,15 +191,15 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [x] Verify `client/src/hooks/useTeam.ts` fetches roster correctly
 
 **Phase 9: Frontend - Awards Section**
-- [ ] Add award types to `client/src/types/index.ts`
-- [ ] Create `client/src/hooks/useTrophees.ts`
-- [ ] Create `client/src/components/trophees/TropheesList.tsx`
-- [ ] Create `client/src/components/trophees/TropheeCard.tsx`
-- [ ] Create `client/src/components/equipes/TeamTrophies.tsx`
-- [ ] Review UI plan to see clever way to display trophies
-- [ ] Add different icons for each award type
-- [ ] Général trophies are the most important so they should have a bigger presence or priority
-- [ ] Add "Trophées" to team page
+- [x] Add award types to `client/src/types/index.ts`
+- [x] Create `client/src/hooks/useTrophees.ts`
+- [x] Create `client/src/components/trophees/TropheesList.tsx`
+- [x] Create `client/src/components/trophees/TropheeCard.tsx`
+- [x] Create `client/src/components/equipes/TeamTrophies.tsx`
+- [x] Review UI plan to see clever way to display trophies
+- [x] Add different icons for each award type
+- [x] Général trophies are the most important so they should have a bigger presence or priority
+- [x] Add "Trophées" to team page
 
 
 #### Verification Steps:
@@ -223,7 +223,6 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 **Dependencies:** Stage 4 completion
 
 #### Sub-steps:
-- [ ] Consider splitting the project into multiple repositories (frontend, backend, shared)
 - [ ] Conduct comprehensive manual and automated testing
 - [ ] Optimize performance (bundle size, lazy loading, etc.)
 - [ ] Enhance accessibility (a11y) and responsive design

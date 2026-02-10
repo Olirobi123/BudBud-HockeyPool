@@ -103,22 +103,6 @@ export class EchangesService {
   }
 
   /**
-   * Récupérer un échange par son ID
-   */
-  async getEchangeById(id: number): Promise<EchangeWithTeams | null> {
-    try {
-      const result = await pool.query(
-        `${QUERIES.GET_ALL_ECHANGES} AND e.id = $1`,
-        [id],
-      );
-      return result.rows.length > 0 ? result.rows[0] : null;
-    } catch (error) {
-      console.error('Erreur lors de la récupération de l\'échange:', error);
-      throw new Error('Erreur lors de la récupération de l\'échange');
-    }
-  }
-
-  /**
    * Récupérer le dernier échange formaté pour la page d'accueil
    */
   async getLatestEchange(): Promise<HomeTradeResponse | null> {
