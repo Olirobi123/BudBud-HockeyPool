@@ -1,30 +1,12 @@
 import { Trophy } from 'lucide-react';
-import { TropheeGagnant } from '@/types';
-import { TropheeCard, GroupedTrophee } from './TropheeCard';
+import { GroupedTrophee } from '@/types';
+import { TropheeCard } from './TropheeCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TropheesListProps {
-  trophees: TropheeGagnant[];
+  generalTrophees: GroupedTrophee[];
+  otherTrophees: GroupedTrophee[];
   isLoading?: boolean;
-}
-
-function groupTrophees(trophees: TropheeGagnant[]): GroupedTrophee[] {
-  const grouped = new Map<string, GroupedTrophee>();
-
-  for (const t of trophees) {
-    const existing = grouped.get(t.trophee_nom);
-    if (existing) {
-      existing.annees.push(t.annee);
-    } else {
-      grouped.set(t.trophee_nom, {
-        trophee_nom: t.trophee_nom,
-        annees: [t.annee],
-        equipe_nom: t.equipe_nom,
-      });
-    }
-  }
-
-  return Array.from(grouped.values());
 }
 
 function TropheesSkeleton() {
@@ -39,12 +21,12 @@ function TropheesSkeleton() {
   );
 }
 
-export function TropheesList({ trophees, isLoading }: TropheesListProps) {
+export function TropheesList({ generalTrophees, otherTrophees, isLoading }: TropheesListProps) {
   if (isLoading) {
     return <TropheesSkeleton />;
   }
 
-  if (!trophees || trophees.length === 0) {
+  if (generalTrophees.length === 0 && otherTrophees.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Trophy className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -52,10 +34,6 @@ export function TropheesList({ trophees, isLoading }: TropheesListProps) {
       </div>
     );
   }
-
-  const groupedTrophees = groupTrophees(trophees);
-  const generalTrophees = groupedTrophees.filter((t) => t.trophee_nom === 'Général');
-  const otherTrophees = groupedTrophees.filter((t) => t.trophee_nom !== 'Général');
 
   return (
     <div className="space-y-3">

@@ -1,5 +1,5 @@
 import { Trophy } from 'lucide-react';
-import { useTeamTrophies } from '@/hooks/useTrophees';
+import { useTeamTrophies, useGroupedTrophees } from '@/hooks/trophees/useTrophees';
 import { TropheesList } from '@/components/trophees/TropheesList';
 
 interface TeamTrophiesProps {
@@ -8,8 +8,9 @@ interface TeamTrophiesProps {
 
 export function TeamTrophies({ teamId }: TeamTrophiesProps) {
   const { data: trophees, isLoading } = useTeamTrophies(teamId);
+  const { generalTrophees, otherTrophees } = useGroupedTrophees(trophees ?? []);
 
-  const count = trophees?.length || 0;
+  const count = trophees?.length ?? 0;
 
   return (
     <div className="space-y-4">
@@ -17,14 +18,14 @@ export function TeamTrophies({ teamId }: TeamTrophiesProps) {
         <Trophy className="w-5 h-5" />
         Trophées
         {count > 0 && (
-          <span className="text-sm font-normal text-muted-foreground">
-            (
-            {count}
-            )
-          </span>
+          <span className="text-sm font-normal text-muted-foreground">({count})</span>
         )}
       </h3>
-      <TropheesList trophees={trophees || []} isLoading={isLoading} />
+      <TropheesList
+        generalTrophees={generalTrophees}
+        otherTrophees={otherTrophees}
+        isLoading={isLoading}
+      />
     </div>
   );
 }

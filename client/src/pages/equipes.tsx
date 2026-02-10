@@ -47,7 +47,7 @@ export default function Equipes() {
     <Layout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Liste des Équipes</h1>
-        <p className="text-muted-foreground">Saison 2024-25</p>
+        <p className="text-muted-foreground">Saison 2025-26</p>
       </div>
 
       {/* Statistics Summary */}

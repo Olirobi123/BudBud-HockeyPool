@@ -23,7 +23,7 @@ export const HomeQuickActions: React.FC = () => (
       <Link href="/draft">
         <Button variant="outline" className="w-full justify-start">
           <Users className="w-4 h-4 mr-2" />
-          Repêchage 2024-25
+          Repêchage 2025-26
         </Button>
       </Link>
       <Link href="/echanges" className="w-full justify-start">

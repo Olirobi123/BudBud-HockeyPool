@@ -10,12 +10,12 @@ import { TropheeType } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface TropheeIconProps {
-  type: TropheeType | string;
+  type: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-const iconMap: Record<string, LucideIcon> = {
+const iconMap: Record<TropheeType, LucideIcon> = {
   Général: Trophy,
   Attaque: Swords,
   Défense: Shield,
@@ -23,7 +23,7 @@ const iconMap: Record<string, LucideIcon> = {
   Playoffs: Flame,
 };
 
-const colorMap: Record<string, string> = {
+const colorMap: Record<TropheeType, string> = {
   Général: 'text-amber-500',
   Attaque: 'text-red-500',
   Défense: 'text-blue-500',
@@ -37,9 +37,13 @@ const sizeMap = {
   lg: 'w-8 h-8 md:w-10 md:h-10',
 };
 
+function isTropheeType(type: string): type is TropheeType {
+  return type in iconMap;
+}
+
 export function TropheeIcon({ type, size = 'md', className }: TropheeIconProps) {
-  const Icon = iconMap[type] || Trophy;
-  const color = colorMap[type] || 'text-gray-500';
+  const Icon = isTropheeType(type) ? iconMap[type] : Trophy;
+  const color = isTropheeType(type) ? colorMap[type] : 'text-gray-500';
   const sizeClass = sizeMap[size];
 
   return (

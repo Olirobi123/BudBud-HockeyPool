@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { tropheesService } from '../services/tropheesService';
-import { sendSuccess, sendServerError } from '../utils/response';
+import { sendSuccess, sendValidationError } from '../utils/response';
 import { asyncHandler } from '../middleware/errorHandler';
 
 export class TropheesController {
@@ -27,7 +27,7 @@ export class TropheesController {
     const year = parseInt(req.params.year);
 
     if (isNaN(year)) {
-      sendServerError(res, 'Année invalide');
+      sendValidationError(res, 'Année invalide');
       return;
     }
 
@@ -42,7 +42,7 @@ export class TropheesController {
     const teamId = parseInt(req.params.teamId);
 
     if (isNaN(teamId)) {
-      sendServerError(res, 'ID d\'équipe invalide');
+      sendValidationError(res, 'ID d\'équipe invalide');
       return;
     }
 

@@ -110,7 +110,7 @@ export interface TropheeGagnantWithDetails extends TropheeGagnant {
 // Types pour la page d'accueil
 export interface HomeActivityItem {
   id: string;
-  type: 'trade';
+  type: 'Échange';
   time: string;
   description: string;
   details?: string;

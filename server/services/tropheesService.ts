@@ -3,36 +3,44 @@ import { Trophee, TropheeGagnantWithDetails } from '../types';
 import { QUERIES } from '../models';
 
 export class TropheesService {
-  /**
-   * Récupérer tous les types de trophées
-   */
   async getAllTrophees(): Promise<Trophee[]> {
-    const result = await pool.query(QUERIES.GET_ALL_TROPHEES);
-    return result.rows;
+    try {
+      const result = await pool.query(QUERIES.GET_ALL_TROPHEES);
+      return result.rows;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des trophées:', error);
+      throw new Error('Erreur lors de la récupération des trophées');
+    }
   }
 
-  /**
-   * Récupérer tous les gagnants
-   */
   async getAllWinners(): Promise<TropheeGagnantWithDetails[]> {
-    const result = await pool.query(QUERIES.GET_ALL_WINNERS);
-    return result.rows;
+    try {
+      const result = await pool.query(QUERIES.GET_ALL_WINNERS);
+      return result.rows;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des gagnants:', error);
+      throw new Error('Erreur lors de la récupération des gagnants');
+    }
   }
 
-  /**
-   * Récupérer les gagnants par année
-   */
   async getWinnersByYear(year: number): Promise<TropheeGagnantWithDetails[]> {
-    const result = await pool.query(QUERIES.GET_WINNERS_BY_YEAR, [year]);
-    return result.rows;
+    try {
+      const result = await pool.query(QUERIES.GET_WINNERS_BY_YEAR, [year]);
+      return result.rows;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des gagnants par année:', error);
+      throw new Error('Erreur lors de la récupération des gagnants par année');
+    }
   }
 
-  /**
-   * Récupérer les trophées d'une équipe
-   */
   async getTeamTrophies(teamId: number): Promise<TropheeGagnantWithDetails[]> {
-    const result = await pool.query(QUERIES.GET_TEAM_TROPHIES, [teamId]);
-    return result.rows;
+    try {
+      const result = await pool.query(QUERIES.GET_TEAM_TROPHIES, [teamId]);
+      return result.rows;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des trophées de l\'équipe:', error);
+      throw new Error('Erreur lors de la récupération des trophées de l\'équipe');
+    }
   }
 }
 
