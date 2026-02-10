@@ -12,13 +12,19 @@ async function fetchFromApi<T>(path: string, errorMessage: string): Promise<T> {
   return result.data ?? [];
 }
 
+const fetchTrophies = async (teamId: number): Promise<TropheeGagnant[]> => {
+  const response = await fetch(`${BACKEND_URL}/api/trophees/equipe/${teamId}`);
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération des échanges');
+  }
+  const result = await response.json();
+  return result.data || [];
+};
+
 export function useTeamTrophies(teamId: number) {
-  return useQuery<TropheeGagnant[]>({
+  return useQuery<TropheeGagnant[] | null>({
     queryKey: ['team-trophies', teamId],
-    queryFn: () => fetchFromApi<TropheeGagnant[]>(
-      `/api/trophees/equipe/${teamId}`,
-      'Erreur lors de la récupération des trophées de l\'équipe',
-    ),
+    queryFn: () => fetchTrophies(teamId),
     enabled: !!teamId,
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
