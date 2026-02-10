@@ -29,8 +29,8 @@ export const PlayerSearchResultItem: React.FC<PlayerSearchResultItemProps> = ({ 
           )}
         </div>
       </div>
-      <Badge className={getPositionColor(player.positionCode)}>
-        {player.positionCode}
+      <Badge className={getPositionColor(player.positionCode ?? '')}>
+        {player.positionCode ?? '-'}
       </Badge>
     </div>
   </div>

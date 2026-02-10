@@ -5,6 +5,7 @@ import { NavigationLogo } from './navigation/NavigationLogo';
 import { NavigationLinks } from './navigation/NavigationLinks';
 import { NavigationMobileMenu } from './navigation/NavigationMobileMenu';
 import PlayerSearch from '@/components/PlayerSearch';
+import type { NHLPlayer } from '@/types';
 
 const navLinks = [
   { href: '/equipes', label: 'Équipes' },
@@ -22,7 +23,7 @@ export default function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location, setLocation] = useLocation();
 
-  const handlePlayerSelect = (player: any) => {
+  const handlePlayerSelect = (player: NHLPlayer) => {
     setIsMobileMenuOpen(false);
     setLocation(`/joueur/${player.playerId}`);
   };

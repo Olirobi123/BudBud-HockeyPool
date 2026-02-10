@@ -14,6 +14,13 @@ export function formatDate(dateStr: string) {
   }).format(date);
 }
 
+export function formatSeason(season?: number): string {
+  if (!season) return '-';
+  const str = String(season);
+  if (str.length === 8) return `${str.slice(0, 4)}-${str.slice(4)}`;
+  return str;
+}
+
 export function formatYearRanges(years: number[]): string {
   if (years.length === 0) return '';
   if (years.length === 1) return String(years[0]);

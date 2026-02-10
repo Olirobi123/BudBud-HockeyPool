@@ -1,14 +1,10 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
-import { Link } from 'wouter';
+
 import { useLatestTrade } from '@/hooks/home/useLatestTrade';
-import {
-  Card, CardHeader, CardTitle, CardContent,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading';
 import { InlineError } from '@/components/ui/error-display';
 import { EchangeCard } from '@/components/echanges/EchangeCard';
+import type Echange from '@/types/IEchange';
 
 export const HomeLatestTrade: React.FC = () => {
   const { data: latestTrade, isLoading, error } = useLatestTrade();
@@ -18,16 +14,16 @@ export const HomeLatestTrade: React.FC = () => {
   if (!latestTrade) return <div>Aucun échange récent.</div>;
 
   // Adapt HomeTrade to Echange format
-  const mappedTrade = {
+  const mappedTrade: Echange = {
     id: parseInt(latestTrade.id, 10),
     date: latestTrade.date,
-    equipe_source_id: 0, // Not needed for display
-    equipe_destination_id: 0, // Not needed for display
+    equipe_source_id: 0,
+    equipe_destination_id: 0,
     equipe_source_nom: latestTrade.teamA,
     equipe_destination_nom: latestTrade.teamB,
     details: `${latestTrade.playersA.join(', ')} | ${latestTrade.playersB.join(', ')}`,
     statut_confirmer: true,
-  } as any; // Cast to any or Echange if imports allow (using simplified mapping)
+  };
 
   return (
     <div className="space-y-6">

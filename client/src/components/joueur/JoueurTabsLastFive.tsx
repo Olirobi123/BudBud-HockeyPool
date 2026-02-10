@@ -50,7 +50,7 @@ export default function JoueurTabsLastFive({ player }: Props) {
               <TableBody>
                 {player.last5Games.map((game) => (
                   <TableRow key={game.gameDate}>
-                    <TableCell>{format(new Date(game.gameDate), 'd MMM', { locale: fr })}</TableCell>
+                    <TableCell>{game.gameDate ? format(new Date(game.gameDate), 'd MMM', { locale: fr }) : '-'}</TableCell>
                     <TableCell>
                       {game.homeRoadFlag === 'H' ? 'vs' : '@'}
                       {' '}
