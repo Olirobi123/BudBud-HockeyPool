@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { Users } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link } from "react-router-dom";
 import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/components/ui/card';
@@ -93,7 +93,7 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
                   <TableCell>
                     <Link
-                      href={`/joueur/${player.nhl_player_id}`}
+                      to={`/joueur/${player.nhl_player_id}`}
                       className="flex items-center gap-2 font-medium hover:underline text-primary"
                     >
                       {player.teamLogo && (
@@ -168,7 +168,7 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
               <TableRow key={player.id}>
                 <TableCell>
                   <Link
-                    href={`/joueur/${player.nhl_player_id}`}
+                    to={`/joueur/${player.nhl_player_id}`}
                     className="flex items-center gap-2 font-medium hover:underline text-primary"
                   >
                     {player.teamLogo && (

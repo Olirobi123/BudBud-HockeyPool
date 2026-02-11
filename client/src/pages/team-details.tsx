@@ -1,4 +1,4 @@
-import { useRoute, Link } from 'wouter';
+import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
@@ -13,12 +13,12 @@ import { Button } from '@/components/ui/button';
 import NotFound from '@/pages/not-found';
 
 export default function TeamDetails() {
-  const [, params] = useRoute('/equipes/:id');
-  const id = params ? parseInt(params.id) : 0;
+  let { id }= useParams();
+   let idNum =  id != undefined && id.trim() != ""  ? parseInt(id.trim()) : 0;
 
-  const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(id);
-  const { data: roster, isLoading: isLoadingRoster } = useTeamRoster(id);
-  const { data: latestTrade, isLoading: isLoadingTrade } = useTeamLatestTrade(id);
+  const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(idNum);
+  const { data: roster, isLoading: isLoadingRoster } = useTeamRoster(idNum);
+  const { data: latestTrade, isLoading: isLoadingTrade } = useTeamLatestTrade(idNum);
 
   // Gestion automatique du loading de la page
   usePageLoading({ dependencies: [isLoadingTeam] });
@@ -31,14 +31,14 @@ export default function TeamDetails() {
     );
   }
 
-  if (isNaN(id) || id === 0 || errorTeam || !team) {
+  if (isNaN(idNum) || idNum === 0 || errorTeam || !team) {
     return <NotFound />;
   }
 
   return (
     <Layout>
       {/* Back Button */}
-      <Link href="/equipes">
+      <Link to="/equipes">
         <Button variant="ghost" className="mb-6 hover:bg-transparent hover:text-blue-600 pl-0 transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Retour aux équipes
@@ -55,7 +55,7 @@ export default function TeamDetails() {
 
         {/* Sidebar: Trophies & Latest Trade */}
         <div className="space-y-6">
-          <TeamTrophies teamId={id} />
+          <TeamTrophies teamId={idNum} />
           <TeamLatestTrade trade={latestTrade || null} isLoading={isLoadingTrade} />
         </div>
       </div>

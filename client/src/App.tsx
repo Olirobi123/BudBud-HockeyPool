@@ -1,5 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Switch, Route } from 'wouter';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { queryClient } from '@/lib/queryClient';
 import { LoadingProvider, useLoading } from '@/lib/loading-context';
 import Loading from '@/components/ui/loading';
@@ -27,18 +27,29 @@ function LoadingOverlay() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+     <QueryClientProvider client={queryClient}>
       <LoadingProvider>
         <LoadingOverlay />
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/equipes" component={Equipes} />
-          <Route path="/equipes/:id" component={TeamDetails} />
-          <Route path="/draft" component={Draft} />
-          <Route path="/echanges" component={Echanges} />
-          <Route path="/joueur/:id" component={Joueur} />
-          <Route component={NotFound} />
-        </Switch>
+        <BrowserRouter>
+          <Routes>
+            {/* Route principale */}
+            <Route path="/" element={<Home />} />
+
+            {/* Routes équipes */}
+            <Route path="/equipes" element={<Equipes />} />
+            <Route path="/equipes/:id" element={<TeamDetails />} />
+
+            {/* Autres pages */}
+            <Route path="/draft" element={<Draft />} />
+            <Route path="/echanges" element={<Echanges />} />
+
+            {/* Route joueurs */}
+            <Route path="/joueur/:id" element={<Joueur />} />
+
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
       </LoadingProvider>
     </QueryClientProvider>
   );

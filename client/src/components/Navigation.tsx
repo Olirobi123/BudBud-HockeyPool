@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigationScroll } from '@/hooks/navigation/useNavigationScroll';
 import { NavigationLogo } from './navigation/NavigationLogo';
 import { NavigationLinks } from './navigation/NavigationLinks';
@@ -21,11 +21,12 @@ const navLinks = [
 export default function Navigation() {
   const isScrolled = useNavigationScroll();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [location, setLocation] = useLocation();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handlePlayerSelect = (player: NHLPlayer) => {
     setIsMobileMenuOpen(false);
-    setLocation(`/joueur/${player.playerId}`);
+    navigate(`/joueur/${player.playerId}`);
   };
 
   return (
@@ -39,7 +40,7 @@ export default function Navigation() {
               <NavigationLogo />
             </div>
             <div className="hidden lg:block ml-10">
-              <NavigationLinks navLinks={navLinks} location={location} />
+              <NavigationLinks navLinks={navLinks} location={location.pathname} />
             </div>
           </div>
           <div className="hidden md:block">
@@ -51,7 +52,7 @@ export default function Navigation() {
               isOpen={isMobileMenuOpen}
               setIsOpen={setIsMobileMenuOpen}
               handlePlayerSelect={handlePlayerSelect}
-              location={location}
+              location={location.pathname}
             />
           </div>
         </div>
