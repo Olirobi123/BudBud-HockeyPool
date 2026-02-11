@@ -19,21 +19,39 @@ app.use(helmet());
 app.set('trust proxy', true);
 
 
-const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
 
-let corsOrigin: any;
+/**
+ * CORS Configuration
+ * 
+ * - In dev: allow localhost easily
+ * - In prod: allow only specific frontend domains
+ * - Avoid '*' if credentials are needed
+ */
+const allowedOriginsEnv = process.env.ALLOWED_ORIGINS; // e.g. "http://localhost:5173,https://my-frontend.vercel.app"
 
-if (!allowedOriginsEnv || allowedOriginsEnv === '*') {
-  corsOrigin = '*';
-} else {
-  corsOrigin = allowedOriginsEnv.split(',').map(o => o.trim());
-}
-
-app.use(cors({
-  origin: corsOrigin,
+const corsOptions = {
+  origin: (origin: string | undefined, callback: Function) => {
+    if (!origin) {
+      // Allow server-to-server requests or tools like Postman
+      return callback(null, true);
+    }
+    if (!allowedOriginsEnv || allowedOriginsEnv === '*') {
+      // Allow all origins (no credentials)
+      return callback(null, true);
+    }
+    const allowedOrigins = allowedOriginsEnv.split(',').map(o => o.trim());
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Origin not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: false,
-}));
+  credentials: false, // Set to true only if you use cookies/auth
+};
+
+app.use(cors(corsOptions));
+
 
 // Rate limiting
 const apiLimiter = rateLimit({
