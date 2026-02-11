@@ -1,5 +1,5 @@
 import { AlertCircle, Home as HomeIcon } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -22,7 +22,7 @@ export default function NotFound() {
           </div>
 
           <div className="flex justify-center">
-            <Link href="/">
+            <Link to="/">
               <Button className="w-full bg-gradient-to-r from-blue-400 to-cyan-400 text-slate-900 hover:from-blue-500 hover:to-cyan-500 font-bold shadow-lg">
                 <HomeIcon className="mr-2 h-4 w-4" />
                 Retour à l'accueil

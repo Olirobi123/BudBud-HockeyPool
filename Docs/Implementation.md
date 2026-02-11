@@ -11,9 +11,6 @@
   *Justification: Utility-first, enforces consistency, already in use*  
   [Tailwind Docs](https://tailwindcss.com/)
 
-- **Routing:** Wouter  
-  *Justification: Lightweight, simple, already in use*  
-  [Wouter Docs](https://github.com/molefrog/wouter)
 
 - **State/Server State:** TanStack Query (React Query)  
   *Justification: Best-in-class for server state, already in use*  
@@ -234,7 +231,6 @@ Implement comprehensive roster tracking, NHL API integration with @olirobi/nhl_a
 - [TypeScript Documentation](https://www.typescriptlang.org/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/)
 - [TanStack Query Documentation](https://tanstack.com/query/latest)
-- [Wouter Documentation](https://github.com/molefrog/wouter)
 - [Node.js Documentation](https://nodejs.org/en/docs)
 - [Express Documentation](https://expressjs.com/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)

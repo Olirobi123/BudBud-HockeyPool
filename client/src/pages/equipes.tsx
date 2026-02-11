@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
+import { Link } from 'react-router-dom';
 import { useTeams } from '@/hooks/useTeams';
 import { useActiveTeams } from '@/hooks/useActiveTeams';
 import { ErrorDisplay } from '@/components/ui/error-display';
@@ -83,14 +84,14 @@ export default function Equipes() {
                   </Badge>
                 </div>
 
-                <a href={`/equipes/${equipe.id}`}>
+                <Link to={`/equipes/${equipe.id}`}>
                   <Button
                     size="sm"
                     className="w-full mt-4 bg-transparent border border-border text-foreground transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-400 hover:to-cyan-400 hover:text-slate-900 hover:border-transparent hover:font-bold"
                   >
                     Voir les Détails
                   </Button>
-                </a>
+                </Link>
               </div>
             </CardContent>
           </Card>

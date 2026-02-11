@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { usePlayerOwnership } from '@/hooks/joueur/usePlayerOwnership';
@@ -39,7 +39,7 @@ export default function JoueurHeader({ player }: Props) {
               {player.position}
             </Badge>
             {!ownershipLoading && ownership != null && (
-              <Link href={`/equipes/${ownership.id}`}>
+              <Link to={`/equipes/${ownership.id}`}>
                 <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer">
                   {ownership.nom}
                 </Badge>

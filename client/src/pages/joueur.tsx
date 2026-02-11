@@ -1,19 +1,20 @@
-import { useRoute } from 'wouter';
+import { useParams } from "react-router-dom";
 import Loading from '@/components/ui/loading';
 import JoueurLayout from '@/components/joueur/JoueurLayout';
 import { usePlayerDetails } from '@/hooks/usePlayerDetails';
 import { ErrorDisplay } from '@/components/ui/error-display';
 import { usePageLoading } from '@/hooks/usePageLoading';
+import NotFound from "./not-found";
 
 export default function Joueur() {
-  const [, params] = useRoute('/joueur/:id');
-  const playerId = params?.id;
+  const { id } = useParams();
+  console.log(id)
 
   const {
     data: player,
     isLoading,
     error,
-  } = usePlayerDetails(playerId || '');
+  } = usePlayerDetails(id || '');
 
   // Gestion automatique du loading de la page
   usePageLoading({ dependencies: [isLoading] });
@@ -33,7 +34,9 @@ export default function Joueur() {
       </div>
     );
   }
-  if (!player) return <div>Joueur non trouvé</div>;
+  if (!player){
+    return <NotFound />;
+  }
 
   return (
     <JoueurLayout player={player} />

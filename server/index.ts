@@ -16,15 +16,23 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(helmet());
 
-// CORS — origines autorisées via variable d'environnement (séparées par des virgules)
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : ['http://localhost:5173'];
+app.set('trust proxy', true);
+
+
+const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
+
+let corsOrigin: any;
+
+if (!allowedOriginsEnv || allowedOriginsEnv === '*') {
+  corsOrigin = '*';
+} else {
+  corsOrigin = allowedOriginsEnv.split(',').map(o => o.trim());
+}
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: corsOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
+  credentials: false,
 }));
 
 // Rate limiting

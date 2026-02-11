@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { NHLPlayer } from '@/types/IPlayerDetails';
 import { BACKEND_URL } from '@/lib/apiConfig';
 
@@ -15,7 +15,7 @@ async function searchPlayers(query: string): Promise<NHLPlayer[]> {
 export function usePlayerSearch(onPlayerSelect?: (player: NHLPlayer) => void) {
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
 
   const { data: players, isLoading, error } = useQuery<NHLPlayer[]>({
@@ -31,7 +31,7 @@ export function usePlayerSearch(onPlayerSelect?: (player: NHLPlayer) => void) {
     if (onPlayerSelect) {
       onPlayerSelect(player);
     } else {
-      setLocation(`/joueur/${player.playerId}`);
+      navigate(`/joueur/${player.playerId}`);
     }
   };
 

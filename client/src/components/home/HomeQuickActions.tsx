@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Trophy, Users, TrendingUp, ArrowLeftRight,
 } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card, CardHeader, CardTitle, CardContent,
@@ -14,19 +14,19 @@ export const HomeQuickActions: React.FC = () => (
       <CardTitle className="text-lg">Actions Rapides</CardTitle>
     </CardHeader>
     <CardContent className="space-y-4">
-      <Link href="/equipes">
+      <Link to="/equipes">
         <Button variant="outline" className="w-full justify-start">
           <Trophy className="w-4 h-4 mr-2" />
           Voir Classement
         </Button>
       </Link>
-      <Link href="/draft">
+      <Link to="/draft">
         <Button variant="outline" className="w-full justify-start">
           <Users className="w-4 h-4 mr-2" />
           Repêchage 2025-26
         </Button>
       </Link>
-      <Link href="/echanges" className="w-full justify-start">
+      <Link to="/echanges" className="w-full justify-start">
         <Button variant="outline" className="w-full justify-start">
           <ArrowLeftRight className="w-4 h-4 mr-2" />
           Voir tous les Échanges

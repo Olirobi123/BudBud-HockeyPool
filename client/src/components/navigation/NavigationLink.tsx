@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 
 interface NavigationLinkProps {
@@ -34,7 +34,7 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
     );
   }
   return (
-    <Link href={href}>
+    <Link to={href}>
       <span
         className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer ${
           active

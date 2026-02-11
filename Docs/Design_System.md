@@ -30,7 +30,7 @@
 - **Frontend:** React 18 + TypeScript
 - **Styling:** Tailwind CSS 3.x
 - **UI Components:** shadcn/ui (Radix-based primitives)
-- **Routing:** Wouter
+- **Routing:** React-router-dom
 - **State Management:** TanStack Query for server state
 - **Backend:** Node.js + Express + PostgreSQL
 
