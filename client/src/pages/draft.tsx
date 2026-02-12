@@ -8,7 +8,7 @@ import { DraftFilters } from '@/components/draft/DraftFilters';
 import { DraftTable } from '@/components/draft/DraftTable';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
-export default function Draft() {
+export default function Draft(): JSX.Element {
   const {
     data: draftPicks,
     isLoading,
@@ -54,33 +54,52 @@ export default function Draft() {
   if (!draftPicks || draftPicks.length === 0) return <div>Aucun choix de repêchage trouvé</div>;
 
   return (
-    <Layout maxWidth="max-w-5xl" containerPadding="px-2 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2 tracking-tight">
-          Repêchage
-          {' '}
-          {selectedYear}
-        </h1>
-        <p className="text-muted-foreground mb-6">Ordre de sélection et historique du repêchage</p>
-        {/* Use DraftFilters component */}
-        <DraftFilters
-          annees={annees}
-          equipes={equipes}
-          types={types}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
-          selectedRound={selectedRound}
-          setSelectedRound={setSelectedRound}
-          selectedEquipe={selectedEquipe}
-          setSelectedEquipe={setSelectedEquipe}
-          availableRounds={availableRounds}
-          isTypesLoading={isTypesLoading}
-        />
+    <Layout
+      maxWidth="max-w-5xl"
+      containerPadding="px-2 sm:px-6 lg:px-8"
+      mainPadding="pt-12 pb-12"
+    >
+      {/* Page Header Section */}
+      <div className="mb-12">
+        <div className="flex items-center gap-3 mb-3">
+          {/* Decorative accent */}
+          <div className="flex items-center gap-1.5">
+            <div className="w-1 h-8 bg-cyan-400 rounded-full" />
+            <div className="w-0.5 h-6 bg-cyan-400/60 rounded-full" />
+          </div>
+
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
+              Repêchage
+              {' '}
+              <span className="text-cyan-400">{selectedYear}</span>
+            </h1>
+          </div>
+        </div>
+
+        <p className="text-base text-muted-foreground ml-6 pl-2">
+          Ordre de sélection et historique du repêchage
+        </p>
       </div>
 
-      {/* Tableau style joueur-tabs-stats */}
+      {/* Filters */}
+      <DraftFilters
+        annees={annees}
+        equipes={equipes}
+        types={types}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        selectedType={selectedType}
+        setSelectedType={setSelectedType}
+        selectedRound={selectedRound}
+        setSelectedRound={setSelectedRound}
+        selectedEquipe={selectedEquipe}
+        setSelectedEquipe={setSelectedEquipe}
+        availableRounds={availableRounds}
+        isTypesLoading={isTypesLoading}
+      />
+
+      {/* Draft Table */}
       <DraftTable
         filteredPicksEquipe={filteredPicksEquipe}
         selectedType={selectedType}
