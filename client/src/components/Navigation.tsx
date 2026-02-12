@@ -6,6 +6,7 @@ import { NavigationLinks } from './navigation/NavigationLinks';
 import { NavigationMobileMenu } from './navigation/NavigationMobileMenu';
 import PlayerSearch from '@/components/PlayerSearch';
 import type { NHLPlayer } from '@/types';
+import { cn } from '@/lib/utils';
 
 const navLinks = [
   { href: '/equipes', label: 'Équipes' },
@@ -31,21 +32,29 @@ export default function Navigation() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 bg-slate-900"
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 duration-500 ease-out',
+        isScrolled
+          ? 'nav-glass-scrolled'
+          : 'nav-glass',
+      )}
     >
+      {/* Subtle top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <NavigationLogo />
-            </div>
-            <div className="hidden lg:block ml-10">
+          <div className="flex items-center gap-10">
+            <NavigationLogo />
+            <div className="hidden lg:block">
               <NavigationLinks navLinks={navLinks} location={location.pathname} />
             </div>
           </div>
+
           <div className="hidden md:block">
             <PlayerSearch onPlayerSelect={handlePlayerSelect} className="w-64" />
           </div>
+
           <div className="md:hidden">
             <NavigationMobileMenu
               navLinks={navLinks}
@@ -56,6 +65,16 @@ export default function Navigation() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Bottom edge — only visible when not scrolled, dissolves into hero */}
+      <div
+        className={cn(
+          'absolute bottom-0 left-0 right-0 h-px transition-opacity duration-500',
+          isScrolled ? 'opacity-0' : 'opacity-100',
+        )}
+      >
+        <div className="h-full bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       </div>
     </nav>
   );
