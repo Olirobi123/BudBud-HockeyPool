@@ -1,152 +1,7 @@
-import { JSX, useMemo } from 'react';
+import { JSX } from 'react';
 import useNHLScores from '@/hooks/useNHLScores';
 import { GameScore } from '@/types';
 import { cn } from '@/lib/utils';
-
-// ──────────────────────────────────────────────────────────────────────────────
-// TODO: DELETE FAKE GAMES — These are placeholder games to showcase every game
-// state (live, intermission, critical/OT, final, final/OT, final/SO, upcoming).
-// Remove this entire block + the merging logic in the component once real data
-// covers all states.
-// ──────────────────────────────────────────────────────────────────────────────
-const FAKE_GAMES: GameScore[] = [
-  {
-    // FAKE — Live game, 2nd period
-    id: 90001,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-11T00:00:00Z',
-    gameState: 'LIVE',
-    period: 2,
-    periodDescriptor: { number: 2, periodType: 'REG' },
-    clock: {
-      timeRemaining: '08:42', secondsRemaining: 522, running: true, inIntermission: false,
-    },
-    awayTeam: {
-      id: 8, abbrev: 'MTL', logo: 'https://assets.nhle.com/logos/nhl/svg/MTL_light.svg', score: 2,
-    },
-    homeTeam: {
-      id: 10, abbrev: 'TOR', logo: 'https://assets.nhle.com/logos/nhl/svg/TOR_light.svg', score: 1,
-    },
-  },
-  {
-    // FAKE — Intermission between 1st and 2nd
-    id: 90002,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-11T00:00:00Z',
-    gameState: 'LIVE',
-    period: 1,
-    periodDescriptor: { number: 1, periodType: 'REG' },
-    clock: {
-      timeRemaining: '00:00', secondsRemaining: 0, running: false, inIntermission: true,
-    },
-    awayTeam: {
-      id: 23, abbrev: 'EDM', logo: 'https://assets.nhle.com/logos/nhl/svg/EDM_light.svg', score: 3,
-    },
-    homeTeam: {
-      id: 20, abbrev: 'CGY', logo: 'https://assets.nhle.com/logos/nhl/svg/CGY_light.svg', score: 3,
-    },
-  },
-  {
-    // FAKE — Critical moment (overtime)
-    id: 90003,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-11T00:00:00Z',
-    gameState: 'CRIT',
-    period: 4,
-    periodDescriptor: { number: 4, periodType: 'OT' },
-    clock: {
-      timeRemaining: '02:15', secondsRemaining: 135, running: true, inIntermission: false,
-    },
-    awayTeam: {
-      id: 6, abbrev: 'BOS', logo: 'https://assets.nhle.com/logos/nhl/svg/BOS_light.svg', score: 4,
-    },
-    homeTeam: {
-      id: 3, abbrev: 'NYR', logo: 'https://assets.nhle.com/logos/nhl/svg/NYR_light.svg', score: 4,
-    },
-  },
-  {
-    // FAKE — Final (regulation)
-    id: 90004,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-11T23:00:00Z',
-    gameState: 'FINAL',
-    period: 3,
-    periodDescriptor: { number: 3, periodType: 'REG' },
-    awayTeam: {
-      id: 52, abbrev: 'WPG', logo: 'https://assets.nhle.com/logos/nhl/svg/WPG_light.svg', score: 5,
-    },
-    homeTeam: {
-      id: 16, abbrev: 'CHI', logo: 'https://assets.nhle.com/logos/nhl/svg/CHI_light.svg', score: 2,
-    },
-  },
-  {
-    // FAKE — Final (overtime)
-    id: 90005,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-11T23:30:00Z',
-    gameState: 'OFF',
-    period: 4,
-    periodDescriptor: { number: 4, periodType: 'OT' },
-    awayTeam: {
-      id: 12, abbrev: 'CAR', logo: 'https://assets.nhle.com/logos/nhl/svg/CAR_light.svg', score: 3,
-    },
-    homeTeam: {
-      id: 14, abbrev: 'TBL', logo: 'https://assets.nhle.com/logos/nhl/svg/TBL_light.svg', score: 2,
-    },
-  },
-  {
-    // FAKE — Final (shootout)
-    id: 90006,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-11T23:45:00Z',
-    gameState: 'FINAL',
-    period: 5,
-    periodDescriptor: { number: 5, periodType: 'SO' },
-    awayTeam: {
-      id: 25, abbrev: 'DAL', logo: 'https://assets.nhle.com/logos/nhl/svg/DAL_light.svg', score: 4,
-    },
-    homeTeam: {
-      id: 21, abbrev: 'COL', logo: 'https://assets.nhle.com/logos/nhl/svg/COL_light.svg', score: 3,
-    },
-  },
-  {
-    // FAKE — Upcoming game
-    id: 90007,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-12T00:30:00Z',
-    gameState: 'FUT',
-    awayTeam: { id: 55, abbrev: 'SEA', logo: 'https://assets.nhle.com/logos/nhl/svg/SEA_light.svg' },
-    homeTeam: { id: 24, abbrev: 'ANA', logo: 'https://assets.nhle.com/logos/nhl/svg/ANA_light.svg' },
-  },
-  {
-    // FAKE — Another upcoming game
-    id: 90008,
-    season: 20252026,
-    gameType: 2,
-    gameDate: '2026-02-11',
-    startTimeUTC: '2026-02-12T01:00:00Z',
-    gameState: 'FUT',
-    awayTeam: { id: 26, abbrev: 'LAK', logo: 'https://assets.nhle.com/logos/nhl/svg/LAK_light.svg' },
-    homeTeam: { id: 29, abbrev: 'SJS', logo: 'https://assets.nhle.com/logos/nhl/svg/SJS_light.svg' },
-  },
-];
-// ──────────────────────────────────────────────────────────────────────────────
-// END FAKE GAMES
-// ──────────────────────────────────────────────────────────────────────────────
 
 /**
  * Get period label for display
@@ -306,30 +161,21 @@ function GameCard({ game }: GameCardProps): JSX.Element {
 }
 
 /**
- * "NHL" label pill at the start of the ticker
+ * pill at the start of the ticker
  */
 function TickerLabel(): JSX.Element {
   return (
-    <div className="flex-shrink-0 flex items-center gap-2 pr-3 mr-1 border-r border-white/[0.06]">
+    <div className="flex-shrink-0 flex items-center gap-2 pr-3 mr-1 ">
       <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-      <span className="text-[11px] font-display font-bold tracking-[0.2em] uppercase text-slate-400">
-        NHL
-      </span>
     </div>
   );
 }
 
 export default function LiveScoresTicker(): JSX.Element | null {
-  const { data: realGames, isLoading, error } = useNHLScores();
-
-  // TODO: DELETE — Merge fake games with real ones. Remove this once fake games are deleted.
-  const games = useMemo(() => {
-    const real = realGames ?? [];
-    return [...FAKE_GAMES, ...real];
-  }, [realGames]);
+  const { data: games, isLoading, error } = useNHLScores();
 
   // Don't render anything if loading, error, or no games
-  if (isLoading || error !== null || games.length === 0) {
+  if (isLoading || error !== null || games === undefined || games.length === 0) {
     return null;
   }
 

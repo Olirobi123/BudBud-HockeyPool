@@ -17,7 +17,7 @@ function StatPill({
 }) {
   return (
     <div
-      className="group relative flex items-center gap-3 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 backdrop-blur-sm hover:bg-white/[0.08] hover:border-cyan-400/30 transition-all duration-300 animate-slide-up"
+      className="group relative flex items-center gap-3 bg-white/[0.04] rounded-xl px-5 py-4 backdrop-blur-sm hover:bg-white/[0.08] transition-all duration-300 animate-slide-up"
       style={{ animationDelay: delay, animationFillMode: 'both' }}
     >
       <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors duration-300">
@@ -42,18 +42,19 @@ export default function HeroSection(): JSX.Element {
   usePageLoading({ dependencies: [isLoading] });
 
   return (
-    <section className="relative overflow-hidden hero-ice-bg min-h-[85vh] flex items-center">
-      {/* Rink line grid pattern */}
-      <div className="absolute inset-0 rink-lines animate-ice-drift" />
-
-      {/* Diagonal accent slash */}
-      <div className="absolute -right-20 top-0 w-[400px] h-full bg-gradient-to-b from-cyan-500/[0.03] to-transparent rotate-12 origin-top-right" />
-      <div className="absolute -left-20 bottom-0 w-[300px] h-[60%] bg-gradient-to-t from-blue-500/[0.04] to-transparent -rotate-12 origin-bottom-left" />
-
-      {/* Large decorative 38 watermark */}
-      <div className="absolute right-[-5%] top-1/2 -translate-y-1/2 font-display text-[28rem] font-bold text-white/[0.015] leading-none select-none pointer-events-none hidden lg:block">
-        38
-      </div>
+    <section className="relative overflow-hidden min-h-[85vh] flex items-center bg-slate-950">
+      {/* Background photo — flipped so player appears on right */}
+      <img
+        src="/images/hero-bg.jpg"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover object-[25%_20%] -scale-x-100 pointer-events-none select-none"
+      />
+      {/* Dark gradient overlay */}
+      <div className="absolute inset-0 hero-gradient-overlay" />
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 w-full">
@@ -159,7 +160,7 @@ export default function HeroSection(): JSX.Element {
       </div>
 
       {/* Bottom edge gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 to-transparent z-[5]" />
     </section>
   );
 }
