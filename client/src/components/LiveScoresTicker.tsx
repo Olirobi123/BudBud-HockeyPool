@@ -164,7 +164,7 @@ function GameCard({ game }: GameCardProps): JSX.Element {
  * pill at the start of the ticker
  */
 function TickerLabel(): JSX.Element {
-  return (
+  return ( 
     <div className="flex-shrink-0 flex items-center gap-2 pr-3 mr-1 ">
       <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
     </div>
