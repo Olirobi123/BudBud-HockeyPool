@@ -17,6 +17,22 @@ export const QUERIES = {
   GET_ACTIVE_TEAMS: `SELECT * FROM ${TABLES.EQUIPES} WHERE active = true`,
   GET_TEAM_BY_ID: `SELECT * FROM ${TABLES.EQUIPES} WHERE id = $1`,
 
+  // Teams by division (alphabetically ordered)
+  GET_TEAMS_BY_DIVISION: `
+    SELECT id, nom, active, division
+    FROM ${TABLES.EQUIPES}
+    WHERE division = $1 AND active = true
+    ORDER BY nom ASC
+  `,
+
+  // Inactive teams
+  GET_INACTIVE_TEAMS: `
+    SELECT id, nom, active, division
+    FROM ${TABLES.EQUIPES}
+    WHERE active = false
+    ORDER BY nom ASC
+  `,
+
   // Échanges
   GET_ALL_ECHANGES: `
     SELECT 

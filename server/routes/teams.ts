@@ -9,6 +9,12 @@ router.get('/', teamsController.getAllTeams);
 // Récupérer uniquement les équipes actives
 router.get('/active', teamsController.getActiveTeams);
 
+// Récupérer les équipes inactives
+router.get('/inactive', teamsController.getInactiveTeams);
+
+// Récupérer le classement d'une division (nord ou sud)
+router.get('/division/:division/standings', teamsController.getDivisionStandings);
+
 // Récupérer une équipe par son ID
 router.get('/:id', teamsController.getTeamById);
 

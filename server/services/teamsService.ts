@@ -185,6 +185,53 @@ export class TeamsService {
       throw new Error('Erreur lors de la récupération du dernier échange');
     }
   }
+
+  /**
+   * Get all teams in a specific division (alphabetically ordered)
+   */
+  async getTeamsByDivision(division: 'nord' | 'sud'): Promise<Equipe[]> {
+    try {
+      const result = await pool.query(QUERIES.GET_TEAMS_BY_DIVISION, [division]);
+      return result.rows;
+    } catch (error) {
+      console.error(`Erreur lors de la récupération des équipes de la division ${division}:`, error);
+      throw new Error(`Erreur lors de la récupération des équipes de la division ${division}`);
+    }
+  }
+
+  /**
+   * Get division standings (alphabetically ordered, not stats-based)
+   * Rank is simply the position in the alphabetical list
+   */
+  async getDivisionStandings(division: 'nord' | 'sud'): Promise<{ id: number; nom: string; division: 'nord' | 'sud'; rank: number }[]> {
+    try {
+      const teams = await this.getTeamsByDivision(division);
+
+      // Assign ranks based on alphabetical position (1, 2, 3...)
+      return teams.map((team, index) => ({
+        id: team.id,
+        nom: team.nom,
+        division: division,
+        rank: index + 1,
+      }));
+    } catch (error) {
+      console.error(`Erreur lors de la récupération du classement de la division ${division}:`, error);
+      throw new Error(`Erreur lors de la récupération du classement de la division ${division}`);
+    }
+  }
+
+  /**
+   * Get all inactive teams
+   */
+  async getInactiveTeams(): Promise<Equipe[]> {
+    try {
+      const result = await pool.query(QUERIES.GET_INACTIVE_TEAMS);
+      return result.rows;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des équipes inactives:', error);
+      throw new Error('Erreur lors de la récupération des équipes inactives');
+    }
+  }
 }
 
 export const teamsService = new TeamsService();
