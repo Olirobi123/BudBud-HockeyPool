@@ -1,96 +1,165 @@
+import { Link } from 'react-router-dom';
 import {
-  Trophy, Users, TrendingUp, Zap,
+  Trophy, Users, Zap, ArrowRight,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useActiveTeams } from '@/hooks/useActiveTeams';
 import { useEchanges } from '@/hooks/echanges/useEchanges';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
-export default function HeroSection() {
+function StatPill({
+  icon: Icon, value, label, delay,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  value: string | number;
+  label: string;
+  delay: string;
+}) {
+  return (
+    <div
+      className="group relative flex items-center gap-3 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 backdrop-blur-sm hover:bg-white/[0.08] hover:border-cyan-400/30 transition-all duration-300 animate-slide-up"
+      style={{ animationDelay: delay, animationFillMode: 'both' }}
+    >
+      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors duration-300">
+        <Icon className="w-5 h-5 text-cyan-400" />
+      </div>
+      <div>
+        <div className="font-display text-2xl font-bold text-white tracking-wide leading-none">
+          {value}
+        </div>
+        <div className="text-[11px] uppercase tracking-[0.15em] text-slate-400 mt-0.5 font-medium">
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function HeroSection(): JSX.Element {
   const { data: equipesActives = [], isLoading } = useActiveTeams();
   const { data: echanges = [] } = useEchanges();
 
-  // Gestion automatique du loading de la page
   usePageLoading({ dependencies: [isLoading] });
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-20 sm:py-32">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.blue.100),transparent)] opacity-10" />
-      <div className="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-slate-50 shadow-xl shadow-primary/10 ring-1 ring-slate-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center opacity-5" />
+    <section className="relative overflow-hidden hero-ice-bg min-h-[85vh] flex items-center">
+      {/* Rink line grid pattern */}
+      <div className="absolute inset-0 rink-lines animate-ice-drift" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-center">
+      {/* Diagonal accent slash */}
+      <div className="absolute -right-20 top-0 w-[400px] h-full bg-gradient-to-b from-cyan-500/[0.03] to-transparent rotate-12 origin-top-right" />
+      <div className="absolute -left-20 bottom-0 w-[300px] h-[60%] bg-gradient-to-t from-blue-500/[0.04] to-transparent -rotate-12 origin-bottom-left" />
+
+      {/* Large decorative 38 watermark */}
+      <div className="absolute right-[-5%] top-1/2 -translate-y-1/2 font-display text-[28rem] font-bold text-white/[0.015] leading-none select-none pointer-events-none hidden lg:block">
+        38
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 w-full">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-12 items-center">
+
+          {/* Left: Copy */}
           <div className="lg:col-span-7">
             <div className="animate-slide-up">
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
-                <span className="text-success text-sm font-medium">En direct - Saison 2025-26</span>
+              {/* Live badge */}
+              <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 rounded-full px-4 py-1.5 mb-8">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
+                </span>
+                <span className="text-emerald-300 text-xs font-semibold tracking-wide uppercase">
+                  En direct &mdash; Saison 2025-26
+                </span>
               </div>
 
-              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Pool de Hockey
-                {' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
-                  38BudBud
+              {/* Headline */}
+              <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[0.95]">
+                POOL DE
+                <br />
+                HOCKEY
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 text-glow-cyan">
+                  38BUDBUD
                 </span>
               </h1>
 
-              <p className="mt-6 text-xl text-white/90 leading-relaxed max-w-2xl">
-                Plateforme modernisée pour votre pool de hockey avec suivi en temps réel,
-                statistiques avancées et interface intuitive pour une expérience de jeu optimale.
+              <p className="mt-6 text-lg text-slate-300/90 leading-relaxed max-w-lg">
+                Suivi en temps réel, statistiques avancées et interface
+                intuitive pour votre pool de hockey.
               </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-400 to-cyan-400 text-slate-900 hover:from-blue-500 hover:to-cyan-500 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-bold"
-                >
-                  <Trophy className="w-5 h-5 mr-2" />
-                  Voir le Classement
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="bg-slate-800/50 text-white border-slate-700 hover:bg-slate-800 hover:text-white backdrop-blur-sm transition-all duration-200"
-                >
-                  <TrendingUp className="w-5 h-5 mr-2" />
-                  Statistiques
-                </Button>
+              {/* CTAs */}
+              <div className="mt-10 flex flex-col sm:flex-row gap-4">
+                <Link to="/equipes">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 font-display text-base tracking-wide uppercase font-semibold px-8 transition-all duration-300 hover:-translate-y-0.5"
+                  >
+                    <Trophy className="w-5 h-5 mr-2" />
+                    Classement
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <Link to="/echanges">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="bg-white/[0.03] text-slate-200 border-white/10 hover:bg-white/[0.08] hover:text-white hover:border-cyan-400/30 backdrop-blur-sm font-display text-base tracking-wide uppercase font-semibold px-8 transition-all duration-300"
+                  >
+                    Échanges
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-5 mt-12 lg:mt-0">
-            <div className="grid grid-cols-2 gap-4 animate-fade-in">
-              <Card className="bg-blue-500/10 border-blue-400/20 backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300">
-                <CardContent className="p-6 text-center">
-                  <Users className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-white">{equipesActives.length || 0}</div>
-                  <div className="text-sm text-blue-200">Équipes Actives</div>
-                </CardContent>
-              </Card>
+          {/* Right: Stats */}
+          <div className="lg:col-span-5 mt-16 lg:mt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+              <StatPill
+                icon={Users}
+                value={equipesActives.length || 0}
+                label="Équipes actives"
+                delay="0.15s"
+              />
+              <StatPill
+                icon={Zap}
+                value={echanges.length}
+                label="Échanges cette saison"
+                delay="0.25s"
+              />
+              <StatPill
+                icon={Trophy}
+                value="2025-26"
+                label="Saison en cours"
+                delay="0.35s"
+              />
+            </div>
 
-              <Card className="bg-blue-500/10 border-blue-400/20 backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300">
-                <CardContent className="p-6 text-center">
-                  <Zap className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-white">{echanges.length}</div>
-                  <div className="text-sm text-blue-200">Échanges Total</div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-blue-500/10 border-blue-400/20 backdrop-blur-sm hover:bg-blue-500/20 transition-all duration-300 col-span-2">
-                <CardContent className="p-6 text-center">
-                  <Trophy className="w-8 h-8 text-amber-400 mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-white">En cours</div>
-                  <div className="text-sm text-blue-200">Saison 2025-26 - Mise à jour quotidienne</div>
-                </CardContent>
-              </Card>
+            {/* Decorative scoreboard accent */}
+            <div
+              className="mt-6 border border-white/[0.06] rounded-xl p-4 bg-white/[0.02] backdrop-blur-sm animate-slide-up"
+              style={{ animationDelay: '0.45s', animationFillMode: 'both' }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-semibold">
+                    Mise à jour quotidienne
+                  </span>
+                </div>
+                <div className="h-px flex-1 mx-4 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <span className="font-display text-xs text-slate-500 tracking-wider">LIVE</span>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
+
+      {/* Bottom edge gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 }
