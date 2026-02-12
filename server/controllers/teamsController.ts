@@ -85,6 +85,31 @@ export class TeamsController {
     const trade = await teamsService.getTeamLatestTrade(id);
     sendSuccess(res, trade);
   });
+
+  /**
+   * GET /api/teams/division/:division/standings
+   * Returns alphabetically ordered standings for a division
+   */
+  getDivisionStandings = asyncHandler(async (req: Request, res: Response) => {
+    const { division } = req.params;
+
+    if (division !== 'nord' && division !== 'sud') {
+      sendServerError(res, 'Division invalide. Utilisez "nord" ou "sud".');
+      return;
+    }
+
+    const standings = await teamsService.getDivisionStandings(division);
+    sendSuccess(res, standings);
+  });
+
+  /**
+   * GET /api/teams/inactive
+   * Returns all inactive teams
+   */
+  getInactiveTeams = asyncHandler(async (req: Request, res: Response) => {
+    const teams = await teamsService.getInactiveTeams();
+    sendSuccess(res, teams);
+  });
 }
 
 export const teamsController = new TeamsController();

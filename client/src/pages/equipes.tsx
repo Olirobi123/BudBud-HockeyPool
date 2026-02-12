@@ -1,33 +1,43 @@
-import { Users } from 'lucide-react';
-import {
-  Card, CardContent, CardHeader, CardTitle,
-} from '@/components/ui/card';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
-import { Link } from 'react-router-dom';
-import { useTeams } from '@/hooks/useTeams';
-import { useActiveTeams } from '@/hooks/useActiveTeams';
 import { ErrorDisplay } from '@/components/ui/error-display';
 import { usePageLoading } from '@/hooks/usePageLoading';
+import { useDivisionStandings } from '@/hooks/equipes/useDivisionStandings';
+import { useInactiveTeams } from '@/hooks/equipes/useInactiveTeams';
+import { QuebecMap } from '@/components/equipes/QuebecMap';
+import { DivisionStandings } from '@/components/equipes/DivisionStandings';
+import { InactiveTeamsSection } from '@/components/equipes/InactiveTeamsSection';
 
 export default function Equipes() {
+  const [divisionFilter, setDivisionFilter] = useState<'nord' | 'sud' | null>(null);
+
+  // Fetch standings for both divisions
   const {
-    data: equipes,
-    isLoading: isLoadingAll,
-    error: errorAll,
-  } = useTeams();
+    data: nordStandings,
+    isLoading: isLoadingNord,
+    error: errorNord,
+  } = useDivisionStandings('nord');
 
   const {
-    data: equipesActives,
-    isLoading: isLoadingActives,
-  } = useActiveTeams();
+    data: sudStandings,
+    isLoading: isLoadingSud,
+    error: errorSud,
+  } = useDivisionStandings('sud');
 
-  // Gestion automatique du loading de la page
-  usePageLoading({ dependencies: [isLoadingAll, isLoadingActives] });
+  const {
+    data: inactiveTeams,
+    isLoading: isLoadingInactive,
+  } = useInactiveTeams();
 
-  if (isLoadingAll || isLoadingActives) {
+  // Page loading state
+  usePageLoading({
+    dependencies: [isLoadingNord, isLoadingSud, isLoadingInactive],
+  });
+
+  // Loading state
+  if (isLoadingNord || isLoadingSud) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loading />
@@ -35,68 +45,62 @@ export default function Equipes() {
     );
   }
 
-  if (errorAll) {
+  // Error state
+  if (errorNord || errorSud) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <ErrorDisplay error={errorAll} onRetry={() => window.location.reload()} />
+        <ErrorDisplay
+          error={errorNord || errorSud}
+          onRetry={() => window.location.reload()}
+        />
       </div>
     );
   }
-  if (!equipes) return <div>Aucune équipe trouvée</div>;
+
+  const totalTeams = (nordStandings?.length || 0) + (sudStandings?.length || 0);
 
   return (
     <Layout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Liste des Équipes</h1>
-        <p className="text-muted-foreground">Saison 2025-26</p>
+      {/* Hero Section */}
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground mb-3">
+          DIVISIONS
+        </h1>
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <p className="text-muted-foreground text-lg">Saison 2025-26</p>
+          <Badge variant="outline" className="text-sm font-semibold">
+            {totalTeams} équipes actives
+          </Badge>
+        </div>
       </div>
 
-      {/* Statistics Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Users className="w-8 h-8 text-primary mx-auto mb-2" />
-            <div className="text-2xl font-bold text-foreground">{equipesActives?.length || 0}</div>
-            <div className="text-sm text-muted-foreground">Équipes Actives</div>
-          </CardContent>
-        </Card>
+      {/* Main Layout: Map + Standings */}
+      <div className="grid grid-cols-1 lg:grid-cols-[38%_1fr] gap-8 mb-8">
+        {/* Quebec Map */}
+        <div className="animate-fadeIn">
+          <QuebecMap
+            nordTeams={nordStandings || []}
+            sudTeams={sudStandings || []}
+            onRegionClick={setDivisionFilter}
+            activeFilter={divisionFilter}
+          />
+        </div>
+
+        {/* Division Standings */}
+        <div className="animate-fadeIn" style={{ animationDelay: '0.1s' }}>
+          <DivisionStandings
+            nordStandings={nordStandings || []}
+            sudStandings={sudStandings || []}
+            divisionFilter={divisionFilter}
+          />
+        </div>
       </div>
 
-      {/* Teams Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {equipes.map((equipe) => (
-          <Card key={equipe.id} className="hover:shadow-lg transition-shadow duration-300">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-bold text-foreground">
-                {equipe.nom}
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Statut</span>
-                  <Badge
-                    variant="secondary"
-                    className={equipe.active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}
-                  >
-                    {equipe.active ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-
-                <Link to={`/equipes/${equipe.id}`}>
-                  <Button
-                    size="sm"
-                    className="w-full mt-4 bg-transparent border border-border text-foreground transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-400 hover:to-cyan-400 hover:text-slate-900 hover:border-transparent hover:font-bold"
-                  >
-                    Voir les Détails
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Inactive Teams (Collapsible) */}
+      <InactiveTeamsSection
+        teams={inactiveTeams || []}
+        isLoading={isLoadingInactive}
+      />
     </Layout>
   );
 }
