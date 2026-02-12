@@ -31,8 +31,14 @@ export default function Layout({
 
   return (
     <div className={cn('min-h-screen', bgClassName)}>
-      {!hideNavigation && <Navigation />}
-      {!hideNavigation && <div className="pt-16 bg-slate-900"><LiveScoresTicker /></div>}
+      {!hideNavigation && (
+        <>
+          <Navigation />
+          {/* Solid dark backdrop behind the fixed nav so glass doesn't show page content through */}
+          <div className="h-16 bg-slate-900" />
+          <LiveScoresTicker />
+        </>
+      )}
 
       {beforeContainer}
 

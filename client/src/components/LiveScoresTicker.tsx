@@ -11,7 +11,7 @@ function getPeriodLabel(period: number | undefined): string {
   if (period === 1) return '1re';
   if (period === 2) return '2e';
   if (period === 3) return '3e';
-  return `Prol.${period > 3 ? period - 3 : ''}`;
+  return 'Prol.';
 }
 
 /**
@@ -36,7 +36,7 @@ function formatGameState(game: GameScore): string {
     return 'FINAL';
   }
 
-  // Future game - show start time in ET
+  // Future game — show start time in ET
   const date = new Date(startTimeUTC);
   return date.toLocaleTimeString('fr-CA', {
     hour: 'numeric',
@@ -45,11 +45,54 @@ function formatGameState(game: GameScore): string {
   });
 }
 
-/**
- * Check if game is currently live
- */
-function isLive(gameState: string): boolean {
-  return gameState === 'LIVE' || gameState === 'CRIT';
+type GameStatus = 'live' | 'final' | 'upcoming';
+
+function getGameStatus(gameState: string): GameStatus {
+  if (gameState === 'LIVE' || gameState === 'CRIT') return 'live';
+  if (gameState === 'FINAL' || gameState === 'OFF') return 'final';
+  return 'upcoming';
+}
+
+interface TeamRowProps {
+  team: GameScore['awayTeam'] | GameScore['homeTeam'];
+  isWinner: boolean;
+  status: GameStatus;
+}
+
+function TeamRow({ team, isWinner, status }: TeamRowProps): JSX.Element {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        <img
+          src={team.logo}
+          alt={team.abbrev}
+          className="w-5 h-5 flex-shrink-0 object-contain"
+        />
+        <span
+          className={cn(
+            'text-xs font-semibold tracking-wide whitespace-nowrap font-display',
+            status === 'final' && !isWinner && 'text-slate-500',
+            status === 'final' && isWinner && 'text-white',
+            status === 'live' && 'text-slate-200',
+            status === 'upcoming' && 'text-slate-400',
+          )}
+        >
+          {team.abbrev}
+        </span>
+      </div>
+      <span
+        className={cn(
+          'text-sm font-bold tabular-nums min-w-[1ch] text-right',
+          status === 'final' && !isWinner && 'text-slate-500',
+          status === 'final' && isWinner && 'text-white',
+          status === 'live' && 'text-white',
+          status === 'upcoming' && 'text-slate-500',
+        )}
+      >
+        {team.score ?? '-'}
+      </span>
+    </div>
+  );
 }
 
 interface GameCardProps {
@@ -58,59 +101,72 @@ interface GameCardProps {
 
 function GameCard({ game }: GameCardProps): JSX.Element {
   const { awayTeam, homeTeam, gameState } = game;
-  const live = isLive(gameState);
+  const status = getGameStatus(gameState);
   const stateText = formatGameState(game);
+  const isCritical = gameState === 'CRIT';
+
+  const awayWins = status === 'final' && (awayTeam.score ?? 0) > (homeTeam.score ?? 0);
+  const homeWins = status === 'final' && (homeTeam.score ?? 0) > (awayTeam.score ?? 0);
 
   return (
     <div
       className={cn(
-        'flex-shrink-0 rounded-lg bg-slate-800/50 border border-slate-700/50',
-        'flex flex-col px-3 py-2 min-w-[90px]',
-        live && 'border-red-500/50 bg-slate-800/70',
+        'flex-shrink-0 rounded-lg border flex flex-col px-3 py-2.5 min-w-[100px] w-[100px]',
+        'transition-all duration-200 cursor-default group',
+        // Live games
+        status === 'live' && 'bg-white/[0.04] border-red-500/30 game-card-live hover:border-red-500/50',
+        // Critical (OT) — extra emphasis
+        isCritical && 'bg-red-500/[0.06] border-red-400/40',
+        // Final games
+        status === 'final' && 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04]',
+        // Upcoming
+        status === 'upcoming' && 'bg-white/[0.015] border-white/[0.04] hover:border-white/[0.08]',
       )}
     >
-      {/* Game State */}
-      <div className="flex items-center justify-center gap-1.5 mb-1.5">
-        {live && (
-          <span className="relative flex h-2 w-2 flex-shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+      {/* Game State Header */}
+      <div className="flex items-center justify-center gap-1.5 mb-2">
+        {status === 'live' && (
+          <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
+            <span className={cn(
+              'animate-ping absolute inline-flex h-full w-full rounded-full opacity-75',
+              isCritical ? 'bg-amber-400' : 'bg-red-400',
+            )}
+            />
+            <span className={cn(
+              'relative inline-flex rounded-full h-1.5 w-1.5',
+              isCritical ? 'bg-amber-400' : 'bg-red-500',
+            )}
+            />
           </span>
         )}
         <span className={cn(
-          'text-[10px] font-medium whitespace-nowrap',
-          live ? 'text-red-400' : 'text-slate-400',
+          'text-[10px] font-bold tracking-wider uppercase whitespace-nowrap font-display',
+          status === 'live' && !isCritical && 'text-red-400',
+          isCritical && 'text-amber-400',
+          status === 'final' && 'text-slate-500',
+          status === 'upcoming' && 'text-cyan-500/70',
         )}
         >
           {stateText}
         </span>
       </div>
 
-      {/* Away Team */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5">
-          <img
-            src={awayTeam.logo}
-            alt={awayTeam.abbrev}
-            className="w-6 h-6 flex-shrink-0 object-contain"
-          />
-          <span className="text-xs font-medium text-slate-200 whitespace-nowrap">{awayTeam.abbrev}</span>
-        </div>
-        <span className="text-sm font-bold text-white">{awayTeam.score ?? '-'}</span>
+      {/* Teams */}
+      <div className="space-y-1">
+        <TeamRow team={awayTeam} isWinner={awayWins} status={status} />
+        <TeamRow team={homeTeam} isWinner={homeWins} status={status} />
       </div>
+    </div>
+  );
+}
 
-      {/* Home Team */}
-      <div className="flex items-center justify-between gap-2 mt-1">
-        <div className="flex items-center gap-1.5">
-          <img
-            src={homeTeam.logo}
-            alt={homeTeam.abbrev}
-            className="w-6 h-6 flex-shrink-0 object-contain"
-          />
-          <span className="text-xs font-medium text-slate-200 whitespace-nowrap">{homeTeam.abbrev}</span>
-        </div>
-        <span className="text-sm font-bold text-white">{homeTeam.score ?? '-'}</span>
-      </div>
+/**
+ * pill at the start of the ticker
+ */
+function TickerLabel(): JSX.Element {
+  return (
+    <div className="flex-shrink-0 flex items-center gap-2 pr-3 mr-1 ">
+      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
     </div>
   );
 }
@@ -123,12 +179,21 @@ export default function LiveScoresTicker(): JSX.Element | null {
     return null;
   }
 
+  // Sort: live first, then upcoming, then final
+  const sorted = [...games].sort((a, b) => {
+    const order: Record<string, number> = {
+      CRIT: 0, LIVE: 1, FUT: 2, PRE: 2, FINAL: 3, OFF: 3,
+    };
+    return (order[a.gameState] ?? 4) - (order[b.gameState] ?? 4);
+  });
+
   return (
-    <div className="w-full bg-slate-900">
+    <div className="w-full ticker-strip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3 py-2 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-hide">
+          <TickerLabel />
           <div className="flex items-center gap-2">
-            {games.map((game) => (
+            {sorted.map((game) => (
               <GameCard key={game.id} game={game} />
             ))}
           </div>
