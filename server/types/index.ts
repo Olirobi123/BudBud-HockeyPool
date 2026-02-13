@@ -11,6 +11,8 @@ export interface Equipe {
   id: number;
   nom: string;
   active: boolean;
+  division?: string;
+  dg_name?: string;
   created_at?: Date;
   updated_at?: Date;
 }
@@ -140,6 +142,7 @@ export interface EquipePoints {
 export interface EquipePointsWithTeam extends EquipePoints {
   equipe_nom: string;
   division?: string;
+  dg_name?: string;
 }
 
 // Stats for skaters (C, LW, RW, D)

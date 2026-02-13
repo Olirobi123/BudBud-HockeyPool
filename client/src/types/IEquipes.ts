@@ -3,6 +3,7 @@ export default interface Equipe {
   nom: string;
   active: boolean;
   division?: 'nord' | 'sud' | null;
+  dg_name? : string;
 }
 
 export interface TeamStanding {
@@ -11,4 +12,5 @@ export interface TeamStanding {
   division: 'nord' | 'sud';
   rank: number;
   total_points: number;
+  dg_name?: string;
 }

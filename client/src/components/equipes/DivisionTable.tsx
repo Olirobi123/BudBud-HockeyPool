@@ -1,8 +1,10 @@
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TeamDGTooltip } from '@/components/ui/team-dg-tooltip';
 import type { TeamStanding } from '@/types/IEquipes';
 
 const PLAYOFF_CUTOFF = 4;
@@ -48,31 +50,36 @@ export function DivisionTable({ division, standings, color }: DivisionTableProps
 
               return (
                 <Fragment key={team.id}>
-                  <TableRow
-                    className={`cursor-pointer hover:bg-muted/50 transition-colors ${!isPlayoff ? 'opacity-50' : ''}`}
-                    style={isPlayoff ? { boxShadow: `inset 3px 0 0 ${color}` } : undefined}
-                    onClick={() => navigate(`/equipes/${team.id}`)}
-                  >
-                    <TableCell className="text-center">
-                      {team.rank === 1 ? (
-                        <Badge className="bg-yellow-500 text-yellow-950 font-bold">
-                          {team.rank}
-                        </Badge>
-                      ) : (
-                        <span className={`font-medium ${isPlayoff ? 'text-foreground' : 'text-muted-foreground'}`}>
-                          {team.rank}
-                        </span>
-                      )}
-                    </TableCell>
+                  <TeamDGTooltip dgName={team.dg_name} division={division}>
+                    <TableRow
+                      className={`cursor-pointer hover:bg-muted/50 transition-colors group/row ${!isPlayoff ? 'opacity-50' : ''}`}
+                      style={isPlayoff ? { boxShadow: `inset 3px 0 0 ${color}` } : undefined}
+                      onClick={() => navigate(`/equipes/${team.id}`)}
+                    >
+                      <TableCell className="text-center">
+                        {team.rank === 1 ? (
+                          <Badge className="bg-yellow-500 text-yellow-950 font-bold">
+                            {team.rank}
+                          </Badge>
+                        ) : (
+                          <span className={`font-medium ${isPlayoff ? 'text-foreground' : 'text-muted-foreground'}`}>
+                            {team.rank}
+                          </span>
+                        )}
+                      </TableCell>
 
-                    <TableCell className="font-semibold">
-                      {team.nom}
-                    </TableCell>
+                      <TableCell className="font-semibold">
+                        <div className="flex items-center gap-2">
+                          {team.nom}
+                          <UserCircle className="w-4 h-4 text-muted-foreground opacity-0 group-hover/row:opacity-100 transition-opacity duration-75" />
+                        </div>
+                      </TableCell>
 
-                    <TableCell className="text-right font-medium">
-                      {team.total_points}
-                    </TableCell>
-                  </TableRow>
+                      <TableCell className="text-right font-medium">
+                        {team.total_points}
+                      </TableCell>
+                    </TableRow>
+                  </TeamDGTooltip>
 
                   {isLastPlayoffSpot && standings.length > PLAYOFF_CUTOFF && (
                     <TableRow className="pointer-events-none">
