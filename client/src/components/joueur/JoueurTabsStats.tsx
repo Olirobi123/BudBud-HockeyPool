@@ -1,4 +1,3 @@
-import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import {
   Card, CardContent, CardHeader, CardTitle,
@@ -81,21 +80,21 @@ export default function JoueurTabsStats({ player }: Props) {
               return (
                 <>
                   {(statsTotals.regular.gamesPlayed > 0 || statsTotals.playoffs.gamesPlayed > 0) && (
-                  <div className="grid gap-6 md:grid-cols-2">
+                  <div className="grid gap-3 sm:gap-6 md:grid-cols-2">
                     {statsTotals.regular.gamesPlayed > 0 && (
                     <Card className="bg-primary/10">
                       <CardHeader className="p-3 sm:p-6">
                         <CardTitle className="text-sm sm:text-lg">Total NHL - Saison régulière</CardTitle>
                       </CardHeader>
                       <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
+                        <div className="grid grid-cols-[0.8fr_1.2fr_0.8fr_0.8fr_0.8fr] gap-1 sm:gap-4">
                           {player.position === 'G' ? (
                             <>
                               <div>
                                 <p className="text-xs sm:text-sm font-medium">PJ</p>
                                 <p className="text-base sm:text-xl font-bold">{statsTotals.regular.gamesPlayed}</p>
                               </div>
-                              <div>
+                              <div className="mr-1 sm:mr-2">
                                 <p className="text-xs sm:text-sm font-medium">V-D-DP</p>
                                 <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.regular.wins ?? 0}
@@ -112,7 +111,7 @@ export default function JoueurTabsStats({ player }: Props) {
                               <div>
                                 <p className="text-xs sm:text-sm font-medium">%ARR</p>
                                 <p className="text-base sm:text-xl font-bold">
-                                  {statsTotals.regular.savePctg ? `${(statsTotals.regular.savePctg * 100).toFixed(1)}%` : '-'}
+                                  {statsTotals.regular.savePctg ? `${(statsTotals.regular.savePctg ).toFixed(3)}` : '-'}
                                 </p>
                               </div>
                               <div>
@@ -161,14 +160,14 @@ export default function JoueurTabsStats({ player }: Props) {
                         <CardTitle className="text-sm sm:text-lg">Total NHL - Séries</CardTitle>
                       </CardHeader>
                       <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
+                        <div className="grid grid-cols-[0.8fr_1.2fr_0.8fr_0.8fr_0.8fr] gap-1 sm:gap-4">
                           {player.position === 'G' ? (
                             <>
                               <div>
                                 <p className="text-xs sm:text-sm font-medium">PJ</p>
                                 <p className="text-base sm:text-xl font-bold">{statsTotals.playoffs.gamesPlayed}</p>
                               </div>
-                              <div>
+                              <div className="mr-1 sm:mr-2">
                                 <p className="text-xs sm:text-sm font-medium">V-D-DP</p>
                                 <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.playoffs.wins ?? 0}
@@ -185,7 +184,7 @@ export default function JoueurTabsStats({ player }: Props) {
                               <div>
                                 <p className="text-xs sm:text-sm font-medium">%ARR</p>
                                 <p className="text-base sm:text-xl font-bold">
-                                  {statsTotals.playoffs.savePctg ? `${(statsTotals.playoffs.savePctg * 100).toFixed(1)}%` : '-'}
+                                  {statsTotals.playoffs.savePctg ? `${(statsTotals.playoffs.savePctg ).toFixed(3)}` : '-'}
                                 </p>
                               </div>
                               <div>
@@ -295,7 +294,7 @@ export default function JoueurTabsStats({ player }: Props) {
                                 <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.otLosses || '-'}</TableCell>
                                 <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.shutouts || '-'}</TableCell>
                                 <TableCell className="px-1.5 sm:px-4">
-                                  {season.savePctg ? `${(season.savePctg * 100).toFixed(1)}%` : '-'}
+                                  {season.savePctg ? `${(season.savePctg).toFixed(3)}` : '-'}
                                 </TableCell>
                                 <TableCell className="px-1.5 sm:px-4">
                                   {season.goalsAgainstAvg ? season.goalsAgainstAvg.toFixed(2) : '-'}
