@@ -18,31 +18,31 @@ export default function JoueurTabsLastFive({ player }: Props) {
   return (
     <TabsContent value="derniers-matchs">
       <Card>
-        <CardHeader>
+        <CardHeader className="p-3 sm:p-6">
           <CardTitle>Historique des matchs</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
           {player.last5Games ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>vs</TableHead>
+                  <TableHead className="px-1.5 sm:px-4">Date</TableHead>
+                  <TableHead className="px-1.5 sm:px-4">vs</TableHead>
                   {player.position === 'G' ? (
                     <>
-                      <TableHead>DÉC</TableHead>
-                      <TableHead>BC</TableHead>
-                      <TableHead>ARR</TableHead>
-                      <TableHead>%</TableHead>
-                      <TableHead>TJ</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">DÉC</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">BC</TableHead>
+                      <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">ARR</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">%</TableHead>
+                      <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">TJ</TableHead>
                     </>
                   ) : (
                     <>
-                      <TableHead>B</TableHead>
-                      <TableHead>P</TableHead>
-                      <TableHead>PTS</TableHead>
-                      <TableHead>+/-</TableHead>
-                      <TableHead>TJ</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">B</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">P</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">PTS</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">+/-</TableHead>
+                      <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">TJ</TableHead>
                     </>
                   )}
                 </TableRow>
@@ -50,27 +50,27 @@ export default function JoueurTabsLastFive({ player }: Props) {
               <TableBody>
                 {player.last5Games.map((game) => (
                   <TableRow key={game.gameDate}>
-                    <TableCell>{game.gameDate ? format(new Date(game.gameDate), 'd MMM', { locale: fr }) : '-'}</TableCell>
-                    <TableCell>
+                    <TableCell className="px-1.5 sm:px-4 whitespace-nowrap">{game.gameDate ? format(new Date(game.gameDate), 'd MMM', { locale: fr }) : '-'}</TableCell>
+                    <TableCell className="px-1.5 sm:px-4 whitespace-nowrap">
                       {game.homeRoadFlag === 'H' ? 'vs' : '@'}
                       {' '}
                       {game.opponentAbbrev}
                     </TableCell>
                     {player.position === 'G' ? (
                       <>
-                        <TableCell>{game.decision || '-'}</TableCell>
-                        <TableCell>{game.goalsAgainst}</TableCell>
-                        <TableCell>{game.shotsAgainst}</TableCell>
-                        <TableCell>{game.savePctg ? `${(game.savePctg * 100).toFixed(1)}%` : '-'}</TableCell>
-                        <TableCell>{game.toi}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.decision || '-'}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.goalsAgainst}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{game.shotsAgainst}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.savePctg ? `${(game.savePctg).toFixed(3)}` : '-'}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{game.toi}</TableCell>
                       </>
                     ) : (
                       <>
-                        <TableCell>{game.goals}</TableCell>
-                        <TableCell>{game.assists}</TableCell>
-                        <TableCell>{game.points}</TableCell>
-                        <TableCell>{game.plusMinus}</TableCell>
-                        <TableCell>{game.toi}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.goals}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.assists}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.points}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.plusMinus}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{game.toi}</TableCell>
                       </>
                     )}
                   </TableRow>

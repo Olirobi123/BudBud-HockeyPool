@@ -100,7 +100,7 @@ export default function JoueurTabsOverview({ player }: Props) {
             <CardTitle className="text-lg">
               Statistiques
               {' '}
-              {new Date().getFullYear()}
+              {formatSeason(player.featuredStats?.season)}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -123,8 +123,8 @@ export default function JoueurTabsOverview({ player }: Props) {
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">% d'arrêts</p>
                       <p className="font-medium">
-                        {((subSeason.savePctg ?? 0) * 100).toFixed(1)}
-                        %
+                        {((subSeason.savePctg ?? 0)).toFixed(3)}
+                        
                       </p>
                     </div>
                     <div className="space-y-1">
@@ -214,7 +214,7 @@ export default function JoueurTabsOverview({ player }: Props) {
                             <div className="space-y-1">
                               <p className="text-sm text-muted-foreground">% d'arrêts</p>
                               <p className="font-medium">
-                                {lastStats.savePctg ? `${(lastStats.savePctg * 100).toFixed(1)}%` : '-'}
+                                {lastStats.savePctg ? `${(lastStats.savePctg).toFixed(3)}` : '-'}
                               </p>
                             </div>
                             <div className="space-y-1">

@@ -75,9 +75,9 @@ export default function Equipes() {
       </div>
 
       {/* Main Layout: Map + Standings */}
-      <div className="grid grid-cols-1 lg:grid-cols-[38%_1fr] gap-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8 mb-8">
         {/* Quebec Map */}
-        <div className="animate-fadeIn">
+        <div className="animate-fadeIn lg:sticky lg:top-4 self-start">
           <QuebecMap
             nordTeams={nordStandings || []}
             sudTeams={sudStandings || []}

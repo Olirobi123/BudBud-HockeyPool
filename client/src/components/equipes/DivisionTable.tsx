@@ -1,8 +1,11 @@
+import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { TeamStanding } from '@/types/IEquipes';
+
+const PLAYOFF_CUTOFF = 4;
 
 interface DivisionTableProps {
   division: 'nord' | 'sud';
@@ -34,43 +37,69 @@ export function DivisionTable({ division, standings, color }: DivisionTableProps
             <TableRow>
               <TableHead className="w-16 text-center">#</TableHead>
               <TableHead>Équipe</TableHead>
+              <TableHead className="text-right">Pts</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {standings.map((team) => (
-              <TableRow
-                key={team.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => navigate(`/equipes/${team.id}`)}
-              >
-                <TableCell className="text-center">
-                  {team.rank === 1 ? (
-                    <Badge className="bg-yellow-500 text-yellow-950 font-bold">
-                      {team.rank}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground font-medium">
-                      {team.rank}
-                    </span>
-                  )}
-                </TableCell>
+            {standings.map((team) => {
+              const isPlayoff = team.rank <= PLAYOFF_CUTOFF;
+              const isLastPlayoffSpot = team.rank === PLAYOFF_CUTOFF;
 
-                <TableCell className="font-semibold">
-                  {team.nom}
-                </TableCell>
-              </TableRow>
-            ))}
+              return (
+                <Fragment key={team.id}>
+                  <TableRow
+                    className={`cursor-pointer hover:bg-muted/50 transition-colors ${!isPlayoff ? 'opacity-50' : ''}`}
+                    style={isPlayoff ? { boxShadow: `inset 3px 0 0 ${color}` } : undefined}
+                    onClick={() => navigate(`/equipes/${team.id}`)}
+                  >
+                    <TableCell className="text-center">
+                      {team.rank === 1 ? (
+                        <Badge className="bg-yellow-500 text-yellow-950 font-bold">
+                          {team.rank}
+                        </Badge>
+                      ) : (
+                        <span className={`font-medium ${isPlayoff ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {team.rank}
+                        </span>
+                      )}
+                    </TableCell>
+
+                    <TableCell className="font-semibold">
+                      {team.nom}
+                    </TableCell>
+
+                    <TableCell className="text-right font-medium">
+                      {team.total_points}
+                    </TableCell>
+                  </TableRow>
+
+                  {isLastPlayoffSpot && standings.length > PLAYOFF_CUTOFF && (
+                    <TableRow className="pointer-events-none">
+                      <TableCell colSpan={3} className="py-0 px-0">
+                        <div className="border-t-2 border-dashed border-muted-foreground/30" />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </Fragment>
+              );
+            })}
 
             {standings.length === 0 && (
               <TableRow>
-                <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
                   Aucune équipe dans cette division
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+
+        {standings.length > PLAYOFF_CUTOFF && (
+          <div className="px-4 py-2 border-t text-xs text-muted-foreground">
+            Les {PLAYOFF_CUTOFF} premières équipes se qualifient pour les séries.
+          </div>
+        )}
       </CardContent>
     </Card>
   );

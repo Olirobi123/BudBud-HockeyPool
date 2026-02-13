@@ -7,6 +7,7 @@ import repechageRoutes from './routes/repechage';
 import scoresRoutes from './routes/scores';
 import healthRoutes from './routes/health';
 import tropheesRoutes from './routes/trophees';
+import pointsRoutes from './routes/points';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -29,6 +30,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Routes pour les trophées
   app.use('/api/trophees', tropheesRoutes);
+
+  // Routes pour les points / classement
+  app.use('/api/points', pointsRoutes);
 
   const httpServer = createServer(app);
 

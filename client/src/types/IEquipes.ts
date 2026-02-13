@@ -9,5 +9,6 @@ export interface TeamStanding {
   id: number;
   nom: string;
   division: 'nord' | 'sud';
-  rank: number; // Alphabetical position
+  rank: number;
+  total_points: number;
 }

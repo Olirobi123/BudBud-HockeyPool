@@ -9,6 +9,7 @@ import {
   GoalieStats,
 } from '../types';
 import { QUERIES } from '../models';
+import { getCurrentSeasonNumber } from './seasonHelper';
 
 /**
  * Extract relevant stats from NHL API response based on player position.
@@ -18,41 +19,45 @@ function extractStats(
   statsResponse: PlayerStatsResponse,
   position: string,
 ): SkaterStats | GoalieStats {
-  // Use seasonTotals to ensure we get NHL stats only
+  // Filter for current NHL regular season only
   // gameTypeId 2 = regular season, leagueAbbrev 'NHL' = NHL league
-  const nhlSeasons = statsResponse.seasonTotals?.filter(
-    (s) => s.leagueAbbrev === 'NHL' && s.gameTypeId === 2,
+  const currentSeasonNum = getCurrentSeasonNumber();
+  const currentSeasonEntries = statsResponse.seasonTotals?.filter(
+    (s) =>
+      s.leagueAbbrev === 'NHL' &&
+      s.gameTypeId === 2 &&
+      s.season === currentSeasonNum,
   );
 
-  // Return zeros if no NHL season found
-  if (!nhlSeasons || nhlSeasons.length === 0) {
+  // Return zeros if no current season data found
+  if (!currentSeasonEntries || currentSeasonEntries.length === 0) {
     if (position === 'G') {
-      return { gamesPlayed: 0, savePctg: 0, goalsAgainstAvg: 0, wins: 0 };
+      return { gamesPlayed: 0, savePctg: 0, goalsAgainstAvg: 0, wins: 0, shutouts: 0 };
     }
     return { gamesPlayed: 0, goals: 0, assists: 0, points: 0 };
   }
 
-  // Get the most recent NHL season (highest season number)
-  const currentSeason = nhlSeasons.reduce((latest, current) => {
-    const currentSeasonNum = current.season ?? 0;
-    const latestSeasonNum = latest.season ?? 0;
-    return currentSeasonNum > latestSeasonNum ? current : latest;
-  });
-
   if (position === 'G') {
-    return {
-      gamesPlayed: currentSeason.gamesPlayed ?? 0,
-      savePctg: currentSeason.savePctg ?? 0,
-      goalsAgainstAvg: currentSeason.goalsAgainstAvg ?? 0,
-      wins: currentSeason.wins ?? 0,
-    };
+    const totalGP = currentSeasonEntries.reduce((sum, s) => sum + (s.gamesPlayed ?? 0), 0);
+    const totalWins = currentSeasonEntries.reduce((sum, s) => sum + (s.wins ?? 0), 0);
+    // Weighted average for rate stats
+    const totalShotsAgainst = currentSeasonEntries.reduce((sum, s) => sum + (s.shotsAgainst ?? 0), 0);
+    const totalGoalsAgainst = currentSeasonEntries.reduce((sum, s) => sum + (s.goalsAgainst ?? 0), 0);
+    const savePctg = totalShotsAgainst > 0
+      ? (totalShotsAgainst - totalGoalsAgainst) / totalShotsAgainst
+      : 0;
+    const goalsAgainstAvg = totalGP > 0
+      ? (totalGoalsAgainst / totalGP) * 60 / 60
+      : 0;
+    const totalShutouts = currentSeasonEntries.reduce((sum, s) => sum + (s.shutouts ?? 0), 0);
+    return { gamesPlayed: totalGP, savePctg, goalsAgainstAvg, wins: totalWins, shutouts: totalShutouts };
   }
 
   return {
-    gamesPlayed: currentSeason.gamesPlayed ?? 0,
-    goals: currentSeason.goals ?? 0,
-    assists: currentSeason.assists ?? 0,
-    points: currentSeason.points ?? 0,
+    gamesPlayed: currentSeasonEntries.reduce((sum, s) => sum + (s.gamesPlayed ?? 0), 0),
+    goals: currentSeasonEntries.reduce((sum, s) => sum + (s.goals ?? 0), 0),
+    assists: currentSeasonEntries.reduce((sum, s) => sum + (s.assists ?? 0), 0),
+    points: currentSeasonEntries.reduce((sum, s) => sum + (s.points ?? 0), 0),
   };
 }
 
@@ -168,7 +173,19 @@ export class TeamsService {
       .sort((a, b) => getPoints(b) - getPoints(a))
       .map((p, index) => ({ ...p, isActive: index < MAX_ACTIVE_DEFENSEMEN }));
 
-    const goalies = enrichedRoster.filter((p) => p.position === 'G');
+    const MAX_ACTIVE_GOALIES = 2;
+
+    const getGoaliePoolPoints = (player: RosterPlayerWithStats): number => {
+      if (player.nhlStats && 'wins' in player.nhlStats) {
+        return player.nhlStats.wins * 2 + player.nhlStats.shutouts * 3;
+      }
+      return 0;
+    };
+
+    const goalies = enrichedRoster
+      .filter((p) => p.position === 'G')
+      .sort((a, b) => getGoaliePoolPoints(b) - getGoaliePoolPoints(a))
+      .map((p, index) => ({ ...p, isActive: index < MAX_ACTIVE_GOALIES }));
 
     return [...forwards, ...defensemen, ...goalies];
   }

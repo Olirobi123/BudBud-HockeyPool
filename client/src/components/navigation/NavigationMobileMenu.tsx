@@ -29,7 +29,7 @@ export const NavigationMobileMenu: React.FC<NavigationMobileMenuProps> = ({
   <Sheet open={isOpen} onOpenChange={setIsOpen}>
     <SheetTrigger asChild>
       <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-        <Menu className="h-5 w-5" />
+        <Menu className="h-7 w-7" />
       </Button>
     </SheetTrigger>
     <SheetContent
