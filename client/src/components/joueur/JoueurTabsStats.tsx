@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import PlayerDetails from '@/types/IPlayerDetails';
-import { formatSeason } from '@/lib/utils';
+import { formatSeason, formatSeasonShort } from '@/lib/utils';
 
 type Props = {
   player: PlayerDetails;
@@ -36,10 +36,10 @@ export default function JoueurTabsStats({ player }: Props) {
   return (
     <TabsContent value="stats">
       <Card>
-        <CardHeader>
+        <CardHeader className="p-3 sm:p-6">
           <CardTitle>Statistiques par saison</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
           <div className="space-y-6">
             {(() => {
               const initial: StatsAccumulator = {
@@ -84,20 +84,20 @@ export default function JoueurTabsStats({ player }: Props) {
                   <div className="grid gap-6 md:grid-cols-2">
                     {statsTotals.regular.gamesPlayed > 0 && (
                     <Card className="bg-primary/10">
-                      <CardHeader>
-                        <CardTitle className="text-lg">Total NHL - Saison régulière</CardTitle>
+                      <CardHeader className="p-3 sm:p-6">
+                        <CardTitle className="text-sm sm:text-lg">Total NHL - Saison régulière</CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <div className="grid gap-4" style={{ gridTemplateColumns: '0.8fr 1.2fr 0.8fr 0.8fr 0.8fr' }}>
+                      <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
                           {player.position === 'G' ? (
                             <>
                               <div>
-                                <p className="text-sm font-medium">PJ</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.gamesPlayed}</p>
+                                <p className="text-xs sm:text-sm font-medium">PJ</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.regular.gamesPlayed}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">V-D-DP</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">V-D-DP</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.regular.wins ?? 0}
                                   -
                                   {statsTotals.regular.losses ?? 0}
@@ -106,18 +106,18 @@ export default function JoueurTabsStats({ player }: Props) {
                                 </p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">BL</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.shutouts ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">BL</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.regular.shutouts ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">%ARR</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">%ARR</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.regular.savePctg ? `${(statsTotals.regular.savePctg * 100).toFixed(1)}%` : '-'}
                                 </p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">MOY</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">MOY</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.regular.goalsAgainstAvg ? statsTotals.regular.goalsAgainstAvg.toFixed(2) : '-'}
                                 </p>
                               </div>
@@ -125,24 +125,24 @@ export default function JoueurTabsStats({ player }: Props) {
                           ) : (
                             <>
                               <div>
-                                <p className="text-sm font-medium">PJ</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.gamesPlayed}</p>
+                                <p className="text-xs sm:text-sm font-medium">PJ</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.regular.gamesPlayed}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">B</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.goals ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">B</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.regular.goals ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">P</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.assists ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">P</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.regular.assists ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">PTS</p>
-                                <p className="text-xl font-bold">{statsTotals.regular.points ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">PTS</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.regular.points ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">PPM</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">PPM</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.regular.gamesPlayed
                                     ? ((statsTotals.regular.points ?? 0) / statsTotals.regular.gamesPlayed).toFixed(2)
                                     : '0.00'}
@@ -157,20 +157,20 @@ export default function JoueurTabsStats({ player }: Props) {
 
                     {statsTotals.playoffs.gamesPlayed > 0 && (
                     <Card className="bg-yellow-500/10">
-                      <CardHeader>
-                        <CardTitle className="text-lg">Total NHL - Séries</CardTitle>
+                      <CardHeader className="p-3 sm:p-6">
+                        <CardTitle className="text-sm sm:text-lg">Total NHL - Séries</CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <div className="grid gap-4" style={{ gridTemplateColumns: '0.8fr 1.2fr 0.8fr 0.8fr 0.8fr' }}>
+                      <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
                           {player.position === 'G' ? (
                             <>
                               <div>
-                                <p className="text-sm font-medium">PJ</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.gamesPlayed}</p>
+                                <p className="text-xs sm:text-sm font-medium">PJ</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.playoffs.gamesPlayed}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">V-D-DP</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">V-D-DP</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.playoffs.wins ?? 0}
                                   -
                                   {statsTotals.playoffs.losses ?? 0}
@@ -179,18 +179,18 @@ export default function JoueurTabsStats({ player }: Props) {
                                 </p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">BL</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.shutouts ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">BL</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.playoffs.shutouts ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">%ARR</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">%ARR</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.playoffs.savePctg ? `${(statsTotals.playoffs.savePctg * 100).toFixed(1)}%` : '-'}
                                 </p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">MOY</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">MOY</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.playoffs.goalsAgainstAvg ? statsTotals.playoffs.goalsAgainstAvg.toFixed(2) : '-'}
                                 </p>
                               </div>
@@ -198,24 +198,24 @@ export default function JoueurTabsStats({ player }: Props) {
                           ) : (
                             <>
                               <div>
-                                <p className="text-sm font-medium">PJ</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.gamesPlayed}</p>
+                                <p className="text-xs sm:text-sm font-medium">PJ</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.playoffs.gamesPlayed}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">B</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.goals ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">B</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.playoffs.goals ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">P</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.assists ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">P</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.playoffs.assists ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">PTS</p>
-                                <p className="text-xl font-bold">{statsTotals.playoffs.points ?? 0}</p>
+                                <p className="text-xs sm:text-sm font-medium">PTS</p>
+                                <p className="text-base sm:text-xl font-bold">{statsTotals.playoffs.points ?? 0}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium">PPM</p>
-                                <p className="text-xl font-bold">
+                                <p className="text-xs sm:text-sm font-medium">PPM</p>
+                                <p className="text-base sm:text-xl font-bold">
                                   {statsTotals.playoffs.gamesPlayed
                                     ? ((statsTotals.playoffs.points ?? 0) / statsTotals.playoffs.gamesPlayed).toFixed(2)
                                     : '0.00'}
@@ -233,27 +233,27 @@ export default function JoueurTabsStats({ player }: Props) {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Saison</TableHead>
-                        <TableHead>Ligue</TableHead>
-                        <TableHead>Équipe</TableHead>
-                        <TableHead>Type</TableHead>
+                        <TableHead className="px-1 sm:px-4">Saison</TableHead>
+                        <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">Ligue</TableHead>
+                        <TableHead className="px-1 sm:px-4">Équipe</TableHead>
+                        <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">Type</TableHead>
                         {player.position === 'G' ? (
                           <>
-                            <TableHead>PJ</TableHead>
-                            <TableHead>V</TableHead>
-                            <TableHead>D</TableHead>
-                            <TableHead>DP</TableHead>
-                            <TableHead>BL</TableHead>
-                            <TableHead>%ARR</TableHead>
-                            <TableHead>MOY</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">PJ</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">V</TableHead>
+                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">D</TableHead>
+                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">DP</TableHead>
+                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">BL</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">%ARR</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">MOY</TableHead>
                           </>
                         ) : (
                           <>
-                            <TableHead>PJ</TableHead>
-                            <TableHead>B</TableHead>
-                            <TableHead>P</TableHead>
-                            <TableHead>PTS</TableHead>
-                            <TableHead>PPM</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">PJ</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">B</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">P</TableHead>
+                            <TableHead className="px-1.5 sm:px-4">PTS</TableHead>
+                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">PPM</TableHead>
                           </>
                         )}
                       </TableRow>
@@ -276,35 +276,38 @@ export default function JoueurTabsStats({ player }: Props) {
                                             : ''
                                         }
                           >
-                            <TableCell>{formatSeason(season.season)}</TableCell>
-                            <TableCell>{season.leagueAbbrev}</TableCell>
-                            <TableCell>{season.teamName?.default ?? '-'}</TableCell>
-                            <TableCell>
+                            <TableCell className="px-1 sm:px-4 whitespace-nowrap">
+                              <span className="sm:hidden">{formatSeasonShort(season.season)}</span>
+                              <span className="hidden sm:inline">{formatSeason(season.season)}</span>
+                            </TableCell>
+                            <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.leagueAbbrev}</TableCell>
+                            <TableCell className="px-1 sm:px-4 max-w-[80px] sm:max-w-none truncate">{season.teamName?.default ?? '-'}</TableCell>
+                            <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">
                               <Badge variant={season.gameTypeId === 3 ? 'destructive' : 'default'}>
                                 {season.gameTypeId === 3 ? 'Séries' : 'Régulière'}
                               </Badge>
                             </TableCell>
                             {player.position === 'G' ? (
                               <>
-                                <TableCell>{season.gamesPlayed || '-'}</TableCell>
-                                <TableCell>{season.wins || '-'}</TableCell>
-                                <TableCell>{season.losses || '-'}</TableCell>
-                                <TableCell>{season.otLosses || '-'}</TableCell>
-                                <TableCell>{season.shutouts || '-'}</TableCell>
-                                <TableCell>
+                                <TableCell className="px-1.5 sm:px-4">{season.gamesPlayed || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4">{season.wins || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.losses || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.otLosses || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.shutouts || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4">
                                   {season.savePctg ? `${(season.savePctg * 100).toFixed(1)}%` : '-'}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="px-1.5 sm:px-4">
                                   {season.goalsAgainstAvg ? season.goalsAgainstAvg.toFixed(2) : '-'}
                                 </TableCell>
                               </>
                             ) : (
                               <>
-                                <TableCell>{season.gamesPlayed || '-'}</TableCell>
-                                <TableCell>{season.goals || '-'}</TableCell>
-                                <TableCell>{season.assists || '-'}</TableCell>
-                                <TableCell>{season.points || '-'}</TableCell>
-                                <TableCell>
+                                <TableCell className="px-1.5 sm:px-4">{season.gamesPlayed || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4">{season.goals || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4">{season.assists || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4">{season.points || '-'}</TableCell>
+                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">
                                   {season.gamesPlayed && season.points
                                     ? (season.points / season.gamesPlayed).toFixed(2)
                                     : '-'}
