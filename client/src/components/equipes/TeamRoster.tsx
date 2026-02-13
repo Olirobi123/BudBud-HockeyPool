@@ -141,8 +141,20 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
   );
 }
 
+function getGoaliePoolPoints(player: RosterPlayerWithStats): number {
+  if (player.nhlStats && isGoalieStats(player.nhlStats)) {
+    return player.nhlStats.wins * 2 + player.nhlStats.shutouts * 3;
+  }
+  return 0;
+}
+
 function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
   if (goalies.length === 0) return null;
+
+  const sorted = [...goalies].sort((a, b) => getGoaliePoolPoints(b) - getGoaliePoolPoints(a));
+  const totalPoints = sorted
+    .filter((p) => p.isActive)
+    .reduce((sum, p) => sum + getGoaliePoolPoints(p), 0);
 
   return (
     <div>
@@ -154,53 +166,75 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
             <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">Pos</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">PJ</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">V</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">%ARR</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">MOY</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">BL</TableHead>
+            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">Pts</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {goalies.map((player) => {
+          {sorted.map((player, index) => {
             const stats = player.nhlStats && isGoalieStats(player.nhlStats)
               ? player.nhlStats
               : null;
+            const poolPts = getGoaliePoolPoints(player);
+
+            const showSeparator = player.isActive === false
+              && index > 0
+              && sorted[index - 1].isActive === true;
 
             return (
-              <TableRow key={player.id}>
-                <TableCell className="px-2 sm:px-4">
-                  <Link
-                    to={`/joueur/${player.nhl_player_id}`}
-                    className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"
-                  >
-                    {player.teamLogo && (
-                      <img
-                        src={player.teamLogo}
-                        alt=""
-                        className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0"
-                      />
-                    )}
-                    <span className="truncate">{player.prenom} {player.nom}</span>
-                  </Link>
-                </TableCell>
-                <TableCell className="text-center px-1 sm:px-4">
-                  <Badge className={getPositionColor(player.position)}>
-                    {player.position}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
-                  {stats?.gamesPlayed ?? '-'}
-                </TableCell>
-                <TableCell className="text-center px-1 sm:px-4">
-                  {stats?.wins ?? '-'}
-                </TableCell>
-                <TableCell className="text-center px-1 sm:px-4">
-                  {stats ? `.${Math.round(stats.savePctg * 1000).toString().padStart(3, '0')}` : '-'}
-                </TableCell>
-                <TableCell className="text-center font-medium px-1 sm:px-4">
-                  {stats?.goalsAgainstAvg.toFixed(2) ?? '-'}
-                </TableCell>
-              </TableRow>
+              <Fragment key={player.id}>
+                {showSeparator && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-1 px-0">
+                      <div className="border-t-2 border-dashed border-muted-foreground/30" />
+                    </TableCell>
+                  </TableRow>
+                )}
+                <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
+                  <TableCell className="px-2 sm:px-4">
+                    <Link
+                      to={`/joueur/${player.nhl_player_id}`}
+                      className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"
+                    >
+                      {player.teamLogo && (
+                        <img
+                          src={player.teamLogo}
+                          alt=""
+                          className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0"
+                        />
+                      )}
+                      <span className="truncate">{player.prenom} {player.nom}</span>
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-center px-1 sm:px-4">
+                    <Badge className={getPositionColor(player.position)}>
+                      {player.position}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
+                    {stats?.gamesPlayed ?? '-'}
+                  </TableCell>
+                  <TableCell className="text-center px-1 sm:px-4">
+                    {stats?.wins ?? '-'}
+                  </TableCell>
+                  <TableCell className="text-center px-1 sm:px-4">
+                    {stats?.shutouts ?? '-'}
+                  </TableCell>
+                  <TableCell className="text-center font-medium px-1 sm:px-4">
+                    {poolPts}
+                  </TableCell>
+                </TableRow>
+              </Fragment>
             );
           })}
+          <TableRow className="bg-muted/50 font-semibold border-t-2">
+            <TableCell colSpan={5} className="text-right">
+              Total
+            </TableCell>
+            <TableCell className="text-center text-lg font-bold text-primary">
+              {totalPoints}
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </div>

@@ -125,6 +125,23 @@ export interface HomeTradeResponse {
   playersB: string[];
 }
 
+// Equipe Points (classement)
+export interface EquipePoints {
+  id: number;
+  equipe_id: number;
+  season: string;
+  attaque_points: number;
+  defense_points: number;
+  gardien_points: number;
+  total_points: number;
+  last_update_at?: Date;
+}
+
+export interface EquipePointsWithTeam extends EquipePoints {
+  equipe_nom: string;
+  division?: string;
+}
+
 // Stats for skaters (C, LW, RW, D)
 export interface SkaterStats {
   gamesPlayed: number;
@@ -139,6 +156,7 @@ export interface GoalieStats {
   savePctg: number;
   goalsAgainstAvg: number;
   wins: number;
+  shutouts: number;
 }
 
 // Roster player with NHL stats

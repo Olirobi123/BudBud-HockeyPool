@@ -9,6 +9,7 @@ export const TABLES = {
   EQUIPE_JOUEURS: 'equipe_joueurs',
   TROPHEES: 'trophees',
   TROPHEE_GAGNANTS: 'trophee_gagnants',
+  EQUIPE_POINTS: 'equipe_points',
 } as const;
 
 export const QUERIES = {
@@ -187,5 +188,37 @@ export const QUERIES = {
     JOIN ${TABLES.TROPHEES} t ON tg.trophee_id = t.id
     WHERE tg.equipe_id = $1
     ORDER BY tg.annee DESC, t.id
+  `,
+
+  // Equipe Points (classement)
+  UPSERT_EQUIPE_POINTS: `
+    INSERT INTO ${TABLES.EQUIPE_POINTS} (equipe_id, season, attaque_points, defense_points, gardien_points, total_points, last_update_at)
+    VALUES ($1, $2, $3, $4, $5, $6, NOW())
+    ON CONFLICT (equipe_id, season) DO UPDATE SET
+      attaque_points = EXCLUDED.attaque_points,
+      defense_points = EXCLUDED.defense_points,
+      gardien_points = EXCLUDED.gardien_points,
+      total_points = EXCLUDED.total_points,
+      last_update_at = NOW()
+  `,
+  GET_RANKINGS_BY_SEASON: `
+    SELECT ep.*, e.nom as equipe_nom, e.division
+    FROM ${TABLES.EQUIPE_POINTS} ep
+    JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
+    WHERE ep.season = $1
+    ORDER BY ep.total_points DESC
+  `,
+  GET_RANKINGS_BY_DIVISION: `
+    SELECT ep.*, e.nom as equipe_nom, e.division
+    FROM ${TABLES.EQUIPE_POINTS} ep
+    JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
+    WHERE e.division = $1 AND ep.season = $2
+    ORDER BY ep.total_points DESC
+  `,
+  GET_EQUIPE_POINTS_BY_TEAM: `
+    SELECT ep.*, e.nom as equipe_nom, e.division
+    FROM ${TABLES.EQUIPE_POINTS} ep
+    JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
+    WHERE ep.equipe_id = $1 AND ep.season = $2
   `,
 } as const;

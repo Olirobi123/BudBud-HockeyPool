@@ -18,6 +18,7 @@ export interface GoalieStats {
   savePctg: number;
   goalsAgainstAvg: number;
   wins: number;
+  shutouts: number;
 }
 
 export interface RosterPlayerWithStats extends Joueur {

@@ -28,7 +28,7 @@ export function QuebecMap({
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="relative w-full" style={{ aspectRatio: '1188 / 1280' }}>
           {/* Background Quebec map */}
           <img
@@ -201,13 +201,13 @@ export function QuebecMap({
         </div>
 
         {/* Legend */}
-        <div className="mt-4 space-y-2 text-sm">
+        <div className="mt-3 space-y-1.5 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'hsl(217 91% 60%)', opacity: 0.4 }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(217 91% 60%)', opacity: 0.4 }} />
             <span className="text-muted-foreground">Division Nord</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: 'hsl(6 78% 57%)', opacity: 0.4 }} />
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(6 78% 57%)', opacity: 0.4 }} />
             <span className="text-muted-foreground">Division Sud</span>
           </div>
           {activeFilter && (
