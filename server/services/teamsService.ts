@@ -220,7 +220,7 @@ export class TeamsService {
    * Get division standings (alphabetically ordered, not stats-based)
    * Rank is simply the position in the alphabetical list
    */
-  async getDivisionStandings(division: 'nord' | 'sud'): Promise<{ id: number; nom: string; division: 'nord' | 'sud'; rank: number }[]> {
+  async getDivisionStandings(division: 'nord' | 'sud'): Promise<{ id: number; nom: string; division: 'nord' | 'sud'; rank: number; dg_name?: string }[]> {
     try {
       const teams = await this.getTeamsByDivision(division);
 
@@ -230,6 +230,7 @@ export class TeamsService {
         nom: team.nom,
         division: division,
         rank: index + 1,
+        dg_name: team.dg_name,
       }));
     } catch (error) {
       console.error(`Erreur lors de la récupération du classement de la division ${division}:`, error);

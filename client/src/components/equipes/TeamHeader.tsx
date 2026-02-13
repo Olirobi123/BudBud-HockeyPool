@@ -24,10 +24,10 @@ export function TeamHeader({ team }: TeamHeaderProps) {
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-2 text-sm text-gray-600">
               <span className="flex items-center">
                 <User className="w-4 h-4 mr-1" />
-                DG: Olivier (Placeholder)
+                DG: {team.dg_name ?? 'Non disponible'}
               </span>
               <Badge variant={team.active ? 'default' : 'secondary'}>
-                {team.active ? 'Active' : 'Inactive'}
+                {team.active ? 'Actif' : 'Inactif'}
               </Badge>
             </div>
           </div>

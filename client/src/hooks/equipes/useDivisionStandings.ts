@@ -7,6 +7,7 @@ interface RankingResponse {
   equipe_nom: string;
   division: 'nord' | 'sud';
   total_points: number;
+  dg_name?: string;
 }
 
 const fetchDivisionStandings = async (
@@ -26,6 +27,7 @@ const fetchDivisionStandings = async (
     division: r.division,
     rank: index + 1,
     total_points: r.total_points,
+    dg_name: r.dg_name,
   }));
 };
 

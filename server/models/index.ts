@@ -20,7 +20,7 @@ export const QUERIES = {
 
   // Teams by division (alphabetically ordered)
   GET_TEAMS_BY_DIVISION: `
-    SELECT id, nom, active, division
+    SELECT id, nom, active, division, dg_name
     FROM ${TABLES.EQUIPES}
     WHERE division = $1 AND active = true
     ORDER BY nom ASC
@@ -28,7 +28,7 @@ export const QUERIES = {
 
   // Inactive teams
   GET_INACTIVE_TEAMS: `
-    SELECT id, nom, active, division
+    SELECT id, nom, active, division, dg_name
     FROM ${TABLES.EQUIPES}
     WHERE active = false
     ORDER BY nom ASC
@@ -202,21 +202,21 @@ export const QUERIES = {
       last_update_at = NOW()
   `,
   GET_RANKINGS_BY_SEASON: `
-    SELECT ep.*, e.nom as equipe_nom, e.division
+    SELECT ep.*, e.nom as equipe_nom, e.division, e.dg_name
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE ep.season = $1
     ORDER BY ep.total_points DESC
   `,
   GET_RANKINGS_BY_DIVISION: `
-    SELECT ep.*, e.nom as equipe_nom, e.division
+    SELECT ep.*, e.nom as equipe_nom, e.division, e.dg_name
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE e.division = $1 AND ep.season = $2
     ORDER BY ep.total_points DESC
   `,
   GET_EQUIPE_POINTS_BY_TEAM: `
-    SELECT ep.*, e.nom as equipe_nom, e.division
+    SELECT ep.*, e.nom as equipe_nom, e.division, e.dg_name
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE ep.equipe_id = $1 AND ep.season = $2
