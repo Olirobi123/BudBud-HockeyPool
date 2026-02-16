@@ -1,7 +1,7 @@
 export type { default as Equipe } from './IEquipes';
 export type { default as Echange } from './IEchange';
 export type { default as PlayerDetails, NHLPlayer } from './IPlayerDetails';
-export type { HomeActivity, HomeTrade } from './IHome';
+export type { HomeTrade } from './IHome';
 export type { DraftPick, DraftType } from './IDraft';
 export type {
   GameScore, TeamWithScore, GameClock, Period, ScoreResponse,
