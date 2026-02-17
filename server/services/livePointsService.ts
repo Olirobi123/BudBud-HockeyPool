@@ -1,4 +1,4 @@
-import { NHLClient, PlayByPlayResponse, GameScore, RosterSpot } from '@olirobi/nhl_api_client';
+import { NHLClient, PlayByPlayResponse, GameScore } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
 import { QUERIES } from '../models';
 import { LivePlayerPoints, LiveTeamPoints, LivePointsResponse } from '../types';
@@ -142,17 +142,10 @@ export class LivePointsService {
     game: GameScore,
     playerMap: Map<number, PlayerAccumulator>,
   ): void {
-    const rosterMap = new Map<number, RosterSpot>();
-    for (const spot of pbp.rosterSpots ?? []) {
-      rosterMap.set(spot.playerId, spot);
-    }
-
-    // Build team ID → abbrev map (fallback when rosterSpot.teamTriCode is missing)
     const teamIdToAbbrev = new Map<number, string>();
     teamIdToAbbrev.set(game.awayTeam.id, game.awayTeam.abbrev);
     teamIdToAbbrev.set(game.homeTeam.id, game.homeTeam.abbrev);
 
-    // Build team logo map from game data
     const teamLogoMap = new Map<string, string>();
     if (game.awayTeam.abbrev !== '' && game.awayTeam.logo != null) {
       teamLogoMap.set(game.awayTeam.abbrev, game.awayTeam.logo);
@@ -161,64 +154,46 @@ export class LivePointsService {
       teamLogoMap.set(game.homeTeam.abbrev, game.homeTeam.logo);
     }
 
-    const goalPlays = (pbp.plays ?? []).filter(
-      (play) => play.typeDescKey === 'goal',
-    );
+    // Seed all skaters from the roster so players with 0 points appear
+    for (const spot of pbp.rosterSpots ?? []) {
+      if (spot.positionCode === GOALIE_POSITION || playerMap.has(spot.playerId)) continue;
 
-    for (const play of goalPlays) {
+      const teamAbbrev = spot.teamTriCode
+        ?? (spot.teamId != null ? teamIdToAbbrev.get(spot.teamId) : undefined)
+        ?? '';
+
+      playerMap.set(spot.playerId, {
+        nhlPlayerId: spot.playerId,
+        firstName: spot.firstName?.default ?? '',
+        lastName: spot.lastName?.default ?? '',
+        position: spot.positionCode ?? '',
+        nhlTeamAbbrev: teamAbbrev,
+        nhlTeamLogo: teamLogoMap.get(teamAbbrev) ?? '',
+        headshot: spot.headshot ?? '',
+        goals: 0,
+        assists: 0,
+      });
+    }
+
+    // Accumulate goals and assists from play-by-play
+    for (const play of pbp.plays ?? []) {
+      if (play.typeDescKey !== 'goal') continue;
       const details = play.details;
       if (!details) continue;
 
-      // Process scorer
       if (details.scoringPlayerId != null) {
-        this.addPlayerPoints(details.scoringPlayerId, 'goal', rosterMap, teamLogoMap, teamIdToAbbrev, playerMap);
+        const p = playerMap.get(details.scoringPlayerId);
+        if (p) p.goals++;
       }
-
-      // Process assist 1
       if (details.assist1PlayerId != null) {
-        this.addPlayerPoints(details.assist1PlayerId, 'assist', rosterMap, teamLogoMap, teamIdToAbbrev, playerMap);
+        const p = playerMap.get(details.assist1PlayerId);
+        if (p) p.assists++;
       }
-
-      // Process assist 2
       if (details.assist2PlayerId != null) {
-        this.addPlayerPoints(details.assist2PlayerId, 'assist', rosterMap, teamLogoMap, teamIdToAbbrev, playerMap);
+        const p = playerMap.get(details.assist2PlayerId);
+        if (p) p.assists++;
       }
     }
-  }
-
-  private addPlayerPoints(
-    playerId: number,
-    type: 'goal' | 'assist',
-    rosterMap: Map<number, RosterSpot>,
-    teamLogoMap: Map<string, string>,
-    teamIdToAbbrev: Map<number, string>,
-    playerMap: Map<number, PlayerAccumulator>,
-  ): void {
-    const existing = playerMap.get(playerId);
-
-    if (existing) {
-      if (type === 'goal') existing.goals++;
-      else existing.assists++;
-      return;
-    }
-
-    const rosterSpot = rosterMap.get(playerId);
-    // teamTriCode may be absent (e.g. international games); fall back to teamId lookup
-    const teamAbbrev = rosterSpot?.teamTriCode
-      ?? (rosterSpot?.teamId != null ? teamIdToAbbrev.get(rosterSpot.teamId) : undefined)
-      ?? '';
-
-    playerMap.set(playerId, {
-      nhlPlayerId: playerId,
-      firstName: rosterSpot?.firstName?.default ?? '',
-      lastName: rosterSpot?.lastName?.default ?? '',
-      position: rosterSpot?.positionCode ?? '',
-      nhlTeamAbbrev: teamAbbrev,
-      nhlTeamLogo: teamLogoMap.get(teamAbbrev) ?? '',
-      headshot: rosterSpot?.headshot ?? '',
-      goals: type === 'goal' ? 1 : 0,
-      assists: type === 'assist' ? 1 : 0,
-    });
   }
 
   private async batchLookupOwnership(
