@@ -55,7 +55,7 @@ export class LivePointsService {
     if (activeGames.length === 0) {
       return {
         topPlayers: [],
-        teamLeaderboard: [],
+        teamLeaderboard: await this.buildTeamLeaderboard([]),
         gamesCount: games.length,
         liveGamesCount: liveGames.length,
       };
@@ -111,8 +111,8 @@ export class LivePointsService {
     // Top 10 for the feed
     const topPlayers = allPlayers.slice(0, TOP_PLAYERS_LIMIT);
 
-    // Build team leaderboard from owned players only
-    const teamLeaderboard = this.buildTeamLeaderboard(allPlayers);
+    // Build team leaderboard from owned players, including teams with 0 points
+    const teamLeaderboard = await this.buildTeamLeaderboard(allPlayers);
 
     const response: LivePointsResponse = {
       topPlayers,
@@ -147,6 +147,11 @@ export class LivePointsService {
       rosterMap.set(spot.playerId, spot);
     }
 
+    // Build team ID → abbrev map (fallback when rosterSpot.teamTriCode is missing)
+    const teamIdToAbbrev = new Map<number, string>();
+    teamIdToAbbrev.set(game.awayTeam.id, game.awayTeam.abbrev);
+    teamIdToAbbrev.set(game.homeTeam.id, game.homeTeam.abbrev);
+
     // Build team logo map from game data
     const teamLogoMap = new Map<string, string>();
     if (game.awayTeam.abbrev !== '' && game.awayTeam.logo != null) {
@@ -166,17 +171,17 @@ export class LivePointsService {
 
       // Process scorer
       if (details.scoringPlayerId != null) {
-        this.addPlayerPoints(details.scoringPlayerId, 'goal', rosterMap, teamLogoMap, playerMap);
+        this.addPlayerPoints(details.scoringPlayerId, 'goal', rosterMap, teamLogoMap, teamIdToAbbrev, playerMap);
       }
 
       // Process assist 1
       if (details.assist1PlayerId != null) {
-        this.addPlayerPoints(details.assist1PlayerId, 'assist', rosterMap, teamLogoMap, playerMap);
+        this.addPlayerPoints(details.assist1PlayerId, 'assist', rosterMap, teamLogoMap, teamIdToAbbrev, playerMap);
       }
 
       // Process assist 2
       if (details.assist2PlayerId != null) {
-        this.addPlayerPoints(details.assist2PlayerId, 'assist', rosterMap, teamLogoMap, playerMap);
+        this.addPlayerPoints(details.assist2PlayerId, 'assist', rosterMap, teamLogoMap, teamIdToAbbrev, playerMap);
       }
     }
   }
@@ -186,6 +191,7 @@ export class LivePointsService {
     type: 'goal' | 'assist',
     rosterMap: Map<number, RosterSpot>,
     teamLogoMap: Map<string, string>,
+    teamIdToAbbrev: Map<number, string>,
     playerMap: Map<number, PlayerAccumulator>,
   ): void {
     const existing = playerMap.get(playerId);
@@ -197,7 +203,10 @@ export class LivePointsService {
     }
 
     const rosterSpot = rosterMap.get(playerId);
-    const teamAbbrev = rosterSpot?.teamTriCode ?? '';
+    // teamTriCode may be absent (e.g. international games); fall back to teamId lookup
+    const teamAbbrev = rosterSpot?.teamTriCode
+      ?? (rosterSpot?.teamId != null ? teamIdToAbbrev.get(rosterSpot.teamId) : undefined)
+      ?? '';
 
     playerMap.set(playerId, {
       nhlPlayerId: playerId,
@@ -231,8 +240,28 @@ export class LivePointsService {
     return map;
   }
 
-  private buildTeamLeaderboard(allPlayers: LivePlayerPoints[]): LiveTeamPoints[] {
+  private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[]): Promise<LiveTeamPoints[]> {
     const teamMap = new Map<number, LiveTeamPoints>();
+
+    // Seed all active pool teams so teams with 0 points still appear
+    try {
+      const result = await pool.query(QUERIES.GET_ACTIVE_TEAMS);
+      for (const row of result.rows as { id: number; nom: string }[]) {
+        teamMap.set(row.id, {
+          equipeId: row.id,
+          equipeNom: row.nom,
+          totalPoints: 0,
+          totalGoals: 0,
+          totalAssists: 0,
+          attaquePoints: 0,
+          defensePoints: 0,
+          players: [],
+        });
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching active teams for leaderboard:', error);
+    }
 
     for (const player of allPlayers) {
       if (!player.poolTeam) continue;
