@@ -6,7 +6,9 @@ import { scoresService } from './scoresService';
 
 const ACTIVE_GAME_STATES = ['LIVE', 'CRIT', 'FINAL', 'OFF'];
 const GOALIE_POSITION = 'G';
+const DEFENSE_POSITION = 'D';
 const TOP_PLAYERS_LIMIT = 10;
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
 interface PlayerAccumulator {
   nhlPlayerId: number;
@@ -32,11 +34,19 @@ interface OwnershipRow {
 export class LivePointsService {
   private nhlClient: NHLClient;
 
+  private cachedResponse: LivePointsResponse | null = null;
+
+  private cacheExpiry = 0;
+
   constructor() {
     this.nhlClient = new NHLClient();
   }
 
   async getLivePoints(): Promise<LivePointsResponse> {
+    if (this.cachedResponse && Date.now() < this.cacheExpiry) {
+      return this.cachedResponse;
+    }
+
     const games = await scoresService.getCurrentScores();
 
     const activeGames = games.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
@@ -104,12 +114,17 @@ export class LivePointsService {
     // Build team leaderboard from owned players only
     const teamLeaderboard = this.buildTeamLeaderboard(allPlayers);
 
-    return {
+    const response: LivePointsResponse = {
       topPlayers,
       teamLeaderboard,
       gamesCount: activeGames.length,
       liveGamesCount: liveGames.length,
     };
+
+    this.cachedResponse = response;
+    this.cacheExpiry = Date.now() + CACHE_TTL_MS;
+
+    return response;
   }
 
   private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | null> {
@@ -222,11 +237,17 @@ export class LivePointsService {
     for (const player of allPlayers) {
       if (!player.poolTeam) continue;
 
+      const isDefense = player.position === DEFENSE_POSITION;
       const existing = teamMap.get(player.poolTeam.id);
       if (existing) {
         existing.totalPoints += player.points;
         existing.totalGoals += player.goals;
         existing.totalAssists += player.assists;
+        if (isDefense) {
+          existing.defensePoints += player.points;
+        } else {
+          existing.attaquePoints += player.points;
+        }
         existing.players.push(player);
       } else {
         teamMap.set(player.poolTeam.id, {
@@ -235,6 +256,8 @@ export class LivePointsService {
           totalPoints: player.points,
           totalGoals: player.goals,
           totalAssists: player.assists,
+          attaquePoints: isDefense ? 0 : player.points,
+          defensePoints: isDefense ? player.points : 0,
           players: [player],
         });
       }

@@ -21,6 +21,8 @@ export interface LiveTeamPoints {
   totalPoints: number;
   totalGoals: number;
   totalAssists: number;
+  attaquePoints: number;
+  defensePoints: number;
   players: LivePlayerPoints[];
 }
 
