@@ -15,18 +15,6 @@ export const executeQuery = async (query: string, params: any[] = []) => {
   }
 };
 
-/**
- * Vérifier la connexion à la base de données
- */
-export const checkDatabaseConnection = async (): Promise<boolean> => {
-  try {
-    await pool.query('SELECT 1');
-    return true;
-  } catch (error) {
-    console.error('Erreur de connexion à la base de données:', error);
-    return false;
-  }
-};
 
 /**
  * Fermer la connexion à la base de données
