@@ -1,25 +1,24 @@
 import { Request, Response } from 'express';
-import { asyncHandler } from '../middleware/errorHandler';
-import { checkDatabaseConnection } from '../utils/database';
-import { sendSuccess, sendServerError } from '../utils/response';
 
 export class HealthController {
   /**
-   * Vérifier l'état de santé de l'application
+   * Liveness check
+   * Ne touche PAS à la base de données
    */
-  check = asyncHandler(async (req: Request, res: Response) => {
-    const dbConnected = await checkDatabaseConnection();
-
-    if (dbConnected) {
-      sendSuccess(res, {
-        status: 'healthy',
-        database: 'connected',
-        timestamp: new Date().toISOString(),
-      });
-    } else {
-      sendServerError(res, 'Database connection failed');
-    }
-  });
+  check = (_req: Request, res: Response) => {
+    res.status(200).json({
+      status: 'ok',
+      uptime: process.uptime(), // seconds
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      version: process.env.npm_package_version,
+      memory: {
+        rss: process.memoryUsage().rss,
+        heapTotal: process.memoryUsage().heapTotal,
+        heapUsed: process.memoryUsage().heapUsed,
+      },
+    });
+  };
 }
 
 export const healthController = new HealthController();
