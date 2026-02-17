@@ -2,7 +2,6 @@ import { useEchanges } from '@/hooks/echanges/useEchanges';
 import { ErrorDisplay } from '@/components/ui/error-display';
 import { EchangeStats } from '@/components/echanges/EchangeStats';
 import { EchangeList } from '@/components/echanges/EchangeList';
-import EchangeForm from '@/components/forms/EchangeForm';
 import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
 import { usePageLoading } from '@/hooks/usePageLoading';
@@ -41,9 +40,6 @@ export default function Echanges() {
         <p className="text-muted-foreground">Tous les échanges de la ligue</p>
       </div>
       <EchangeStats echanges={echanges} />
-      <div className="mb-6">
-        <EchangeForm />
-      </div>
       <EchangeList echanges={echanges} />
     </Layout>
   );
