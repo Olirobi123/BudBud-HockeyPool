@@ -30,13 +30,6 @@ export class EchangesController {
     sendSuccess(res, trade);
   });
 
-  /**
-   * Récupérer l'activité récente (échanges) pour le feed d'accueil
-   */
-  getRecentActivity = asyncHandler(async (req: Request, res: Response) => {
-    const activity = await echangesService.getRecentActivity();
-    sendSuccess(res, activity);
-  });
 }
 
 export const echangesController = new EchangesController();

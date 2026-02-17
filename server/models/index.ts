@@ -71,22 +71,6 @@ export const QUERIES = {
     ORDER BY e.date DESC
     LIMIT 1
   `,
-  GET_RECENT_ECHANGES: `
-    SELECT
-      e.id,
-      e.date,
-      e.details,
-      e.equipe_source_id,
-      e.equipe_destination_id,
-      e.statut_confirmer,
-      src.nom as equipe_source_nom,
-      dest.nom as equipe_destination_nom
-    FROM ${TABLES.ECHANGES} e
-    JOIN ${TABLES.EQUIPES} src ON e.equipe_source_id = src.id
-    JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
-    ORDER BY e.date DESC
-    LIMIT 10
-  `,
   GET_LATEST_TRADE_BY_TEAM: `
     SELECT
       e.id,
@@ -220,5 +204,15 @@ export const QUERIES = {
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE ep.equipe_id = $1 AND ep.season = $2
+  `,
+
+  // Live Points: batch ownership lookup by NHL player IDs
+  GET_BATCH_OWNERSHIP_BY_NHL_IDS: `
+    SELECT j.nhl_player_id, j.nom, j.prenom, j.position,
+           e.id as equipe_id, e.nom as equipe_nom
+    FROM ${TABLES.JOUEURS} j
+    LEFT JOIN ${TABLES.EQUIPE_JOUEURS} ej ON ej.joueur_id = j.id
+    LEFT JOIN ${TABLES.EQUIPES} e ON ej.equipe_id = e.id
+    WHERE j.nhl_player_id = ANY($1)
   `,
 } as const;

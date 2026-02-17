@@ -1,11 +1,3 @@
-export interface HomeActivity {
-  id: string;
-  type: 'Échange' | 'scoring' | 'match';
-  time: string; // e.g. 'il y a 2h'
-  description: string;
-  details?: string;
-}
-
 export interface HomeTrade {
   id: string;
   date: string;
