@@ -314,7 +314,7 @@ export function LivePointsLeaderboard({ teams, isLoading }: LivePointsLeaderboar
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <Trophy className="w-5 h-5 text-amber-400" />
-          <span>Classement en direct</span>
+          <span>Classement quotidien</span>
         </CardTitle>
       </CardHeader>
       <CardContent>

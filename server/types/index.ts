@@ -70,13 +70,6 @@ export interface EquipeJoueur {
   joueur_id: number;
 }
 
-// Types pour les requêtes API
-export interface CreateEchangeRequest {
-  equipe_source_id: string;
-  equipe_destination_id: string;
-  details: string;
-}
-
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;

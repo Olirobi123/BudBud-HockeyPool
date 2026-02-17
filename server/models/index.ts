@@ -50,11 +50,6 @@ export const QUERIES = {
     JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
     ORDER BY e.date DESC
   `,
-  CREATE_ECHANGE: `
-    INSERT INTO ${TABLES.ECHANGES} (equipe_source_id, equipe_destination_id, details, date)
-    VALUES ($1, $2, $3, NOW())
-    RETURNING *
-  `,
   GET_LATEST_ECHANGE: `
     SELECT
       e.id,
