@@ -1,5 +1,6 @@
 # Documentation de la base de données Budbud (branche développement)
 
+
 ## Généralités
 - **Base de données** : `budbud`
 - **Schéma principal** : `public`
@@ -36,33 +37,35 @@
 
 ### 2. `equipes`
 - **Taille de la table** : 8192 bytes
-- **Taille des index** : 16 kB
-- **Taille totale** : 24 kB
+- **Taille des index** : 24 kB
+- **Taille totale** : 32 kB
 
 #### Colonnes
-| Nom            | Type                | Null | Par défaut                                      |
-|----------------|---------------------|------|-------------------------------------------------|
-| id             | integer             | Non  | nextval('equipes_id_seq'::regclass)             |
-| nom            | character varying   | Non  | -                                               |
-| active         | boolean             | Oui  | true                                            |
-| nhl_player_ids | integer[]           | Oui  | -                                               |
+| Nom       | Type              | Null | Par défaut                          |
+|-----------|-------------------|------|-------------------------------------|
+| id        | integer           | Non  | nextval('equipes_id_seq'::regclass) |
+| nom       | character varying | Non  | -                                   |
+| active    | boolean           | Oui  | true                                |
+| division  | character varying | Oui  | -                                   |
+| dg_name   | text              | Oui  | -                                   |
 
 #### Index
 - `equipes_pkey` (16 kB) : UNIQUE sur `id`
-- `idx_equipes_nhl_player_ids_gin` (optionnel) : GIN index sur `nhl_player_ids` pour les opérations sur tableaux
 
 #### Contraintes
 - `PRIMARY KEY (id)`
 
 #### Notes
-- `nhl_player_ids` : **DEPRECIE** - Tableau d'IDs de joueurs NHL (remplace par la table de jonction `equipe_joueurs`)
+- `division` : Division du pool à laquelle appartient l'équipe
+- `dg_name` : Nom du directeur général (DG) de l'équipe dans le pool
+- `nhl_player_ids` : **SUPPRIMÉ** — ancienne colonne tableau remplacée par la table de jonction `equipe_joueurs`
 
 ---
 
 ### 3. `repechages`
 - **Taille de la table** : 16 kB
-- **Taille des index** : 48 kB
-- **Taille totale** : 64 kB
+- **Taille des index** : 64 kB
+- **Taille totale** : 80 kB
 
 #### Colonnes
 | Nom        | Type                | Null | Par défaut                                      |
@@ -93,9 +96,9 @@
 ---
 
 ### 4. `trophee_gagnants`
-- **Taille de la table** : 0 bytes
-- **Taille des index** : 8192 bytes
-- **Taille totale** : 8192 bytes
+- **Taille de la table** : 8192 bytes
+- **Taille des index** : 16 kB
+- **Taille totale** : 24 kB
 
 #### Colonnes
 | Nom        | Type                | Null | Par défaut                                      |
@@ -116,9 +119,9 @@
 ---
 
 ### 5. `trophees`
-- **Taille de la table** : 0 bytes
-- **Taille des index** : 8192 bytes
-- **Taille totale** : 8192 bytes
+- **Taille de la table** : 8192 bytes
+- **Taille des index** : 16 kB
+- **Taille totale** : 24 kB
 
 #### Colonnes
 | Nom   | Type                | Null | Par défaut                                      |
@@ -144,6 +147,9 @@
 ---
 
 ### 6. `equipe_joueurs` (Table de jonction)
+- **Taille de la table** : 16 kB
+- **Taille des index** : 88 kB
+- **Taille totale** : 104 kB
 
 Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_ids`).
 
@@ -155,9 +161,10 @@ Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_
 | joueur_id  | integer | Non  | -                                               |
 
 #### Index
-- `equipe_joueurs_pkey` : UNIQUE sur `id`
-- `idx_equipe_joueurs_equipe_id` : Index sur `equipe_id` pour les recherches par equipe
-- `idx_equipe_joueurs_joueur_id` : Index sur `joueur_id` pour les recherches par joueur
+- `equipe_joueurs_pkey` (16 kB) : UNIQUE sur `id`
+- `equipe_joueurs_joueur_id_key` (16 kB) : UNIQUE sur `joueur_id`
+- `idx_equipe_joueurs_equipe_id` (16 kB) : Index sur `equipe_id` pour les recherches par equipe
+- `idx_equipe_joueurs_joueur_id` (16 kB) : Index sur `joueur_id` pour les recherches par joueur
 
 #### Contraintes
 - `PRIMARY KEY (id)`
@@ -173,9 +180,9 @@ Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_
 ---
 
 ### 7. `joueurs`
-- **Taille de la table** : Variable (nouvelle table)
-- **Taille des index** : Variable
-- **Taille totale** : Variable
+- **Taille de la table** : 24 kB
+- **Taille des index** : 96 kB
+- **Taille totale** : 120 kB
 
 #### Colonnes
 | Nom            | Type                | Null | Par défaut                                      |
@@ -205,7 +212,42 @@ Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_
 
 ---
 
-### 8. `types_repechage`
+### 8. `equipe_points`
+- **Taille de la table** : 8192 bytes
+- **Taille des index** : 72 kB
+- **Taille totale** : 80 kB
+
+Stocke les points cumulés par équipe par saison, décomposés par catégorie (attaque, défense, gardien).
+
+#### Colonnes
+| Nom              | Type    | Null | Par défaut |
+|------------------|---------|------|------------|
+| id               | integer | Non  | -          |
+| equipe_id        | integer | Oui  | -          |
+| season           | text    | Non  | -          |
+| attaque_points   | integer | Non  | 0          |
+| defense_points   | integer | Non  | 0          |
+| gardien_points   | integer | Non  | 0          |
+| total_points     | integer | Non  | 0          |
+| last_update_at   | date    | Oui  | now()      |
+
+#### Index
+- `equipe_stats_pkey` (16 kB) : UNIQUE sur `id`
+- `equipe_points_equipe_id_season_unique` (16 kB) : UNIQUE sur `(equipe_id, season)`
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `UNIQUE (equipe_id, season)` - Une seule ligne de points par équipe par saison
+
+#### Notes
+- `season` : Format texte (ex. `'20242025'`) correspondant à la saison NHL
+- Les points sont divisés en 3 catégories reflétant les positions : attaque (C/LW/RW), défense (D), gardien (G)
+- `total_points` est la somme des 3 catégories
+
+---
+
+### 9. `types_repechage`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 16 kB
 - **Taille totale** : 24 kB
@@ -244,6 +286,7 @@ Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_
 - `trophee_gagnants` → `equipes` (equipe_id)
 - `equipe_joueurs` → `equipes` (equipe_id) - Table de jonction pour les effectifs
 - `equipe_joueurs` → `joueurs` (joueur_id) - Table de jonction pour les effectifs
+- `equipe_points` → `equipes` (equipe_id) - Points cumulés par équipe par saison
 
 ---
 
@@ -261,4 +304,4 @@ Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_
 - Les contraintes d’unicité et de clé primaire sont listées.
 
 ---
-*Dernière mise à jour : janvier 2026 * 
+*Dernière mise à jour : février 2026*
