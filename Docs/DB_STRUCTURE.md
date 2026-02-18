@@ -277,6 +277,41 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie (
 
 ---
 
+### 10. `api_store`
+
+Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour l'UPSERT : une seule ligne par clé, jamais de duplication.
+
+#### Colonnes
+| Nom           | Type        | Null | Par défaut                          |
+|---------------|-------------|------|-------------------------------------|
+| id            | integer     | Non  | nextval('api_store_id_seq'::regclass) |
+| key           | text        | Non  | -                                   |
+| json_response | jsonb       | Non  | -                                   |
+| last_update   | timestamptz | Non  | NOW()                               |
+
+#### Index
+- `api_store_pkey` : UNIQUE sur `id`
+- `idx_api_store_key` : Index sur `key` pour les lectures rapides
+- Contrainte UNIQUE implicite sur `key` (utilisée par l'UPSERT `ON CONFLICT (key)`)
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `UNIQUE (key)` — une seule entrée par clé
+
+#### Clés utilisées
+| Clé                        | Contenu                                                          | Mise à jour       |
+|----------------------------|------------------------------------------------------------------|-------------------|
+| `live_points`              | `{ topPlayers, teamLeaderboard, gamesCount, liveGamesCount }`    | Cron 3h00 nightly |
+| `live_points_leaderboard`  | `{ teamLeaderboard, gamesCount, liveGamesCount }`                | Cron 3h00 nightly |
+| `live_points_feed`         | `{ topPlayers, gamesCount, liveGamesCount }`                     | Cron 3h00 nightly |
+
+#### Notes
+- Pas de FK — table autonome pour le stockage de cache persistant
+- L'UPSERT met à jour `json_response` et `last_update` si la clé existe déjà
+- Alimentée par `POST /api/snapshot/live-points` (protégé par `requireApiKey`)
+
+---
+
 ## Relations entre les tables
 - `echanges` → `equipes` (equipe_source_id, equipe_destination_id)
 - `repechages` → `types_repechage` (type_id)

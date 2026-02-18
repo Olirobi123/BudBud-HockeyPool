@@ -9,6 +9,7 @@ import healthRoutes from './routes/health';
 import tropheesRoutes from './routes/trophees';
 import pointsRoutes from './routes/points';
 import livePointsRoutes from './routes/livePoints';
+import snapshotRoutes from './routes/snapshot';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -37,6 +38,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Routes pour les points en direct
   app.use('/api/live-points', livePointsRoutes);
+
+  // Routes pour les snapshots nocturnes (cron)
+  app.use('/api/snapshot', snapshotRoutes);
 
   const httpServer = createServer(app);
 

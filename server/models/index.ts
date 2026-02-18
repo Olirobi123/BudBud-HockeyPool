@@ -10,6 +10,7 @@ export const TABLES = {
   TROPHEES: 'trophees',
   TROPHEE_GAGNANTS: 'trophee_gagnants',
   EQUIPE_POINTS: 'equipe_points',
+  API_STORE: 'api_store',
 } as const;
 
 export const QUERIES = {
@@ -199,6 +200,15 @@ export const QUERIES = {
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE ep.equipe_id = $1 AND ep.season = $2
+  `,
+
+  // API Store: persistent JSON snapshots (UPSERT by key)
+  UPSERT_API_STORE: `
+    INSERT INTO ${TABLES.API_STORE} (key, json_response, last_update)
+    VALUES ($1, $2, NOW())
+    ON CONFLICT (key) DO UPDATE SET
+      json_response = EXCLUDED.json_response,
+      last_update   = NOW()
   `,
 
   // Live Points: batch ownership lookup by NHL player IDs
