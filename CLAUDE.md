@@ -21,23 +21,43 @@ The app runs on port 5000.
 
 ## Architecture
 
+This is an **npm workspaces monorepo** with `client/` and `server/` as separate packages. `npm run dev` runs both concurrently via `concurrently`.
+
 ### Frontend (`client/`)
-- **Entry**: `main.tsx` → `App.tsx` (routing with Wouter)
-- **State**: TanStack Query for server state, React Context for loading state
-- **Components**: Feature folders under `components/` (draft/, echanges/, home/, joueur/, navigation/, player-search/)
-- **UI Primitives**: 40+ Radix-based components in `components/ui/` (shadcn/ui)
-- **Hooks**: Feature-specific hooks in `hooks/[feature]/` folders
+- **Entry**: `main.tsx` → `App.tsx` (routing with `react-router-dom` BrowserRouter)
+- **Pages**: `home`, `equipes`, `team-details`, `draft`, `echanges`, `joueur`, `not-found`
+- **State**: TanStack Query for server state, React Context for loading state (`lib/loading-context.tsx`)
+- **Components**: Feature folders under `components/` (draft/, echanges/, equipes/, home/, joueur/, navigation/, player-search/, trophees/)
+- **UI Primitives**: Radix-based components in `components/ui/` (shadcn/ui)
+- **Hooks**: Feature-specific hooks in `hooks/[feature]/` folders; shared hooks at `hooks/` root
 - **Styling**: Tailwind CSS with dark mode support
+- **Path alias**: `@/*` → `client/src/*`
 
 ### Backend (`server/`)
 - **Pattern**: MVC (Controllers → Services → Database)
-- **Routes**: `/api/teams`, `/api/echanges`, `/api/repechage`, `/api/players/:id`, `/api/search/players`
-- **Database**: PostgreSQL via connection pool (config in `config/database.ts`)
+- **External API**: NHL data via `@olirobi/nhl_api_client` (used in `services/playersService.ts`, `services/scoresService.ts`)
+- **Routes registered in `routes.ts`**:
+  - `/api/teams` — pool teams + roster endpoints (`GET /:id/roster`, `GET /:id/roster/stats`)
+  - `/api/echanges` — trades
+  - `/api/repechage` — draft picks
+  - `/api/players` — player search and ownership (`GET /search`, `GET /:nhlId/ownership`, `GET /nhl/:nhlId`, `GET /bd/:id`)
+  - `/api/scores` — live NHL game scores
+  - `/api/points` — pool standings (season totals)
+  - `/api/live-points` — live pool points during game days
+  - `/api/trophees` — pool awards
+  - `/api/health` — health check
+- **Database**: PostgreSQL via connection pool (`config/database.ts`); all SQL queries in `models/index.ts`
 - **Error handling**: Centralized middleware in `middleware/errorHandler.ts`
+
+### Database (9 tables)
+`equipes`, `joueurs`, `equipe_joueurs` (junction), `equipe_points`, `repechages`, `types_repechage`, `echanges`, `trophees`, `trophee_gagnants`
+- `equipes.nhl_player_ids` has been **dropped** — use `equipe_joueurs` junction table
+- `equipes` has two new columns: `division` (varchar) and `dg_name` (text)
+- Player positions: `'C'`, `'LW'`, `'RW'`, `'D'`, `'G'`
 
 ### Data Flow
 1. React component → custom hook → TanStack Query → API call
-2. Express route → Controller → Service → Database query
+2. Express route → Controller → Service → `models/index.ts` query → Database
 
 ## Documentation Priority
 
@@ -46,7 +66,7 @@ Before implementing features, consult in this order:
 2. `/Docs/Implementation.md` - Current stage tasks and implementation plan
 3. `/Docs/project_structure.md` - File naming and folder structure
 4. `/Docs/UI_UX_doc.md` - Design system and responsive requirements
-5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (6 tables: equipes, echanges, repechages, types_repechage, trophees, trophee_gagnants)
+5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (8 tables)
 6. `/Docs/Git_Workflow.md` - Branching strategy and deployment process
 
 ## Key Constraints
@@ -54,7 +74,6 @@ Before implementing features, consult in this order:
 - TypeScript strict mode - no `any` types
 - ESLint max 0 warnings - all warnings must be fixed
 - Environment: `.env` with `DATABASE_URL` required
-- Path alias: `@/*` maps to `client/src/*`
 - Mobile-first responsive design
 - Document errors in `/Docs/Bug_tracking.md`
 
@@ -92,4 +111,4 @@ feature/* → dev → acceptation → main
 
 ## Current Development Status
 
-The project follows a 4-stage refactoring plan (Stages 1-2 complete, Stage 3 in progress). Check `/Docs/Implementation.md` for current tasks and their status.
+The project follows a 5-stage refactoring plan. Stages 1-4 are complete. Stage 5 (Polish, Testing & Optimization) is next. Check `/Docs/Implementation.md` for current tasks and their status.
