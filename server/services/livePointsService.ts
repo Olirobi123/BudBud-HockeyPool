@@ -47,12 +47,23 @@ export class LivePointsService {
       return this.cachedResponse;
     }
 
-    const games = await scoresService.getCurrentScores();
+    let games: Awaited<ReturnType<typeof scoresService.getCurrentScores>>;
+    try {
+      games = await scoresService.getCurrentScores();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('NHL scores API unavailable, falling back to snapshot:', error);
+      const snapshot = await this.fetchSnapshot();
+      if (snapshot) return this.cacheAndReturn(snapshot);
+      return { topPlayers: [], teamLeaderboard: [], gamesCount: 0, liveGamesCount: 0 };
+    }
 
     const activeGames = games.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
     const liveGames = games.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
     if (activeGames.length === 0) {
+      const snapshot = await this.fetchSnapshot();
+      if (snapshot) return this.cacheAndReturn(snapshot);
       return {
         topPlayers: [],
         teamLeaderboard: await this.buildTeamLeaderboard([]),
@@ -213,6 +224,24 @@ export class LivePointsService {
     }
 
     return map;
+  }
+
+  private cacheAndReturn(response: LivePointsResponse): LivePointsResponse {
+    this.cachedResponse = response;
+    this.cacheExpiry = Date.now() + CACHE_TTL_MS;
+    return response;
+  }
+
+  private async fetchSnapshot(): Promise<LivePointsResponse | null> {
+    try {
+      const result = await pool.query(QUERIES.GET_API_STORE, ['live_points']);
+      if (result.rows.length === 0) return null;
+      return result.rows[0].json_response as LivePointsResponse;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching live_points snapshot from api_store:', error);
+      return null;
+    }
   }
 
   private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[]): Promise<LiveTeamPoints[]> {
