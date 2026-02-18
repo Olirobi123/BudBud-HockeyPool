@@ -202,7 +202,12 @@ export const QUERIES = {
     WHERE ep.equipe_id = $1 AND ep.season = $2
   `,
 
-  // API Store: persistent JSON snapshots (UPSERT by key)
+  // API Store: persistent JSON snapshots
+  GET_API_STORE: `
+    SELECT json_response, last_update
+    FROM ${TABLES.API_STORE}
+    WHERE key = $1
+  `,
   UPSERT_API_STORE: `
     INSERT INTO ${TABLES.API_STORE} (key, json_response, last_update)
     VALUES ($1, $2, NOW())

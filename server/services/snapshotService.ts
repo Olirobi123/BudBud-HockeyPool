@@ -14,15 +14,15 @@ export class SnapshotService {
     await Promise.all([
       pool.query(QUERIES.UPSERT_API_STORE, [
         FULL_KEY,
-        JSON.stringify(response),
+        response,
       ]),
       pool.query(QUERIES.UPSERT_API_STORE, [
         LEADERBOARD_KEY,
-        JSON.stringify({ teamLeaderboard, gamesCount, liveGamesCount }),
+        { teamLeaderboard, gamesCount, liveGamesCount },
       ]),
       pool.query(QUERIES.UPSERT_API_STORE, [
         FEED_KEY,
-        JSON.stringify({ topPlayers, gamesCount, liveGamesCount }),
+        { topPlayers, gamesCount, liveGamesCount },
       ]),
     ]);
   }
