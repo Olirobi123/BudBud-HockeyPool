@@ -10,6 +10,7 @@ import tropheesRoutes from './routes/trophees';
 import pointsRoutes from './routes/points';
 import livePointsRoutes from './routes/livePoints';
 import snapshotRoutes from './routes/snapshot';
+import misAuBallotageRoutes from './routes/misAuBallotage';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -41,6 +42,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Routes pour les snapshots nocturnes (cron)
   app.use('/api/snapshot', snapshotRoutes);
+
+  // Routes pour les mises au ballotage
+  app.use('/api/mis-au-ballotage', misAuBallotageRoutes);
 
   const httpServer = createServer(app);
 
