@@ -20,7 +20,6 @@ export interface Equipe {
 export interface Echange {
   id: number;
   date: Date;
-  details: string;
   equipe_source_id: number;
   equipe_destination_id: number;
   statut_confirmer: boolean;
@@ -31,6 +30,8 @@ export interface Echange {
 export interface EchangeWithTeams extends Echange {
   equipe_source_nom: string;
   equipe_destination_nom: string;
+  joueurs_source: string[];
+  joueurs_destination: string[];
 }
 
 export interface Player {

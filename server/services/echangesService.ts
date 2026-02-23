@@ -4,37 +4,6 @@ import {
 } from '../types';
 import { QUERIES } from '../models';
 
-/**
- * Parse les détails d'un échange pour extraire les joueurs de chaque équipe
- * Format attendu: "TEAM_A reçoit: player1, player2 | TEAM_B reçoit: player1, player2"
- */
-function parseTradeDetails(details: string): { playersA: string[]; playersB: string[] } {
-  // Séparer les deux côtés de l'échange par " | "
-  const sides = details.split(' | ');
-
-  if (sides.length >= 2) {
-    // Extraire les joueurs de chaque côté (après "reçoit: ")
-    const extractPlayers = (side: string): string[] => {
-      const match = side.match(/reçoit:\s*(.+)/i);
-      if (match) {
-        return match[1].split(',').map((p) => p.trim()).filter((p) => p.length > 0);
-      }
-      return [side.trim()];
-    };
-
-    return {
-      playersA: extractPlayers(sides[0]),
-      playersB: extractPlayers(sides[1]),
-    };
-  }
-
-  // Pas de séparateur "|" trouvé - retourner le texte complet
-  return {
-    playersA: [details],
-    playersB: [],
-  };
-}
-
 export class EchangesService {
   /**
    * Récupérer tous les échanges avec les noms des équipes
@@ -60,15 +29,14 @@ export class EchangesService {
       }
 
       const echange = result.rows[0] as EchangeWithTeams;
-      const { playersA, playersB } = parseTradeDetails(echange.details);
 
       return {
         id: String(echange.id),
         date: new Date(echange.date).toLocaleDateString('fr-CA'),
         teamA: echange.equipe_source_nom,
-        playersA,
+        playersA: echange.joueurs_source,
         teamB: echange.equipe_destination_nom,
-        playersB,
+        playersB: echange.joueurs_destination,
       };
     } catch (error) {
       console.error('Erreur lors de la récupération du dernier échange:', error);

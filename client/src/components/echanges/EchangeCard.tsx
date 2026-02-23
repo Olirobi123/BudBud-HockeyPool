@@ -41,10 +41,10 @@ export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, compact = fal
           <div className="space-y-2">
             <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl shadow-sm h-full">
               <div className="text-sm font-semibold text-primary space-y-2">
-                {echange.details.split('|')[0]?.trim().split(',').map((item, index) => (
+                {echange.joueurs_source.map((item, index) => (
                   <p key={index} className="whitespace-pre-wrap flex items-start">
                     <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2 flex-shrink-0 mt-1.5" />
-                    {item.replace(/^.*?reçoit:?\s*/i, '').trim()}
+                    {item}
                   </p>
                 ))}
               </div>
@@ -58,10 +58,10 @@ export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, compact = fal
           <div className="space-y-2">
             <div className="bg-accent/10 border border-accent/20 p-4 rounded-xl shadow-sm h-full">
               <div className="text-sm font-semibold text-accent space-y-2">
-                {echange.details.split('|')[1]?.trim().split(',').map((item, index) => (
+                {echange.joueurs_destination.map((item, index) => (
                   <p key={index} className="whitespace-pre-wrap flex items-start">
                     <span className="w-1.5 h-1.5 bg-accent rounded-full mr-2 flex-shrink-0 mt-1.5" />
-                    {item.replace(/^.*?reçoit:?\s*/i, '').trim()}
+                    {item}
                   </p>
                 ))}
               </div>
