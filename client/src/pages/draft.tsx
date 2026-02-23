@@ -109,21 +109,17 @@ export default function Draft(): JSX.Element {
         isTypesLoading={isTypesLoading}
       />
 
-      <div className="flex flex-col">
-        {/* Mis au ballotage — before picks on desktop, after on mobile */}
-        <div className="order-2 md:order-1">
-          <MisAuBallotageTable entries={filteredMisAuBallotage} typeName={selectedTypeName} />
-        </div>
+      <div className="flex flex-col gap-12">
+        {/* Mis au ballotage — always on top */}
+        <MisAuBallotageTable entries={filteredMisAuBallotage} typeName={selectedTypeName} />
 
         {/* Draft Table */}
-        <div className="order-1 md:order-2 md:mt-12">
-          <DraftTable
-            filteredPicksEquipe={filteredPicksEquipe}
-            selectedType={selectedType}
-            selectedRound={selectedRound}
-            availableRounds={availableRounds}
-          />
-        </div>
+        <DraftTable
+          filteredPicksEquipe={filteredPicksEquipe}
+          selectedType={selectedType}
+          selectedRound={selectedRound}
+          availableRounds={availableRounds}
+        />
       </div>
     </Layout>
   );
