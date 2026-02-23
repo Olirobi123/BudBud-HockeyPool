@@ -3,10 +3,13 @@ import HeroSection from '@/components/HeroSection';
 import { LivePointsFeed } from '@/components/home/LivePointsFeed';
 import { LivePointsLeaderboard } from '@/components/home/LivePointsLeaderboard';
 import { HomeLatestTrade } from '@/components/home/HomeLatestTrade';
+import { PointsLeaderboard } from '@/components/home/PointsLeaderboard';
 import { useLivePoints } from '@/hooks/home/useLivePoints';
+import { usePointsRankings } from '@/hooks/home/usePointsRankings';
 
 export default function Home(): JSX.Element {
   const { data, isLoading } = useLivePoints();
+  const { data: rankingsData, isLoading: rankingsLoading } = usePointsRankings();
 
   return (
     <Layout
@@ -34,18 +37,32 @@ export default function Home(): JSX.Element {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main focus - Team leaderboard */}
-        <div className="lg:col-span-2">
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Classement Pool
-            </h3>
+        {/* Main focus - Leaderboards */}
+        <div className="lg:col-span-2 space-y-8">
+          <div>
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                Classement Pool
+              </h3>
+            </div>
+            <LivePointsLeaderboard
+              teams={data?.teamLeaderboard ?? []}
+              isLoading={isLoading}
+            />
           </div>
-          <LivePointsLeaderboard
-            teams={data?.teamLeaderboard ?? []}
-            isLoading={isLoading}
-          />
+          <div>
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                Classement général
+              </h3>
+            </div>
+            <PointsLeaderboard
+              teams={rankingsData ?? []}
+              isLoading={rankingsLoading}
+            />
+          </div>
         </div>
 
         {/* Sidebar - Top scorers + Latest trade */}

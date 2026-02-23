@@ -42,8 +42,8 @@ export class LivePointsService {
     this.nhlClient = new NHLClient();
   }
 
-  async getLivePoints(): Promise<LivePointsResponse> {
-    if (this.cachedResponse && Date.now() < this.cacheExpiry) {
+  async getLivePoints(useCache = true): Promise<LivePointsResponse> {
+    if (useCache && this.cachedResponse && Date.now() < this.cacheExpiry) {
       return this.cachedResponse;
     }
 

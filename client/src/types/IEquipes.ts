@@ -14,3 +14,14 @@ export interface TeamStanding {
   total_points: number;
   dg_name?: string;
 }
+
+export interface TeamPointsRanking {
+  id: number;
+  nom: string;
+  division: string;
+  rank: number;
+  total_points: number;
+  attaque_points: number;
+  defense_points: number;
+  gardien_points: number;
+}
