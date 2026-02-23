@@ -13,7 +13,6 @@ export const HomeLatestTrade: React.FC = () => {
   if (error) return <InlineError message="Erreur lors du chargement du dernier échange." />;
   if (!latestTrade) return <div>Aucun échange récent.</div>;
 
-  // Adapt HomeTrade to Echange format
   const mappedTrade: Echange = {
     id: parseInt(latestTrade.id, 10),
     date: latestTrade.date,
@@ -21,7 +20,8 @@ export const HomeLatestTrade: React.FC = () => {
     equipe_destination_id: 0,
     equipe_source_nom: latestTrade.teamA,
     equipe_destination_nom: latestTrade.teamB,
-    details: `${latestTrade.playersA.join(', ')} | ${latestTrade.playersB.join(', ')}`,
+    joueurs_source: latestTrade.playersA,
+    joueurs_destination: latestTrade.playersB,
     statut_confirmer: true,
   };
 

@@ -5,6 +5,7 @@ export default interface Echange {
   equipe_destination_id: number;
   equipe_source_nom: string;
   equipe_destination_nom: string;
-  details: string;
+  joueurs_source: string[];
+  joueurs_destination: string[];
   statut_confirmer: boolean;
 }

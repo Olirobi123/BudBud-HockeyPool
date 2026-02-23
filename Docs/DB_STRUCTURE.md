@@ -20,22 +20,57 @@
 |-----------------------|----------|------|-------------------------------------------------|
 | id                    | integer  | Non  | nextval('echanges_id_seq'::regclass)            |
 | date                  | date     | Non  | -                                               |
-| equipe_source_id      | integer  | Oui  | -                                               |
-| equipe_destination_id | integer  | Oui  | -                                               |
-| details               | text     | Oui  | -                                               |
+| equipe_source_id      | integer  | Non  | -                                               |
+| equipe_destination_id | integer  | Non  | -                                               |
 | statut_confirmer      | boolean  | Oui  | false                                           |
 
 #### Index
 - `echanges_pkey` (16 kB) : UNIQUE sur `id`
+- `idx_echanges_date` : Index sur `date DESC` pour les tris chronologiques
 
 #### Contraintes
 - `PRIMARY KEY (id)`
 - `FOREIGN KEY (equipe_source_id)` → `equipes(id)`
 - `FOREIGN KEY (equipe_destination_id)` → `equipes(id)`
 
+#### Notes
+- `details` : **SUPPRIMÉ** — remplacé par la table de jonction `echange_joueurs`
+
 ---
 
-### 2. `equipes`
+### 2. `echange_joueurs` (Table de jonction)
+
+Table de jonction reliant les échanges aux joueurs reçus par chaque équipe. Remplace la colonne `echanges.details` (texte délimité).
+
+#### Colonnes
+| Nom                   | Type    | Null | Par défaut                                           |
+|-----------------------|---------|------|------------------------------------------------------|
+| id                    | integer | Non  | nextval('echange_joueurs_id_seq'::regclass)          |
+| echange_id            | integer | Non  | -                                                    |
+| equipe_receptrice_id  | integer | Non  | -                                                    |
+| joueur_id             | integer | Oui  | -                                                    |
+| joueur_nom_libre      | text    | Oui  | -                                                    |
+
+#### Index
+- `echange_joueurs_pkey` : UNIQUE sur `id`
+- `idx_echange_joueurs_echange_id` : Index sur `echange_id` pour les jointures
+- `idx_echange_joueurs_joueur_id` : Index partiel sur `joueur_id WHERE joueur_id IS NOT NULL`
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (echange_id)` → `echanges(id) ON DELETE CASCADE`
+- `FOREIGN KEY (equipe_receptrice_id)` → `equipes(id)`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
+- `CHECK (joueur_id IS NOT NULL OR joueur_nom_libre IS NOT NULL)` — au moins un des deux doit être renseigné
+
+#### Notes
+- `joueur_id` : Lien vers `joueurs` quand le joueur est enregistré dans le pool
+- `joueur_nom_libre` : Nom textuel libre pour les joueurs non enregistrés (picks de repêchage, joueurs hors-pool)
+- `equipe_receptrice_id` : L'équipe qui **reçoit** ce joueur dans l'échange
+
+---
+
+### 4. `equipes`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 24 kB
 - **Taille totale** : 32 kB
@@ -62,7 +97,7 @@
 
 ---
 
-### 3. `repechages`
+### 5. `repechages`
 - **Taille de la table** : 16 kB
 - **Taille des index** : 64 kB
 - **Taille totale** : 80 kB
@@ -95,7 +130,7 @@
 
 ---
 
-### 4. `trophee_gagnants`
+### 6. `trophee_gagnants`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 16 kB
 - **Taille totale** : 24 kB
@@ -118,7 +153,7 @@
 
 ---
 
-### 5. `trophees`
+### 7. `trophees`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 16 kB
 - **Taille totale** : 24 kB
@@ -146,7 +181,7 @@
 
 ---
 
-### 6. `equipe_joueurs` (Table de jonction)
+### 8. `equipe_joueurs` (Table de jonction)
 - **Taille de la table** : 16 kB
 - **Taille des index** : 88 kB
 - **Taille totale** : 104 kB
@@ -179,7 +214,7 @@ Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_
 
 ---
 
-### 7. `joueurs`
+### 9. `joueurs`
 - **Taille de la table** : 24 kB
 - **Taille des index** : 96 kB
 - **Taille totale** : 120 kB
@@ -212,7 +247,7 @@ Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_
 
 ---
 
-### 8. `equipe_points`
+### 10. `equipe_points`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 72 kB
 - **Taille totale** : 80 kB
@@ -247,7 +282,7 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie (
 
 ---
 
-### 9. `types_repechage`
+### 11. `types_repechage`
 - **Taille de la table** : 8192 bytes
 - **Taille des index** : 16 kB
 - **Taille totale** : 24 kB
@@ -277,7 +312,7 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie (
 
 ---
 
-### 10. `api_store`
+### 12. `api_store`
 
 Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour l'UPSERT : une seule ligne par clé, jamais de duplication.
 
@@ -314,6 +349,9 @@ Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour 
 
 ## Relations entre les tables
 - `echanges` → `equipes` (equipe_source_id, equipe_destination_id)
+- `echange_joueurs` → `echanges` (echange_id) ON DELETE CASCADE — Table de jonction pour les joueurs échangés
+- `echange_joueurs` → `equipes` (equipe_receptrice_id) — équipe qui reçoit le joueur
+- `echange_joueurs` → `joueurs` (joueur_id) ON DELETE SET NULL — joueur lié (optionnel)
 - `repechages` → `types_repechage` (type_id)
 - `repechages` → `equipes` (equipe_id)
 - `repechages` → `joueurs` (joueur_id)
@@ -339,4 +377,4 @@ Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour 
 - Les contraintes d’unicité et de clé primaire sont listées.
 
 ---
-*Dernière mise à jour : février 2026*
+*Dernière mise à jour : février 2026 — ajout table `echange_joueurs`, suppression colonne `echanges.details`*
