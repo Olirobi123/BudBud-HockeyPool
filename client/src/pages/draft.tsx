@@ -4,8 +4,10 @@ import { ErrorDisplay } from '@/components/ui/error-display';
 import { useDraftPicks } from '@/hooks/draft/useDraftPicks';
 import { useDraftTypes } from '@/hooks/draft/useDraftTypes';
 import { useDraftFilters } from '@/hooks/draft/useDraftFilters';
+import { useMisAuBallotage } from '@/hooks/draft/useMisAuBallotage';
 import { DraftFilters } from '@/components/draft/DraftFilters';
 import { DraftTable } from '@/components/draft/DraftTable';
+import { MisAuBallotageTable } from '@/components/draft/MisAuBallotageTable';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function Draft(): JSX.Element {
@@ -32,6 +34,14 @@ export default function Draft(): JSX.Element {
     availableRounds,
     filteredPicksEquipe,
   } = useDraftFilters(draftPicks, types);
+
+  const { data: misAuBallotage = [] } = useMisAuBallotage(selectedType, selectedYear);
+
+  const filteredMisAuBallotage = selectedEquipe
+    ? misAuBallotage.filter((e) => e.equipe_nom === selectedEquipe)
+    : misAuBallotage;
+
+  const selectedTypeName = types.find((t) => t.id === selectedType)?.nom ?? '';
 
   // Gestion automatique du loading de la page
   usePageLoading({ dependencies: [isLoading] });
@@ -99,13 +109,22 @@ export default function Draft(): JSX.Element {
         isTypesLoading={isTypesLoading}
       />
 
-      {/* Draft Table */}
-      <DraftTable
-        filteredPicksEquipe={filteredPicksEquipe}
-        selectedType={selectedType}
-        selectedRound={selectedRound}
-        availableRounds={availableRounds}
-      />
+      <div className="flex flex-col">
+        {/* Mis au ballotage — before picks on desktop, after on mobile */}
+        <div className="order-2 md:order-1">
+          <MisAuBallotageTable entries={filteredMisAuBallotage} typeName={selectedTypeName} />
+        </div>
+
+        {/* Draft Table */}
+        <div className="order-1 md:order-2 md:mt-12">
+          <DraftTable
+            filteredPicksEquipe={filteredPicksEquipe}
+            selectedType={selectedType}
+            selectedRound={selectedRound}
+            availableRounds={availableRounds}
+          />
+        </div>
+      </div>
     </Layout>
   );
 }
