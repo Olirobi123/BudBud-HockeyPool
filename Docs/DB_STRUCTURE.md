@@ -413,4 +413,4 @@ Trace les joueurs retirés par une équipe avant chaque événement de repêchag
 - Les contraintes d’unicité et de clé primaire sont listées.
 
 ---
-*Dernière mise à jour : février 2026 — ajout table `mis_au_ballotage` ; import des échanges 2023-2026 et normalisation des noms de picks*
+*Dernière mise à jour : février 2026 — ajout table `echange_joueurs`, suppression colonne `echanges.details`*
