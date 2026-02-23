@@ -11,6 +11,7 @@ export const TABLES = {
   TROPHEE_GAGNANTS: 'trophee_gagnants',
   EQUIPE_POINTS: 'equipe_points',
   API_STORE: 'api_store',
+  ECHANGE_JOUEURS: 'echange_joueurs',
 } as const;
 
 export const QUERIES = {
@@ -37,50 +38,68 @@ export const QUERIES = {
 
   // Échanges
   GET_ALL_ECHANGES: `
-    SELECT 
-      e.id,
-      e.date,
-      e.details,
-      e.equipe_source_id,
-      e.equipe_destination_id,
-      e.statut_confirmer,
-      src.nom as equipe_source_nom,
-      dest.nom as equipe_destination_nom
+    SELECT
+      e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
+      src.nom  AS equipe_source_nom,
+      dest.nom AS equipe_destination_nom,
+      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_source_id
+        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
+        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
+        ARRAY[]::text[]) AS joueurs_source,
+      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_destination_id
+        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
+        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
+        ARRAY[]::text[]) AS joueurs_destination
     FROM ${TABLES.ECHANGES} e
-    JOIN ${TABLES.EQUIPES} src ON e.equipe_source_id = src.id
+    JOIN ${TABLES.EQUIPES} src  ON e.equipe_source_id      = src.id
     JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
+    LEFT JOIN ${TABLES.ECHANGE_JOUEURS} ej ON ej.echange_id = e.id
+    LEFT JOIN ${TABLES.JOUEURS} j           ON ej.joueur_id  = j.id
+    GROUP BY e.id, src.nom, dest.nom
     ORDER BY e.date DESC
   `,
   GET_LATEST_ECHANGE: `
     SELECT
-      e.id,
-      e.date,
-      e.details,
-      e.equipe_source_id,
-      e.equipe_destination_id,
-      e.statut_confirmer,
-      src.nom as equipe_source_nom,
-      dest.nom as equipe_destination_nom
+      e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
+      src.nom  AS equipe_source_nom,
+      dest.nom AS equipe_destination_nom,
+      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_source_id
+        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
+        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
+        ARRAY[]::text[]) AS joueurs_source,
+      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_destination_id
+        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
+        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
+        ARRAY[]::text[]) AS joueurs_destination
     FROM ${TABLES.ECHANGES} e
-    JOIN ${TABLES.EQUIPES} src ON e.equipe_source_id = src.id
+    JOIN ${TABLES.EQUIPES} src  ON e.equipe_source_id      = src.id
     JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
+    LEFT JOIN ${TABLES.ECHANGE_JOUEURS} ej ON ej.echange_id = e.id
+    LEFT JOIN ${TABLES.JOUEURS} j           ON ej.joueur_id  = j.id
+    GROUP BY e.id, src.nom, dest.nom
     ORDER BY e.date DESC
     LIMIT 1
   `,
   GET_LATEST_TRADE_BY_TEAM: `
     SELECT
-      e.id,
-      e.date,
-      e.details,
-      e.equipe_source_id,
-      e.equipe_destination_id,
-      e.statut_confirmer,
-      src.nom as equipe_source_nom,
-      dest.nom as equipe_destination_nom
+      e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
+      src.nom  AS equipe_source_nom,
+      dest.nom AS equipe_destination_nom,
+      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_source_id
+        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
+        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
+        ARRAY[]::text[]) AS joueurs_source,
+      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_destination_id
+        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
+        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
+        ARRAY[]::text[]) AS joueurs_destination
     FROM ${TABLES.ECHANGES} e
-    JOIN ${TABLES.EQUIPES} src ON e.equipe_source_id = src.id
+    JOIN ${TABLES.EQUIPES} src  ON e.equipe_source_id      = src.id
     JOIN ${TABLES.EQUIPES} dest ON e.equipe_destination_id = dest.id
+    LEFT JOIN ${TABLES.ECHANGE_JOUEURS} ej ON ej.echange_id = e.id
+    LEFT JOIN ${TABLES.JOUEURS} j           ON ej.joueur_id  = j.id
     WHERE e.equipe_source_id = $1 OR e.equipe_destination_id = $1
+    GROUP BY e.id, src.nom, dest.nom
     ORDER BY e.date DESC
     LIMIT 1
   `,
