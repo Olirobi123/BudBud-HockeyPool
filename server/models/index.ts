@@ -12,6 +12,8 @@ export const TABLES = {
   EQUIPE_POINTS: 'equipe_points',
   API_STORE: 'api_store',
   ECHANGE_JOUEURS: 'echange_joueurs',
+  MIS_AU_BALLOTAGE: 'mis_au_ballotage',
+  TYPES_REPECHAGE: 'types_repechage',
 } as const;
 
 export const QUERIES = {
@@ -219,6 +221,37 @@ export const QUERIES = {
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE ep.equipe_id = $1 AND ep.season = $2
+  `,
+
+  // Mis au ballotage (joueurs retirés avant draft/ballotage)
+  GET_ALL_MIS_AU_BALLOTAGE: `
+    SELECT
+      m.id, m.annee, m.type_id,
+      m.joueur_id, m.joueur_nom_libre,
+      COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), m.joueur_nom_libre) AS joueur_nom,
+      e.id   AS equipe_id,
+      e.nom  AS equipe_nom,
+      tr.nom AS type_nom
+    FROM ${TABLES.MIS_AU_BALLOTAGE} m
+    JOIN ${TABLES.EQUIPES} e          ON m.equipe_id = e.id
+    JOIN ${TABLES.TYPES_REPECHAGE} tr ON m.type_id   = tr.id
+    LEFT JOIN ${TABLES.JOUEURS} j     ON m.joueur_id = j.id
+    ORDER BY m.annee DESC, m.type_id, e.nom
+  `,
+  GET_MIS_AU_BALLOTAGE_BY_TYPE_AND_YEAR: `
+    SELECT
+      m.id, m.annee, m.type_id,
+      m.joueur_id, m.joueur_nom_libre,
+      COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), m.joueur_nom_libre) AS joueur_nom,
+      e.id   AS equipe_id,
+      e.nom  AS equipe_nom,
+      tr.nom AS type_nom
+    FROM ${TABLES.MIS_AU_BALLOTAGE} m
+    JOIN ${TABLES.EQUIPES} e          ON m.equipe_id = e.id
+    JOIN ${TABLES.TYPES_REPECHAGE} tr ON m.type_id   = tr.id
+    LEFT JOIN ${TABLES.JOUEURS} j     ON m.joueur_id = j.id
+    WHERE m.type_id = $1 AND m.annee = $2
+    ORDER BY e.nom, joueur_nom
   `,
 
   // API Store: persistent JSON snapshots

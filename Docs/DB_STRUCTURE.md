@@ -347,6 +347,39 @@ Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour 
 
 ---
 
+### 13. `mis_au_ballotage`
+
+Trace les joueurs retirés par une équipe avant chaque événement de repêchage (draft annuel, ballotage de décembre, ballotage de mars). Pendant que `repechages` enregistre les arrivées, `mis_au_ballotage` enregistre les départs.
+
+#### Colonnes
+| Nom               | Type    | Null | Par défaut                                           |
+|-------------------|---------|------|------------------------------------------------------|
+| id                | integer | Non  | nextval('mis_au_ballotage_id_seq'::regclass)         |
+| equipe_id         | integer | Non  | -                                                    |
+| joueur_id         | integer | Oui  | -                                                    |
+| joueur_nom_libre  | text    | Oui  | -                                                    |
+| annee             | integer | Non  | -                                                    |
+| type_id           | integer | Non  | -                                                    |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
+- `FOREIGN KEY (type_id)` → `types_repechage(id)`
+- `CHECK (joueur_id IS NOT NULL OR joueur_nom_libre IS NOT NULL)`
+
+#### Notes
+- `type_id` réutilise `types_repechage` : `1` = avant ballotage de décembre, `2` = avant draft annuel, `4` = avant ballotage de mars
+- `joueur_id` : lien vers `joueurs` si le joueur est enregistré dans le pool
+- `joueur_nom_libre` : nom textuel pour les joueurs non enregistrés
+- Pour un `(annee, type_id)` donné : `mis_au_ballotage` = qui est parti, `repechages` = qui est arrivé
+
+#### API
+- `GET /api/mis-au-ballotage` — tous les entrées
+- `GET /api/mis-au-ballotage/:type/:annee` — filtré par type et année
+
+---
+
 ## Relations entre les tables
 - `echanges` → `equipes` (equipe_source_id, equipe_destination_id)
 - `echange_joueurs` → `echanges` (echange_id) ON DELETE CASCADE — Table de jonction pour les joueurs échangés
@@ -360,6 +393,9 @@ Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour 
 - `equipe_joueurs` → `equipes` (equipe_id) - Table de jonction pour les effectifs
 - `equipe_joueurs` → `joueurs` (joueur_id) - Table de jonction pour les effectifs
 - `equipe_points` → `equipes` (equipe_id) - Points cumulés par équipe par saison
+- `mis_au_ballotage` → `equipes` (equipe_id) — équipe qui retire le joueur
+- `mis_au_ballotage` → `joueurs` (joueur_id) ON DELETE SET NULL — joueur lié (optionnel)
+- `mis_au_ballotage` → `types_repechage` (type_id) — type d'événement précédé par ce retrait
 
 ---
 
@@ -377,4 +413,4 @@ Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour 
 - Les contraintes d’unicité et de clé primaire sont listées.
 
 ---
-*Dernière mise à jour : février 2026 — ajout table `echange_joueurs`, suppression colonne `echanges.details`*
+*Dernière mise à jour : février 2026 — ajout table `mis_au_ballotage` ; import des échanges 2023-2026 et normalisation des noms de picks*
