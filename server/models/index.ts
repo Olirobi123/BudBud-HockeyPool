@@ -268,6 +268,18 @@ export const QUERIES = {
       last_update   = NOW()
   `,
 
+  // Choix de repêchage futurs
+  GET_TEAM_DRAFT_PICKS: `
+    SELECT
+      cr.annee,
+      cr.round,
+      src.nom AS equipe_source_nom
+    FROM choix_repechage cr
+    LEFT JOIN equipes src ON cr.equipe_source_id = src.id
+    WHERE cr.equipe_id = $1
+    ORDER BY cr.annee ASC, cr.round ASC
+  `,
+
   // Live Points: batch ownership lookup by NHL player IDs
   GET_BATCH_OWNERSHIP_BY_NHL_IDS: `
     SELECT j.nhl_player_id, j.nom, j.prenom, j.position,
