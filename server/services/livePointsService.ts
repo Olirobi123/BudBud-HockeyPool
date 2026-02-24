@@ -42,7 +42,7 @@ export class LivePointsService {
     this.nhlClient = new NHLClient();
   }
 
-  async getLivePoints(useCache = true): Promise<LivePointsResponse> {
+  async getLivePoints(useCache = true, isSnapshotCall = false): Promise<LivePointsResponse> {
     if (useCache && this.cachedResponse && Date.now() < this.cacheExpiry) {
       return this.cachedResponse;
     }
@@ -53,23 +53,27 @@ export class LivePointsService {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('NHL scores API unavailable, falling back to snapshot:', error);
-      const snapshot = await this.fetchSnapshot();
-      if (snapshot) return this.cacheAndReturn(snapshot);
+      if (!isSnapshotCall) {
+        const snapshot = await this.fetchSnapshot();
+        if (snapshot) return this.cacheAndReturn(snapshot);
+      }
       return { topPlayers: [], teamLeaderboard: [], gamesCount: 0, liveGamesCount: 0 };
     }
 
-    const yesterday = this.getYesterdayDateString();
-    const yesterdayGames = games.filter((g) => g.gameDate === yesterday);
-    const activeGames = yesterdayGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
-    const liveGames = yesterdayGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    const dateString = this.getDateString(isSnapshotCall ? -1 : 0);
+    const filteredGames = games.filter((g) => g.gameDate === dateString);
+    const activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+    const liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
     if (activeGames.length === 0) {
-      const snapshot = await this.fetchSnapshot();
-      if (snapshot) return this.cacheAndReturn(snapshot);
+      if (!isSnapshotCall) {
+        const snapshot = await this.fetchSnapshot();
+        if (snapshot) return this.cacheAndReturn(snapshot);
+      }
       return {
         topPlayers: [],
-        teamLeaderboard: await this.buildTeamLeaderboard([]),
-        gamesCount: yesterdayGames.length,
+        teamLeaderboard: [],
+        gamesCount: filteredGames.length,
         liveGamesCount: liveGames.length,
       };
     }
@@ -127,22 +131,19 @@ export class LivePointsService {
     // Build team leaderboard from owned players, including teams with 0 points
     const teamLeaderboard = await this.buildTeamLeaderboard(allPlayers);
 
-    const response: LivePointsResponse = {
+    return this.cacheAndReturn({
       topPlayers,
       teamLeaderboard,
       gamesCount: activeGames.length,
       liveGamesCount: liveGames.length,
-    };
-
-    this.cachedResponse = response;
-    this.cacheExpiry = Date.now() + CACHE_TTL_MS;
-
-    return response;
+    });
   }
 
-  private getYesterdayDateString(): string {
+  private getDateString(offsetDays = 0): string {
     const d = new Date();
-    d.setUTCDate(d.getUTCDate() - 1);
+    if (offsetDays !== 0) {
+      d.setUTCDate(d.getUTCDate() + offsetDays);
+    }
     return d.toISOString().slice(0, 10);
   }
 
@@ -161,17 +162,13 @@ export class LivePointsService {
     game: GameScore,
     playerMap: Map<number, PlayerAccumulator>,
   ): void {
-    const teamIdToAbbrev = new Map<number, string>();
-    teamIdToAbbrev.set(game.awayTeam.id, game.awayTeam.abbrev);
-    teamIdToAbbrev.set(game.homeTeam.id, game.homeTeam.abbrev);
-
-    const teamLogoMap = new Map<string, string>();
-    if (game.awayTeam.abbrev !== '' && game.awayTeam.logo != null) {
-      teamLogoMap.set(game.awayTeam.abbrev, game.awayTeam.logo);
-    }
-    if (game.homeTeam.abbrev !== '' && game.homeTeam.logo != null) {
-      teamLogoMap.set(game.homeTeam.abbrev, game.homeTeam.logo);
-    }
+    const teams = [game.awayTeam, game.homeTeam];
+    const teamIdToAbbrev = new Map(teams.map((t) => [t.id, t.abbrev]));
+    const teamLogoMap = new Map(
+      teams
+        .filter((t) => t.abbrev !== '' && t.logo != null)
+        .map((t) => [t.abbrev, t.logo as string]),
+    );
 
     // Seed all skaters from the roster so players with 0 points appear
     for (const spot of pbp.rosterSpots ?? []) {
@@ -278,30 +275,18 @@ export class LivePointsService {
     for (const player of allPlayers) {
       if (!player.poolTeam) continue;
 
-      const isDefense = player.position === DEFENSE_POSITION;
-      const existing = teamMap.get(player.poolTeam.id);
-      if (existing) {
-        existing.totalPoints += player.points;
-        existing.totalGoals += player.goals;
-        existing.totalAssists += player.assists;
-        if (isDefense) {
-          existing.defensePoints += player.points;
-        } else {
-          existing.attaquePoints += player.points;
-        }
-        existing.players.push(player);
+      const team = teamMap.get(player.poolTeam.id);
+      if (!team) continue;
+
+      team.totalPoints += player.points;
+      team.totalGoals += player.goals;
+      team.totalAssists += player.assists;
+      if (player.position === DEFENSE_POSITION) {
+        team.defensePoints += player.points;
       } else {
-        teamMap.set(player.poolTeam.id, {
-          equipeId: player.poolTeam.id,
-          equipeNom: player.poolTeam.nom,
-          totalPoints: player.points,
-          totalGoals: player.goals,
-          totalAssists: player.assists,
-          attaquePoints: isDefense ? 0 : player.points,
-          defensePoints: isDefense ? player.points : 0,
-          players: [player],
-        });
+        team.attaquePoints += player.points;
       }
+      team.players.push(player);
     }
 
     return Array.from(teamMap.values())

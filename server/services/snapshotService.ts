@@ -9,7 +9,7 @@ const FEED_KEY = 'live_points_feed';
 export class SnapshotService {
   async saveLivePointsSnapshot(): Promise<void> {
     const useCache = false;
-    const response = await livePointsService.getLivePoints(useCache);
+    const response = await livePointsService.getLivePoints(useCache, true);
     const { topPlayers, teamLeaderboard, gamesCount, liveGamesCount } = response;
 
     await Promise.all([
