@@ -74,15 +74,15 @@ export default function Draft(): JSX.Element {
         <div className="flex items-center gap-3 mb-3">
           {/* Decorative accent */}
           <div className="flex items-center gap-1.5">
-            <div className="w-1 h-8 bg-cyan-400 rounded-full" />
-            <div className="w-0.5 h-6 bg-cyan-400/60 rounded-full" />
+            <div className="w-1 h-8 bg-primary rounded-full" />
+            <div className="w-0.5 h-6 bg-primary/60 rounded-full" />
           </div>
 
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
               Repêchage
               {' '}
-              <span className="text-cyan-400">{selectedYear}</span>
+              <span className="text-primary">{selectedYear}</span>
             </h1>
           </div>
         </div>

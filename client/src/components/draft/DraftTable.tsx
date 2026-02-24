@@ -75,7 +75,7 @@ export function DraftTable({
             <Card key={`round-${round}`} className="border-border/50 shadow-sm">
               <CardHeader className="bg-muted/30 border-b border-border/50">
                 <CardTitle className="text-lg font-semibold flex items-center gap-3">
-                  <span className="text-cyan-400">
+                  <span className="text-primary">
                     Ronde
                     {' '}
                     {round}
@@ -105,7 +105,7 @@ export function DraftTable({
                           key={pick.rang}
                           className="hover:bg-muted/50 transition-colors"
                         >
-                          <TableCell className="font-semibold text-cyan-400">
+                          <TableCell className="font-semibold text-primary">
                             {pick.rang}
                           </TableCell>
                           <TableCell className="text-foreground">
@@ -146,7 +146,7 @@ export function DraftTable({
                   key={pick.rang}
                   className="hover:bg-muted/50 transition-colors"
                 >
-                  <TableCell className="font-semibold text-cyan-400">
+                  <TableCell className="font-semibold text-primary">
                     {pick.rang}
                   </TableCell>
                   <TableCell className="text-foreground">{pick.nom}</TableCell>

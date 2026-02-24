@@ -232,27 +232,27 @@ export default function JoueurTabsStats({ player }: Props) {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="px-1 sm:px-4">Saison</TableHead>
-                        <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">Ligue</TableHead>
-                        <TableHead className="px-1 sm:px-4">Équipe</TableHead>
-                        <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">Type</TableHead>
+                        <TableHead className="whitespace-nowrap px-2 sm:px-4">Saison</TableHead>
+                        <TableHead className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">Ligue</TableHead>
+                        <TableHead className="w-full px-2 sm:px-4">Équipe</TableHead>
+                        <TableHead className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">Type</TableHead>
                         {player.position === 'G' ? (
                           <>
-                            <TableHead className="px-1.5 sm:px-4">PJ</TableHead>
-                            <TableHead className="px-1.5 sm:px-4">V</TableHead>
-                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">D</TableHead>
-                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">DP</TableHead>
-                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">BL</TableHead>
-                            <TableHead className="px-1.5 sm:px-4">%ARR</TableHead>
-                            <TableHead className="px-1.5 sm:px-4">MOY</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">PJ</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">V</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">D</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">DP</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">BL</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">%ARR</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">MOY</TableHead>
                           </>
                         ) : (
                           <>
-                            <TableHead className="px-1.5 sm:px-4">PJ</TableHead>
-                            <TableHead className="px-1.5 sm:px-4">B</TableHead>
-                            <TableHead className="px-1.5 sm:px-4">P</TableHead>
-                            <TableHead className="px-1.5 sm:px-4">PTS</TableHead>
-                            <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">PPM</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">PJ</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">B</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">P</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4">PTS</TableHead>
+                            <TableHead className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">PPM</TableHead>
                           </>
                         )}
                       </TableRow>
@@ -275,38 +275,38 @@ export default function JoueurTabsStats({ player }: Props) {
                                             : ''
                                         }
                           >
-                            <TableCell className="px-1 sm:px-4 whitespace-nowrap">
+                            <TableCell className="whitespace-nowrap px-2 sm:px-4">
                               <span className="sm:hidden">{formatSeasonShort(season.season)}</span>
                               <span className="hidden sm:inline">{formatSeason(season.season)}</span>
                             </TableCell>
-                            <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.leagueAbbrev}</TableCell>
-                            <TableCell className="px-1 sm:px-4 max-w-[80px] sm:max-w-none truncate">{season.teamName?.default ?? '-'}</TableCell>
-                            <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">
+                            <TableCell className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">{season.leagueAbbrev}</TableCell>
+                            <TableCell className="max-w-0 px-2 sm:px-4 break-words">{season.teamName?.default ?? '-'}</TableCell>
+                            <TableCell className="px-2 sm:px-4 hidden sm:table-cell">
                               <Badge variant={season.gameTypeId === 3 ? 'destructive' : 'default'}>
                                 {season.gameTypeId === 3 ? 'Séries' : 'Régulière'}
                               </Badge>
                             </TableCell>
                             {player.position === 'G' ? (
                               <>
-                                <TableCell className="px-1.5 sm:px-4">{season.gamesPlayed || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4">{season.wins || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.losses || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.otLosses || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{season.shutouts || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4">
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">{season.gamesPlayed || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">{season.wins || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">{season.losses || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">{season.otLosses || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">{season.shutouts || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">
                                   {season.savePctg ? `${(season.savePctg).toFixed(3)}` : '-'}
                                 </TableCell>
-                                <TableCell className="px-1.5 sm:px-4">
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">
                                   {season.goalsAgainstAvg ? season.goalsAgainstAvg.toFixed(2) : '-'}
                                 </TableCell>
                               </>
                             ) : (
                               <>
-                                <TableCell className="px-1.5 sm:px-4">{season.gamesPlayed || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4">{season.goals || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4">{season.assists || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4">{season.points || '-'}</TableCell>
-                                <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">{season.gamesPlayed || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">{season.goals || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">{season.assists || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4">{season.points || '-'}</TableCell>
+                                <TableCell className="whitespace-nowrap px-2 sm:px-4 hidden sm:table-cell">
                                   {season.gamesPlayed && season.points
                                     ? (season.points / season.gamesPlayed).toFixed(2)
                                     : '-'}
