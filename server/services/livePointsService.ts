@@ -58,8 +58,10 @@ export class LivePointsService {
       return { topPlayers: [], teamLeaderboard: [], gamesCount: 0, liveGamesCount: 0 };
     }
 
-    const activeGames = games.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
-    const liveGames = games.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    const yesterday = this.getYesterdayDateString();
+    const yesterdayGames = games.filter((g) => g.gameDate === yesterday);
+    const activeGames = yesterdayGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+    const liveGames = yesterdayGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
     if (activeGames.length === 0) {
       const snapshot = await this.fetchSnapshot();
@@ -67,7 +69,7 @@ export class LivePointsService {
       return {
         topPlayers: [],
         teamLeaderboard: await this.buildTeamLeaderboard([]),
-        gamesCount: games.length,
+        gamesCount: yesterdayGames.length,
         liveGamesCount: liveGames.length,
       };
     }
@@ -136,6 +138,12 @@ export class LivePointsService {
     this.cacheExpiry = Date.now() + CACHE_TTL_MS;
 
     return response;
+  }
+
+  private getYesterdayDateString(): string {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() - 1);
+    return d.toISOString().slice(0, 10);
   }
 
   private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | null> {
