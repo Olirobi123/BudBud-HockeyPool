@@ -61,12 +61,12 @@ interface TeamRowProps {
 
 function TeamRow({ team, isWinner, status }: TeamRowProps): JSX.Element {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-1.5">
         <img
-          src={team.logo}
+          src={team.logo?.replace('light', 'dark')}
           alt={team.abbrev}
-          className="w-5 h-5 flex-shrink-0 object-contain"
+          className="w-[30px] h-[30px] flex-shrink-0 object-contain"
         />
         <span
           className={cn(
@@ -111,7 +111,7 @@ function GameCard({ game }: GameCardProps): JSX.Element {
   return (
     <div
       className={cn(
-        'flex-shrink-0 rounded-lg border flex flex-col px-3 py-2.5 min-w-[100px] w-[100px]',
+        'flex-shrink-0 rounded-lg border flex flex-col px-2 py-1.5 min-w-[96px] w-[96px]',
         'transition-all duration-200 cursor-default group',
         // Live games
         status === 'live' && 'bg-white/[0.04] border-red-500/30 game-card-live hover:border-red-500/50',
