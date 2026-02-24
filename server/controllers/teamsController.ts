@@ -103,6 +103,20 @@ export class TeamsController {
   });
 
   /**
+   * GET /api/teams/:id/draft-picks
+   * Returns future draft picks for a team
+   */
+  getTeamDraftPicks = asyncHandler(async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      sendServerError(res, 'ID d\'équipe invalide');
+      return;
+    }
+    const picks = await teamsService.getTeamDraftPicks(id);
+    sendSuccess(res, picks);
+  });
+
+  /**
    * GET /api/teams/inactive
    * Returns all inactive teams
    */

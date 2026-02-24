@@ -27,4 +27,7 @@ router.get('/:id/roster/stats', teamsController.getRosterWithStats);
 // Récupérer le dernier échange d'une équipe
 router.get('/:id/latest-trade', teamsController.getLatestTrade);
 
+// Récupérer les choix de repêchage futurs d'une équipe
+router.get('/:id/draft-picks', teamsController.getTeamDraftPicks);
+
 export default router;
