@@ -64,8 +64,8 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead className="px-2 sm:px-4">Joueur</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">Pos</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">PJ</TableHead>
+            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">B</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">A</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">Pts</TableHead>
@@ -100,18 +100,18 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
                         <img
                           src={player.teamLogo}
                           alt=""
-                          className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0"
+                          className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
                         />
                       )}
-                      <span className="truncate">{player.prenom} {player.nom}</span>
+                      <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
                     </Link>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
                     <Badge className={getPositionColor(player.position)}>
                       {player.position}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
+                  <TableCell className="text-center px-1 sm:px-4">
                     {stats?.gamesPlayed ?? '-'}
                   </TableCell>
                   <TableCell className="text-center px-1 sm:px-4">
@@ -128,9 +128,11 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
             );
           })}
           <TableRow className="bg-muted/50 font-semibold border-t-2">
-            <TableCell colSpan={5} className="text-right">
-              Total
-            </TableCell>
+            <TableCell className="text-right">Total</TableCell>
+            <TableCell className="hidden sm:table-cell" />
+            <TableCell />
+            <TableCell />
+            <TableCell />
             <TableCell className="text-center text-lg font-bold text-primary">
               {totalPoints}
             </TableCell>
@@ -163,8 +165,8 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
         <TableHeader>
           <TableRow>
             <TableHead className="px-2 sm:px-4">Joueur</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">Pos</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">PJ</TableHead>
+            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">V</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">BL</TableHead>
             <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">Pts</TableHead>
@@ -200,18 +202,18 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
                         <img
                           src={player.teamLogo}
                           alt=""
-                          className="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0"
+                          className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
                         />
                       )}
-                      <span className="truncate">{player.prenom} {player.nom}</span>
+                      <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
                     </Link>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
                     <Badge className={getPositionColor(player.position)}>
                       {player.position}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
+                  <TableCell className="text-center px-1 sm:px-4">
                     {stats?.gamesPlayed ?? '-'}
                   </TableCell>
                   <TableCell className="text-center px-1 sm:px-4">
@@ -228,9 +230,11 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
             );
           })}
           <TableRow className="bg-muted/50 font-semibold border-t-2">
-            <TableCell colSpan={5} className="text-right">
-              Total
-            </TableCell>
+            <TableCell className="text-right">Total</TableCell>
+            <TableCell className="hidden sm:table-cell" />
+            <TableCell />
+            <TableCell />
+            <TableCell />
             <TableCell className="text-center text-lg font-bold text-primary">
               {totalPoints}
             </TableCell>

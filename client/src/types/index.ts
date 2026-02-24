@@ -1,4 +1,4 @@
-export type { default as Equipe } from './IEquipes';
+export type { default as Equipe, TeamDraftPick } from './IEquipes';
 export type { default as Echange } from './IEchange';
 export type { default as PlayerDetails, NHLPlayer } from './IPlayerDetails';
 export type { HomeTrade } from './IHome';

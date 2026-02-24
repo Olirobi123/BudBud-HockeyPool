@@ -1,3 +1,9 @@
+export interface TeamDraftPick {
+  annee: number;
+  round: number;
+  equipe_source_nom: string | null;
+}
+
 export default interface Equipe {
   id: number;
   nom: string;

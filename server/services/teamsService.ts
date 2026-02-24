@@ -239,6 +239,19 @@ export class TeamsService {
   }
 
   /**
+   * Récupérer les choix de repêchage futurs d'une équipe
+   */
+  async getTeamDraftPicks(teamId: number): Promise<TeamDraftPick[]> {
+    try {
+      const result = await pool.query(QUERIES.GET_TEAM_DRAFT_PICKS, [teamId]);
+      return result.rows;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des choix de repêchage:', error);
+      throw new Error('Erreur lors de la récupération des choix de repêchage');
+    }
+  }
+
+  /**
    * Get all inactive teams
    */
   async getInactiveTeams(): Promise<Equipe[]> {
@@ -250,6 +263,12 @@ export class TeamsService {
       throw new Error('Erreur lors de la récupération des équipes inactives');
     }
   }
+}
+
+export interface TeamDraftPick {
+  annee: number;
+  round: number;
+  equipe_source_nom: string | null;
 }
 
 export const teamsService = new TeamsService();
