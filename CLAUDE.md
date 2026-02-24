@@ -45,14 +45,19 @@ This is an **npm workspaces monorepo** with `client/` and `server/` as separate 
   - `/api/points` — pool standings (season totals)
   - `/api/live-points` — live pool points during game days
   - `/api/trophees` — pool awards
+  - `/api/snapshot` — nightly data snapshots for cron jobs (protected by `requireApiKey`)
+  - `/api/mis-au-ballotage` — waiver wire player history
   - `/api/health` — health check
 - **Database**: PostgreSQL via connection pool (`config/database.ts`); all SQL queries in `models/index.ts`
 - **Error handling**: Centralized middleware in `middleware/errorHandler.ts`
 
-### Database (9 tables)
-`equipes`, `joueurs`, `equipe_joueurs` (junction), `equipe_points`, `repechages`, `types_repechage`, `echanges`, `trophees`, `trophee_gagnants`
+### Database (12 tables)
+`equipes`, `joueurs`, `equipe_joueurs` (junction), `equipe_points`, `repechages`, `types_repechage`, `echanges`, `echange_joueurs` (junction), `trophees`, `trophee_gagnants`, `api_store`, `mis_au_ballotage`
 - `equipes.nhl_player_ids` has been **dropped** — use `equipe_joueurs` junction table
-- `equipes` has two new columns: `division` (varchar) and `dg_name` (text)
+- `echanges.details` has been **dropped** — use `echange_joueurs` junction table
+- `equipes` has two columns: `division` (varchar) and `dg_name` (text)
+- `api_store` — persistent JSON cache for cron snapshots (keyed by text, UPSERT pattern)
+- `mis_au_ballotage` — tracks players waived/dropped before each draft event
 - Player positions: `'C'`, `'LW'`, `'RW'`, `'D'`, `'G'`
 
 ### Data Flow
@@ -66,7 +71,7 @@ Before implementing features, consult in this order:
 2. `/Docs/Implementation.md` - Current stage tasks and implementation plan
 3. `/Docs/project_structure.md` - File naming and folder structure
 4. `/Docs/UI_UX_doc.md` - Design system and responsive requirements
-5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (8 tables)
+5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (12 tables)
 6. `/Docs/Git_Workflow.md` - Branching strategy and deployment process
 
 ## Key Constraints
@@ -111,4 +116,4 @@ feature/* → dev → acceptation → main
 
 ## Current Development Status
 
-The project follows a 5-stage refactoring plan. Stages 1-4 are complete. Stage 5 (Polish, Testing & Optimization) is next. Check `/Docs/Implementation.md` for current tasks and their status.
+The project follows a 5-stage refactoring plan. Stages 1-4 are complete (all phases including Awards and Frontend). Stage 5 (Polish, Testing & Optimization) is next. Check `/Docs/Implementation.md` for current tasks and their status.

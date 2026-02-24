@@ -63,7 +63,7 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="px-2 sm:px-4">Joueur</TableHead>
+            <TableHead className="w-full px-2 sm:px-4">Joueur</TableHead>
             <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">B</TableHead>
@@ -91,7 +91,7 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
                   </TableRow>
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
-                  <TableCell className="px-2 sm:px-4">
+                  <TableCell className="max-w-0 px-2 sm:px-4">
                     <Link
                       to={`/joueur/${player.nhl_player_id}`}
                       className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"
@@ -164,7 +164,7 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="px-2 sm:px-4">Joueur</TableHead>
+            <TableHead className="w-full px-2 sm:px-4">Joueur</TableHead>
             <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">V</TableHead>
@@ -193,7 +193,7 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
                   </TableRow>
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
-                  <TableCell className="px-2 sm:px-4">
+                  <TableCell className="max-w-0 px-2 sm:px-4">
                     <Link
                       to={`/joueur/${player.nhl_player_id}`}
                       className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"

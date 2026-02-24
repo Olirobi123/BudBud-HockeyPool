@@ -69,7 +69,7 @@ export function TeamDraftPicks({ picks, isLoading }: TeamDraftPicksProps) {
                           {pick.round}
                         </div>
                         {isTraded && (
-                          <div className="text-blue-500 dark:text-blue-400 text-[10px] leading-tight mt-0.5 truncate">
+                          <div className="text-blue-500 dark:text-blue-400 text-[10px] leading-tight mt-0.5 break-words">
                             {'de '}
                             {pick.equipe_source_nom}
                           </div>
