@@ -97,7 +97,7 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                     <div className="flex items-center gap-1.5">
                       <Link
                         to={`/joueur/${player.nhl_player_id}`}
-                        className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 overflow-hidden"
+                        className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 flex-1"
                       >
                         {player.teamLogo && (
                           <img
@@ -204,7 +204,7 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
                     <div className="flex items-center gap-1.5">
                       <Link
                         to={`/joueur/${player.nhl_player_id}`}
-                        className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 overflow-hidden"
+                        className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 flex-1"
                       >
                         {player.teamLogo && (
                           <img
