@@ -10,28 +10,27 @@ interface InjuryBadgeProps {
 
 export function InjuryBadge({ injury }: InjuryBadgeProps) {
   const [open, setOpen] = React.useState(false);
-  const [isMobile, setIsMobile] = React.useState(false);
+  const isMobile = React.useRef('ontouchstart' in window || navigator.maxTouchPoints > 0).current;
 
+  // On mobile, close tooltip when tapping outside
   React.useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+    if (!isMobile || !open) return;
+    const handleOutside = () => setOpen(false);
+    document.addEventListener('pointerdown', handleOutside, { once: true });
+    return () => document.removeEventListener('pointerdown', handleOutside);
+  }, [isMobile, open]);
 
   const handleClick = (e: React.MouseEvent) => {
     if (isMobile) {
-      e.preventDefault();
       e.stopPropagation();
-      setOpen(!open);
+      setOpen((prev) => !prev);
     }
   };
 
   return (
-    <TooltipPrimitive.Provider delayDuration={200}>
-      <TooltipPrimitive.Root open={open} onOpenChange={setOpen}>
+    <TooltipPrimitive.Provider delayDuration={isMobile ? 0 : 200}>
+      {/* On mobile, block Radix from closing via pointerleave — we manage state ourselves */}
+      <TooltipPrimitive.Root open={open} onOpenChange={isMobile ? () => {} : setOpen}>
         <TooltipPrimitive.Trigger asChild onClick={handleClick}>
           <span className="inline-flex items-center shrink-0 cursor-default">
             <Hospital className="w-3.5 h-3.5 text-red-500" />

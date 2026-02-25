@@ -207,6 +207,48 @@ export interface LivePointsResponse {
   liveGamesCount: number;
 }
 
+export interface EspnAthleteEntry {
+  athlete: {
+    firstName: string;
+    lastName: string;
+  };
+  status: string;
+  details?: {
+    type?: string;
+    returnDate?: string;
+    shortComment?: string;
+  };
+}
+
+export interface EspnTeamInjuries {
+  team: { displayName: string };
+  injuries: EspnAthleteEntry[];
+}
+
+export interface EspnInjuriesResponse {
+  injuries: EspnTeamInjuries[];
+}
+
+export interface RepechageChoice {
+  annee: number;
+  type_id: number;
+  rang: number;
+  round: number;
+  nom: string;
+  joueur: string;
+}
+
+export interface RepechageType {
+  id: number;
+  nom: string;
+}
+
+export interface TeamDraftPick {
+  annee: number;
+  round: number;
+  equipe_source_nom: string | null;
+}
+
 export interface InjuryInfo {
   nhlPlayerId: number;
   statut: string;

@@ -1,31 +1,9 @@
 import pool from '../config/database';
 import { QUERIES } from '../models';
-import { InjuryInfo } from '../types';
+import { InjuryInfo, EspnInjuriesResponse } from '../types';
 
 const ESPN_INJURIES_URL =
   'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/injuries';
-
-interface EspnAthleteEntry {
-  athlete: {
-    firstName: string;
-    lastName: string;
-  };
-  status: string;
-  details?: {
-    type?: string;
-    returnDate?: string;
-    shortComment?: string;
-  };
-}
-
-interface EspnTeamInjuries {
-  team: { displayName: string };
-  injuries: EspnAthleteEntry[];
-}
-
-interface EspnInjuriesResponse {
-  injuries: EspnTeamInjuries[];
-}
 
 const STATUT_FR: Record<string, string> = {
   'Injured Reserve': 'Réserve des blessés',
@@ -151,7 +129,7 @@ export class InjuriesService {
           entry.statut,
           entry.typeBlessure,
           entry.commentaire,
-          entry.dateRetour || null,
+          entry.dateRetour ?? null,
         ]);
       }
       await client.query('COMMIT');

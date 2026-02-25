@@ -71,8 +71,8 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
             <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">B</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">A</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">Pts</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4">A</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4">Pts</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -126,10 +126,10 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                   <TableCell className="text-center px-1 sm:px-4">
                     {stats?.goals ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-0 sm:px-4">
                     {stats?.assists ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center font-medium px-1 sm:px-4">
+                  <TableCell className="text-center font-medium px-0 sm:px-4">
                     {stats?.points ?? '-'}
                   </TableCell>
                 </TableRow>
