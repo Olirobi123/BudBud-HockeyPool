@@ -14,6 +14,7 @@ export const TABLES = {
   ECHANGE_JOUEURS: 'echange_joueurs',
   MIS_AU_BALLOTAGE: 'mis_au_ballotage',
   TYPES_REPECHAGE: 'types_repechage',
+  BLESSURES: 'blessures',
 } as const;
 
 export const QUERIES = {
@@ -279,6 +280,17 @@ export const QUERIES = {
     WHERE cr.equipe_id = $1
     ORDER BY cr.annee ASC, cr.round ASC
   `,
+
+  // Blessures (injuries)
+  GET_ALL_INJURIES: `SELECT * FROM ${TABLES.BLESSURES}`,
+  TRUNCATE_INJURIES: `TRUNCATE TABLE ${TABLES.BLESSURES}`,
+  INSERT_INJURY: `
+    INSERT INTO ${TABLES.BLESSURES} (nhl_player_id, statut, type_blessure, commentaire, date_retour, last_update)
+    VALUES ($1, $2, $3, $4, $5, NOW())
+  `,
+
+  // Joueurs for injury name matching
+  GET_ALL_JOUEURS_FOR_INJURY_MATCH: `SELECT nhl_player_id, nom, prenom FROM ${TABLES.JOUEURS}`,
 
   // Live Points: batch ownership lookup by NHL player IDs
   GET_BATCH_OWNERSHIP_BY_NHL_IDS: `
