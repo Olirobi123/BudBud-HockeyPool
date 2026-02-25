@@ -33,9 +33,9 @@ function extractStats(
   // Return zeros if no current season data found
   if (!currentSeasonEntries || currentSeasonEntries.length === 0) {
     if (position === 'G') {
-      return { gamesPlayed: 0, savePctg: 0, goalsAgainstAvg: 0, wins: 0, shutouts: 0 };
+      return { gamesPlayed: 0, savePctg: 0, goalsAgainstAvg: 0, wins: 0, shutouts: 0, ppm: 0 };
     }
-    return { gamesPlayed: 0, goals: 0, assists: 0, points: 0 };
+    return { gamesPlayed: 0, goals: 0, assists: 0, points: 0, ppm: 0 };
   }
 
   if (position === 'G') {
@@ -51,14 +51,19 @@ function extractStats(
       ? (totalGoalsAgainst / totalGP) * 60 / 60
       : 0;
     const totalShutouts = currentSeasonEntries.reduce((sum, s) => sum + (s.shutouts ?? 0), 0);
-    return { gamesPlayed: totalGP, savePctg, goalsAgainstAvg, wins: totalWins, shutouts: totalShutouts };
+    const poolPoints = totalWins * 2 + totalShutouts * 3;
+    const ppm = totalGP > 0 ? Math.round((poolPoints / totalGP) * 100) / 100 : 0;
+    return { gamesPlayed: totalGP, savePctg, goalsAgainstAvg, wins: totalWins, shutouts: totalShutouts, ppm };
   }
 
+  const gamesPlayed = currentSeasonEntries.reduce((sum, s) => sum + (s.gamesPlayed ?? 0), 0);
+  const points = currentSeasonEntries.reduce((sum, s) => sum + (s.points ?? 0), 0);
   return {
-    gamesPlayed: currentSeasonEntries.reduce((sum, s) => sum + (s.gamesPlayed ?? 0), 0),
+    gamesPlayed,
     goals: currentSeasonEntries.reduce((sum, s) => sum + (s.goals ?? 0), 0),
     assists: currentSeasonEntries.reduce((sum, s) => sum + (s.assists ?? 0), 0),
-    points: currentSeasonEntries.reduce((sum, s) => sum + (s.points ?? 0), 0),
+    points,
+    ppm: gamesPlayed > 0 ? Math.round((points / gamesPlayed) * 100) / 100 : 0,
   };
 }
 
@@ -194,10 +199,10 @@ export class TeamsService {
   /**
    * Récupérer le dernier échange d'une équipe
    */
-  async getTeamLatestTrade(teamId: number): Promise<Echange | null> {
+  async getTeamLatestTrade(teamId: number): Promise<Echange[]> {
     try {
       const result = await pool.query(QUERIES.GET_LATEST_TRADE_BY_TEAM, [teamId]);
-      return result.rows.length > 0 ? result.rows[0] : null;
+      return result.rows;
     } catch (error) {
       console.error('Erreur lors de la récupération du dernier échange:', error);
       throw new Error('Erreur lors de la récupération du dernier échange');

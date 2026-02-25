@@ -153,6 +153,7 @@ export interface SkaterStats {
   goals: number;
   assists: number;
   points: number;
+  ppm: number;
 }
 
 // Stats for goalies (G)
@@ -162,6 +163,7 @@ export interface GoalieStats {
   goalsAgainstAvg: number;
   wins: number;
   shutouts: number;
+  ppm: number;
 }
 
 // Roster player with NHL stats

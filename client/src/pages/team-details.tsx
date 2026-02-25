@@ -83,7 +83,7 @@ export default function TeamDetails() {
             <TeamDraftPicks picks={draftPicks || []} isLoading={isLoadingDraftPicks} />
           </TabsContent>
           <TabsContent value="transaction" className="mt-4">
-            <TeamLatestTrade trade={latestTrade || null} isLoading={isLoadingTrade} />
+            <TeamLatestTrade trades={latestTrade || []} isLoading={isLoadingTrade} />
           </TabsContent>
         </Tabs>
       </div>
@@ -99,7 +99,7 @@ export default function TeamDetails() {
         <div className="space-y-6 self-start">
           <TeamTrophies teamId={idNum} />
           <TeamDraftPicks picks={draftPicks || []} isLoading={isLoadingDraftPicks} />
-          <TeamLatestTrade trade={latestTrade || null} isLoading={isLoadingTrade} />
+          <TeamLatestTrade trades={latestTrade || []} isLoading={isLoadingTrade} />
         </div>
       </div>
     </Layout>
