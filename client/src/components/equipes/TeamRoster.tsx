@@ -7,9 +7,7 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getPositionColor } from '@/lib/utils';
 import {
   RosterPlayerWithStats, isGoalieStats, isSkaterStats,
 } from '@/types';
@@ -68,11 +66,11 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-full px-2 sm:px-4">Joueur</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">B</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4">A</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4">Pts</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">B</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4 hidden sm:table-cell">A</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4 text-primary font-semibold">Pts</TableHead>
+            <TableHead className="w-10 sm:w-16 text-center px-0 sm:px-4">PPM</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,7 +103,7 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                           <img
                             src={player.teamLogo}
                             alt=""
-                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
+                            className="w-8 h-8 sm:w-11 sm:h-11 object-contain shrink-0"
                           />
                         )}
                         <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
@@ -115,22 +113,20 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
-                    <Badge className={getPositionColor(player.position)}>
-                      {player.position}
-                    </Badge>
-                  </TableCell>
                   <TableCell className="text-center px-1 sm:px-4">
                     {stats?.gamesPlayed ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
                     {stats?.goals ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-0 sm:px-4">
+                  <TableCell className="text-center px-0 sm:px-4 hidden sm:table-cell">
                     {stats?.assists ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center font-medium px-0 sm:px-4">
+                  <TableCell className="text-center px-0 sm:px-4 font-semibold text-primary tabular-nums">
                     {stats?.points ?? '-'}
+                  </TableCell>
+                  <TableCell className="text-center px-0 sm:px-4">
+                    {stats ? stats.ppm.toFixed(2) : '-'}
                   </TableCell>
                 </TableRow>
               </Fragment>
@@ -138,13 +134,15 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
           })}
           <TableRow className="bg-muted/50 font-semibold border-t-2">
             <TableCell className="text-right">Total</TableCell>
+            <TableCell />
             <TableCell className="hidden sm:table-cell" />
-            <TableCell />
-            <TableCell />
-            <TableCell />
-            <TableCell className="text-center text-lg font-bold text-primary">
-              {totalPoints}
+            <TableCell className="hidden sm:table-cell" />
+            <TableCell className="text-center">
+              <span className="inline-flex items-center justify-center min-w-[2.5rem] rounded-md bg-primary/15 text-primary text-lg font-bold px-2 py-0.5 tabular-nums">
+                {totalPoints}
+              </span>
             </TableCell>
+            <TableCell />
           </TableRow>
         </TableBody>
       </Table>
@@ -174,11 +172,11 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
         <TableHeader>
           <TableRow>
             <TableHead className="w-full px-2 sm:px-4">Joueur</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">V</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">BL</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">Pts</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">V</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">BL</TableHead>
+            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 text-primary font-semibold">Pts</TableHead>
+            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">PPM</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -212,7 +210,7 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
                           <img
                             src={player.teamLogo}
                             alt=""
-                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
+                            className="w-8 h-8 sm:w-11 sm:h-11 object-contain shrink-0"
                           />
                         )}
                         <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
@@ -222,22 +220,20 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
-                    <Badge className={getPositionColor(player.position)}>
-                      {player.position}
-                    </Badge>
-                  </TableCell>
                   <TableCell className="text-center px-1 sm:px-4">
                     {stats?.gamesPlayed ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
                     {stats?.wins ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
                     {stats?.shutouts ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center font-medium px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 font-semibold text-primary tabular-nums">
                     {poolPts}
+                  </TableCell>
+                  <TableCell className="text-center px-1 sm:px-4">
+                    {stats ? stats.ppm.toFixed(2) : '-'}
                   </TableCell>
                 </TableRow>
               </Fragment>
@@ -245,13 +241,15 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
           })}
           <TableRow className="bg-muted/50 font-semibold border-t-2">
             <TableCell className="text-right">Total</TableCell>
+            <TableCell />
             <TableCell className="hidden sm:table-cell" />
-            <TableCell />
-            <TableCell />
-            <TableCell />
-            <TableCell className="text-center text-lg font-bold text-primary">
-              {totalPoints}
+            <TableCell className="hidden sm:table-cell" />
+            <TableCell className="text-center">
+              <span className="inline-flex items-center justify-center min-w-[2.5rem] rounded-md bg-primary/15 text-primary text-lg font-bold px-2 py-0.5 tabular-nums">
+                {totalPoints}
+              </span>
             </TableCell>
+            <TableCell />
           </TableRow>
         </TableBody>
       </Table>
