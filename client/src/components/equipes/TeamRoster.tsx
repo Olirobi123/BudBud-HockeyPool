@@ -13,10 +13,13 @@ import { getPositionColor } from '@/lib/utils';
 import {
   RosterPlayerWithStats, isGoalieStats, isSkaterStats,
 } from '@/types';
+import { InjuryInfo } from '@/types/IInjury';
+import { InjuryBadge } from './InjuryBadge';
 
 interface TeamRosterProps {
   roster: RosterPlayerWithStats[];
   isLoading: boolean;
+  injuries?: Record<number, InjuryInfo>;
 }
 
 function sortByPoints(players: RosterPlayerWithStats[]): RosterPlayerWithStats[] {
@@ -49,9 +52,10 @@ function RosterSkeleton() {
 interface SkaterGroupTableProps {
   players: RosterPlayerWithStats[];
   title: string;
+  injuries?: Record<number, InjuryInfo>;
 }
 
-function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
+function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
   if (players.length === 0) return null;
 
   const sortedPlayers = sortByPoints(players);
@@ -67,8 +71,8 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
             <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 hidden sm:table-cell">Pos</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">B</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">A</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">Pts</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4">A</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4">Pts</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,19 +96,24 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
                   <TableCell className="max-w-0 px-2 sm:px-4">
-                    <Link
-                      to={`/joueur/${player.nhl_player_id}`}
-                      className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"
-                    >
-                      {player.teamLogo && (
-                        <img
-                          src={player.teamLogo}
-                          alt=""
-                          className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
-                        />
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        to={`/joueur/${player.nhl_player_id}`}
+                        className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"
+                      >
+                        {player.teamLogo && (
+                          <img
+                            src={player.teamLogo}
+                            alt=""
+                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
+                          />
+                        )}
+                        <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
+                      </Link>
+                      {injuries?.[player.nhl_player_id] && (
+                        <InjuryBadge injury={injuries[player.nhl_player_id]} />
                       )}
-                      <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
-                    </Link>
+                    </div>
                   </TableCell>
                   <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
                     <Badge className={getPositionColor(player.position)}>
@@ -117,10 +126,10 @@ function SkaterGroupTable({ players, title }: SkaterGroupTableProps) {
                   <TableCell className="text-center px-1 sm:px-4">
                     {stats?.goals ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-0 sm:px-4">
                     {stats?.assists ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center font-medium px-1 sm:px-4">
+                  <TableCell className="text-center font-medium px-0 sm:px-4">
                     {stats?.points ?? '-'}
                   </TableCell>
                 </TableRow>
@@ -150,7 +159,7 @@ function getGoaliePoolPoints(player: RosterPlayerWithStats): number {
   return 0;
 }
 
-function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
+function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[]; injuries?: Record<number, InjuryInfo> }) {
   if (goalies.length === 0) return null;
 
   const sorted = [...goalies].sort((a, b) => getGoaliePoolPoints(b) - getGoaliePoolPoints(a));
@@ -194,19 +203,24 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
                   <TableCell className="max-w-0 px-2 sm:px-4">
-                    <Link
-                      to={`/joueur/${player.nhl_player_id}`}
-                      className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"
-                    >
-                      {player.teamLogo && (
-                        <img
-                          src={player.teamLogo}
-                          alt=""
-                          className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
-                        />
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        to={`/joueur/${player.nhl_player_id}`}
+                        className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0"
+                      >
+                        {player.teamLogo && (
+                          <img
+                            src={player.teamLogo}
+                            alt=""
+                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
+                          />
+                        )}
+                        <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
+                      </Link>
+                      {injuries?.[player.nhl_player_id] && (
+                        <InjuryBadge injury={injuries[player.nhl_player_id]} />
                       )}
-                      <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
-                    </Link>
+                    </div>
                   </TableCell>
                   <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
                     <Badge className={getPositionColor(player.position)}>
@@ -245,7 +259,7 @@ function GoaliesTable({ goalies }: { goalies: RosterPlayerWithStats[] }) {
   );
 }
 
-export function TeamRoster({ roster, isLoading }: TeamRosterProps) {
+export function TeamRoster({ roster, isLoading, injuries }: TeamRosterProps) {
   const forwards = roster.filter((p) => ['C', 'L', 'R'].includes(p.position));
   const defensemen = roster.filter((p) => p.position === 'D');
   const goalies = roster.filter((p) => p.position === 'G');
@@ -271,9 +285,9 @@ export function TeamRoster({ roster, isLoading }: TeamRosterProps) {
           </div>
         ) : (
           <div className="space-y-6">
-            <SkaterGroupTable players={forwards} title="Attaquants" />
-            <SkaterGroupTable players={defensemen} title="Défenseurs" />
-            <GoaliesTable goalies={goalies} />
+            <SkaterGroupTable players={forwards} title="Attaquants" injuries={injuries} />
+            <SkaterGroupTable players={defensemen} title="Défenseurs" injuries={injuries} />
+            <GoaliesTable goalies={goalies} injuries={injuries} />
           </div>
         )}
       </CardContent>

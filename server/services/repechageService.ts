@@ -1,18 +1,5 @@
 import pool from '../config/database';
-
-export interface RepechageChoice {
-  annee: number;
-  type_id: number;
-  rang: number;
-  round: number;
-  nom: string;
-  joueur: string;
-}
-
-export interface RepechageType {
-  id: number;
-  nom: string;
-}
+import { RepechageChoice, RepechageType } from '../types';
 
 export class RepechageService {
   /**

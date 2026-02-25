@@ -7,6 +7,7 @@ import {
   RosterPlayerWithStats,
   SkaterStats,
   GoalieStats,
+  TeamDraftPick,
 } from '../types';
 import { QUERIES } from '../models';
 import { getCurrentSeasonNumber } from './seasonHelper';
@@ -263,12 +264,6 @@ export class TeamsService {
       throw new Error('Erreur lors de la récupération des équipes inactives');
     }
   }
-}
-
-export interface TeamDraftPick {
-  annee: number;
-  round: number;
-  equipe_source_nom: string | null;
 }
 
 export const teamsService = new TeamsService();
