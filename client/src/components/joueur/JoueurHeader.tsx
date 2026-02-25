@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { usePlayerOwnership } from '@/hooks/joueur/usePlayerOwnership';
+import { useInjuries } from '@/hooks/useInjuries';
+import { InjuryBadge } from '@/components/equipes/InjuryBadge';
 import PlayerDetails from '@/types/IPlayerDetails';
 
 type Props = {
@@ -10,6 +12,8 @@ type Props = {
 export default function JoueurHeader({ player }: Props) {
   const nhlId = player.playerId?.toString() ?? '';
   const { data: ownership, isLoading: ownershipLoading } = usePlayerOwnership(nhlId);
+  const { data: injuries } = useInjuries();
+  const injury = player.playerId !== undefined ? injuries?.[player.playerId] : undefined;
 
   return (
     <div className="relative h-64 rounded-xl overflow-hidden mb-8 md:h-80">
@@ -45,9 +49,10 @@ export default function JoueurHeader({ player }: Props) {
                 </Badge>
               </Link>
             )}
-            {!ownershipLoading && ownership == null && 
+            {!ownershipLoading && ownership == null &&
               <Badge className="bg-secondary text-primary-foreground hover:bg-slate-500 cursor-pointer">Agent libre</Badge>
             }
+            {injury && <InjuryBadge injury={injury} />}
           </div>
         </div>
       </div>
