@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
-import { AlertCircle } from 'lucide-react';
+import { Hospital } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { InjuryInfo } from '@/types/IInjury';
 
@@ -34,7 +34,7 @@ export function InjuryBadge({ injury }: InjuryBadgeProps) {
       <TooltipPrimitive.Root open={open} onOpenChange={setOpen}>
         <TooltipPrimitive.Trigger asChild onClick={handleClick}>
           <span className="inline-flex items-center shrink-0 cursor-default">
-            <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+            <Hospital className="w-3.5 h-3.5 text-red-500" />
           </span>
         </TooltipPrimitive.Trigger>
 
@@ -58,7 +58,7 @@ export function InjuryBadge({ injury }: InjuryBadgeProps) {
             <div className="relative z-10 space-y-1">
               {/* Status */}
               <div className="flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <Hospital className="w-3.5 h-3.5 text-red-500 shrink-0" />
                 <span className="text-[10px] uppercase tracking-wider font-bold text-red-500">
                   {injury.statut}
                 </span>

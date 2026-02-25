@@ -27,6 +27,62 @@ interface EspnInjuriesResponse {
   injuries: EspnTeamInjuries[];
 }
 
+const STATUT_FR: Record<string, string> = {
+  'Injured Reserve': 'Réserve des blessés',
+  'IR - Long Term': 'LTIR',
+  'Out': 'Absent',
+  'Questionable': 'Incertain',
+  'Doubtful': 'Peu probable',
+  'Suspension': 'Suspension',
+};
+
+const TYPE_BLESSURE_FR: Record<string, string> = {
+  'Lower Body': 'Bas du corps',
+  'Upper Body': 'Haut du corps',
+  'Hip': 'Hanche',
+  'Shoulder': 'Épaule',
+  'Knee': 'Genou',
+  'Ankle': 'Cheville',
+  'Back': 'Dos',
+  'Head': 'Tête',
+  'Neck': 'Cou',
+  'Concussion': 'Commotion cérébrale',
+  'Illness': 'Maladie',
+  'Not Injury Related': 'Non lié à une blessure',
+  'Lower Leg': 'Jambe inférieure',
+  'Upper Leg': 'Cuisse',
+  'Thigh': 'Cuisse',
+  'Face': 'Visage',
+  'Wrist': 'Poignet',
+  'Hand': 'Main',
+  'Finger': 'Doigt',
+  'Arm': 'Bras',
+  'Elbow': 'Coude',
+  'Foot': 'Pied',
+  'Groin': 'Aine',
+  'Rib': 'Côte',
+  'Ribs': 'Côtes',
+  'Oblique': 'Oblique',
+  'Abdomen': 'Abdomen',
+  'Chest': 'Poitrine',
+  'Eye': 'Œil',
+  'Ear': 'Oreille',
+  'Jaw': 'Mâchoire',
+  'Nose': 'Nez',
+  'Tooth': 'Dent',
+  'Fatigue': 'Fatigue',
+  'Personal': 'Raisons personnelles',
+};
+
+function translateStatut(value: string): string {
+  return STATUT_FR[value] ?? value;
+}
+
+function translateTypeBlessure(value: string | null | undefined): string | null {
+  if (value == null) return null;
+  return TYPE_BLESSURE_FR[value] ?? value;
+}
+
 function normalizeName(name: string): string {
   return name
     .normalize('NFD')
@@ -76,8 +132,8 @@ export class InjuriesService {
 
         matched.push({
           nhlPlayerId,
-          statut: injury.status,
-          typeBlessure: injury.details?.type ?? null,
+          statut: translateStatut(injury.status),
+          typeBlessure: translateTypeBlessure(injury.details?.type),
           commentaire: injury.details?.shortComment ?? null,
           dateRetour: injury.details?.returnDate ?? null,
         });
