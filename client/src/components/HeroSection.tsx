@@ -38,6 +38,10 @@ function StatPill({
 export default function HeroSection(): JSX.Element {
   const { data: equipesActives = [], isLoading } = useActiveTeams();
   const { data: echanges = [] } = useEchanges();
+  const now = new Date();
+  const seasonStartYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  const SEASON_START = `${seasonStartYear}-09-01`;
+  const echangesCetteSaison = echanges.filter((e) => e.date >= SEASON_START).length;
 
   usePageLoading({ dependencies: [isLoading] });
 
@@ -85,11 +89,6 @@ export default function HeroSection(): JSX.Element {
                 </span>
               </h1>
 
-              <p className="mt-6 text-lg text-slate-300/90 leading-relaxed max-w-lg">
-                Suivi en temps réel, statistiques avancées et interface
-                intuitive pour votre pool de hockey.
-              </p>
-
               {/* CTAs */}
               <div className="mt-10 flex flex-col sm:flex-row gap-4">
                 <Link to="/equipes">
@@ -126,7 +125,7 @@ export default function HeroSection(): JSX.Element {
               />
               <StatPill
                 icon={Zap}
-                value={echanges.length}
+                value={echangesCetteSaison}
                 label="Échanges cette saison"
                 delay="0.25s"
               />

@@ -42,7 +42,7 @@ export function TeamLatestTrade({ trade, isLoading }: TeamLatestTradeProps) {
         <ArrowLeftRight className="w-5 h-5" />
         Dernière Transaction
       </h3>
-      <EchangeCard echange={trade} compact />
+      <EchangeCard echange={trade} />
     </div>
   );
 }

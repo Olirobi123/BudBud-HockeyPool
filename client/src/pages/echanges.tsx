@@ -1,10 +1,35 @@
+import { ArrowLeftRight } from 'lucide-react';
 import { useEchanges } from '@/hooks/echanges/useEchanges';
 import { ErrorDisplay } from '@/components/ui/error-display';
-import { EchangeStats } from '@/components/echanges/EchangeStats';
 import { EchangeList } from '@/components/echanges/EchangeList';
 import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
 import { usePageLoading } from '@/hooks/usePageLoading';
+
+function HeroBanner({ count }: { count: number }) {
+  return (
+    <div className="bg-slate-950 border-b border-slate-800/60 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p className="text-xs uppercase tracking-[0.25em] text-cyan-400 mb-3 font-medium">
+          Ligue 38BudBud
+        </p>
+        <h1 className="font-display text-5xl sm:text-6xl font-black uppercase tracking-widest text-white leading-none mb-4">
+          Échanges
+        </h1>
+        <p className="text-slate-400 text-sm tracking-wide mb-6">
+          Historique des transactions
+        </p>
+        <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-slate-700 rounded-xl px-4 py-2.5">
+          <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+            <ArrowLeftRight className="w-4 h-4 text-cyan-400" />
+          </div>
+          <span className="text-white font-bold text-sm">{count}</span>
+          <span className="text-slate-400 text-sm">échanges confirmés</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Echanges() {
   const {
@@ -13,7 +38,6 @@ export default function Echanges() {
     error,
   } = useEchanges();
 
-  // Gestion automatique du loading de la page
   usePageLoading({ dependencies: [isLoading] });
 
   if (isLoading) {
@@ -31,16 +55,12 @@ export default function Echanges() {
       </div>
     );
   }
-  if (!echanges || echanges.length === 0) return <div>Aucun échange trouvé</div>;
+
+  const confirmed = (echanges ?? []).filter((e) => e.statut_confirmer);
 
   return (
-    <Layout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Échanges</h1>
-        <p className="text-muted-foreground">Tous les échanges de la ligue</p>
-      </div>
-      <EchangeStats echanges={echanges} />
-      <EchangeList echanges={echanges} />
+    <Layout beforeContainer={<HeroBanner count={confirmed.length} />}>
+      <EchangeList echanges={confirmed} />
     </Layout>
   );
 }
