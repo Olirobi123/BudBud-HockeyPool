@@ -199,10 +199,10 @@ export class TeamsService {
   /**
    * Récupérer le dernier échange d'une équipe
    */
-  async getTeamLatestTrade(teamId: number): Promise<Echange | null> {
+  async getTeamLatestTrade(teamId: number): Promise<Echange[]> {
     try {
       const result = await pool.query(QUERIES.GET_LATEST_TRADE_BY_TEAM, [teamId]);
-      return result.rows.length > 0 ? result.rows[0] : null;
+      return result.rows;
     } catch (error) {
       console.error('Erreur lors de la récupération du dernier échange:', error);
       throw new Error('Erreur lors de la récupération du dernier échange');

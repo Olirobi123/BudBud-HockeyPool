@@ -20,13 +20,13 @@ const fetchTeamRoster = async (id: number): Promise<RosterPlayerWithStats[]> => 
   return result.data || [];
 };
 
-const fetchTeamLatestTrade = async (id: number): Promise<Echange | null> => {
+const fetchTeamLatestTrade = async (id: number): Promise<Echange[]> => {
   const response = await fetch(`${BACKEND_URL}/api/teams/${id}/latest-trade`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération du dernier échange');
   }
   const result = await response.json();
-  return result.data;
+  return result.data ?? [];
 };
 
 export function useTeam(id: number) {
@@ -48,7 +48,7 @@ export function useTeamRoster(id: number) {
 }
 
 export function useTeamLatestTrade(id: number) {
-  return useQuery<Echange | null>({
+  return useQuery<Echange[]>({
     queryKey: ['team-latest-trade', id],
     queryFn: () => fetchTeamLatestTrade(id),
     enabled: !!id,

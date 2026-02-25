@@ -6,11 +6,11 @@ import { EchangeCard } from '@/components/echanges/EchangeCard';
 import { Echange } from '@/types';
 
 interface TeamLatestTradeProps {
-  trade: Echange | null;
+  trades: Echange[];
   isLoading: boolean;
 }
 
-export function TeamLatestTrade({ trade, isLoading }: TeamLatestTradeProps) {
+export function TeamLatestTrade({ trades, isLoading }: TeamLatestTradeProps) {
   if (isLoading) {
     return (
       <Card className="animate-pulse">
@@ -20,13 +20,13 @@ export function TeamLatestTrade({ trade, isLoading }: TeamLatestTradeProps) {
     );
   }
 
-  if (!trade) {
+  if (trades.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ArrowLeftRight className="w-5 h-5" />
-            Dernière Transaction
+            Dernières Transactions
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center py-8 text-gray-500">
@@ -40,9 +40,13 @@ export function TeamLatestTrade({ trade, isLoading }: TeamLatestTradeProps) {
     <div className="space-y-4">
       <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
         <ArrowLeftRight className="w-5 h-5" />
-        Dernière Transaction
+        Dernières Transactions
       </h3>
-      <EchangeCard echange={trade} />
+      <div className="space-y-3">
+        {trades.map((trade) => (
+          <EchangeCard key={trade.id} echange={trade} />
+        ))}
+      </div>
     </div>
   );
 }

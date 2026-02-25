@@ -104,7 +104,7 @@ export const QUERIES = {
     WHERE e.equipe_source_id = $1 OR e.equipe_destination_id = $1
     GROUP BY e.id, src.nom, dest.nom
     ORDER BY e.date DESC
-    LIMIT 1
+    LIMIT 5
   `,
 
   // Joueurs
