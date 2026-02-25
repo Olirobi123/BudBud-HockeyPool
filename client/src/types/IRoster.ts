@@ -11,6 +11,7 @@ export interface SkaterStats {
   goals: number;
   assists: number;
   points: number;
+  ppm: number;
 }
 
 export interface GoalieStats {
@@ -19,6 +20,7 @@ export interface GoalieStats {
   goalsAgainstAvg: number;
   wins: number;
   shutouts: number;
+  ppm: number;
 }
 
 export interface RosterPlayerWithStats extends Joueur {

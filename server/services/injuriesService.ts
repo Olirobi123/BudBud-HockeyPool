@@ -50,6 +50,7 @@ const TYPE_BLESSURE_FR: Record<string, string> = {
   'Tooth': 'Dent',
   'Fatigue': 'Fatigue',
   'Personal': 'Raisons personnelles',
+  'Leg' : 'Jambe'
 };
 
 function translateStatut(value: string): string {
