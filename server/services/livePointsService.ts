@@ -47,9 +47,9 @@ export class LivePointsService {
       return this.cachedResponse;
     }
 
-    let games: Awaited<ReturnType<typeof scoresService.getCurrentScores>>;
+    let scoresResult: Awaited<ReturnType<typeof scoresService.getCurrentScores>>;
     try {
-      games = await scoresService.getCurrentScores();
+      scoresResult = await scoresService.getCurrentScores();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('NHL scores API unavailable, falling back to snapshot:', error);
@@ -60,7 +60,10 @@ export class LivePointsService {
       return { topPlayers: [], teamLeaderboard: [], gamesCount: 0, liveGamesCount: 0 };
     }
 
-    const dateString = this.getDateString(isSnapshotCall ? -1 : 0);
+    const { games } = scoresResult;
+    // For normal calls use NHL's own currentDate (Eastern time); for snapshot cron (runs
+    // after midnight UTC) use yesterday's UTC date which aligns with the Eastern game day.
+    const dateString = isSnapshotCall ? this.getDateString(-1) : scoresResult.currentDate;
     const filteredGames = games.filter((g) => g.gameDate === dateString);
     const activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
     const liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');

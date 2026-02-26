@@ -8,8 +8,8 @@ export class ScoresController {
    * Get current NHL game scores
    */
   getCurrentScores = asyncHandler(async (req: Request, res: Response) => {
-    const scores = await scoresService.getCurrentScores();
-    sendSuccess(res, scores);
+    const { games } = await scoresService.getCurrentScores();
+    sendSuccess(res, games);
   });
 }
 
