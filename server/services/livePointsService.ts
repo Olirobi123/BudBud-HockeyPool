@@ -20,6 +20,9 @@ interface PlayerAccumulator {
   headshot: string;
   goals: number;
   assists: number;
+  wins: number;
+  shutouts: number;
+  goalsAgainst: number;
 }
 
 interface OwnershipRow {
@@ -97,36 +100,56 @@ export class LivePointsService {
       this.processGamePlays(pbp, game, playerMap);
     }
 
-    // Filter out goalies
+    // Separate skaters and goalies
     const skaters = Array.from(playerMap.values()).filter(
       (p) => p.position !== GOALIE_POSITION,
     );
+    const goalies = Array.from(playerMap.values()).filter(
+      (p) => p.position === GOALIE_POSITION,
+    );
 
-    // Batch lookup pool ownership
-    const nhlPlayerIds = skaters.map((p) => p.nhlPlayerId);
+    // Batch lookup pool ownership for all players
+    const nhlPlayerIds = [
+      ...skaters.map((p) => p.nhlPlayerId),
+      ...goalies.map((p) => p.nhlPlayerId),
+    ];
     const ownershipMap = await this.batchLookupOwnership(nhlPlayerIds);
 
-    // Build full player list with ownership
-    const allPlayers: LivePlayerPoints[] = skaters
-      .map((p) => {
-        const ownership = ownershipMap.get(p.nhlPlayerId);
-        return {
-          nhlPlayerId: p.nhlPlayerId,
-          firstName: p.firstName,
-          lastName: p.lastName,
-          position: p.position,
-          nhlTeamAbbrev: p.nhlTeamAbbrev,
-          nhlTeamLogo: p.nhlTeamLogo,
-          headshot: p.headshot,
-          goals: p.goals,
-          assists: p.assists,
-          points: p.goals + p.assists,
-          poolTeam: ownership !== undefined && ownership.equipe_id !== null
-            ? { id: ownership.equipe_id, nom: ownership.equipe_nom as string }
-            : undefined,
-        };
-      })
-      .sort((a, b) => b.points - a.points || b.goals - a.goals);
+    const buildLivePlayer = (
+      p: PlayerAccumulator,
+      pts: number,
+    ): LivePlayerPoints => {
+      const ownership = ownershipMap.get(p.nhlPlayerId);
+      return {
+        nhlPlayerId: p.nhlPlayerId,
+        firstName: p.firstName,
+        lastName: p.lastName,
+        position: p.position,
+        nhlTeamAbbrev: p.nhlTeamAbbrev,
+        nhlTeamLogo: p.nhlTeamLogo,
+        headshot: p.headshot,
+        goals: p.goals,
+        assists: p.assists,
+        points: pts,
+        wins: p.wins,
+        shutouts: p.shutouts,
+        poolTeam: ownership !== undefined && ownership.equipe_id !== null
+          ? { id: ownership.equipe_id, nom: ownership.equipe_nom as string }
+          : undefined,
+      };
+    };
+
+    const skaterPlayers: LivePlayerPoints[] = skaters
+      .map((p) => buildLivePlayer(p, p.goals + p.assists));
+
+    const goaliePlayers: LivePlayerPoints[] = goalies
+      .map((p) => buildLivePlayer(p, p.wins * 2 + p.shutouts * 3));
+
+    // Combine and sort by points descending
+    const allPlayers: LivePlayerPoints[] = [
+      ...skaterPlayers,
+      ...goaliePlayers,
+    ].sort((a, b) => b.points - a.points || b.goals - a.goals);
 
     // Top 10 for the feed
     const topPlayers = allPlayers.slice(0, TOP_PLAYERS_LIMIT);
@@ -173,9 +196,12 @@ export class LivePointsService {
         .map((t) => [t.abbrev, t.logo as string]),
     );
 
-    // Seed all skaters from the roster so players with 0 points appear
+    // Build goalie → teamId map from roster
+    const goalieTeamMap = new Map<number, number>();
+
+    // Seed all players from the roster so players with 0 points appear
     for (const spot of pbp.rosterSpots ?? []) {
-      if (spot.positionCode === GOALIE_POSITION || playerMap.has(spot.playerId)) continue;
+      if (playerMap.has(spot.playerId)) continue;
 
       const teamAbbrev = spot.teamTriCode
         ?? (spot.teamId != null ? teamIdToAbbrev.get(spot.teamId) : undefined)
@@ -191,14 +217,34 @@ export class LivePointsService {
         headshot: spot.headshot ?? '',
         goals: 0,
         assists: 0,
+        wins: 0,
+        shutouts: 0,
+        goalsAgainst: 0,
       });
+
+      if (spot.positionCode === GOALIE_POSITION && spot.teamId != null) {
+        goalieTeamMap.set(spot.playerId, spot.teamId);
+      }
     }
 
-    // Accumulate goals and assists from play-by-play
+    // Track the last goalie seen in net per team and goals against per goalie
+    const lastGoalieByTeam = new Map<number, number>();
+    const goalsAgainstMap = new Map<number, number>();
+
+    // Accumulate goals/assists and track goalie activity from play-by-play
     for (const play of pbp.plays ?? []) {
-      if (play.typeDescKey !== 'goal') continue;
       const details = play.details;
       if (!details) continue;
+
+      // Update last-goalie-in-net tracking (any play that includes goalieInNetId)
+      if (details.goalieInNetId != null) {
+        const goalieTeamId = goalieTeamMap.get(details.goalieInNetId);
+        if (goalieTeamId != null) {
+          lastGoalieByTeam.set(goalieTeamId, details.goalieInNetId);
+        }
+      }
+
+      if (play.typeDescKey !== 'goal') continue;
 
       if (details.scoringPlayerId != null) {
         const p = playerMap.get(details.scoringPlayerId);
@@ -211,6 +257,37 @@ export class LivePointsService {
       if (details.assist2PlayerId != null) {
         const p = playerMap.get(details.assist2PlayerId);
         if (p) p.assists++;
+      }
+
+      // Count goals against the goalie who was scored on
+      if (details.goalieInNetId != null) {
+        goalsAgainstMap.set(
+          details.goalieInNetId,
+          (goalsAgainstMap.get(details.goalieInNetId) ?? 0) + 1,
+        );
+      }
+    }
+
+    // Award wins and shutouts for completed games
+    const COMPLETED_STATES = ['FINAL', 'OFF'];
+    if (COMPLETED_STATES.includes(game.gameState)) {
+      const awayScore = game.awayTeam.score ?? 0;
+      const homeScore = game.homeTeam.score ?? 0;
+
+      if (awayScore !== homeScore) {
+        const winningTeamId = awayScore > homeScore ? game.awayTeam.id : game.homeTeam.id;
+        const winningGoalieId = lastGoalieByTeam.get(winningTeamId);
+
+        if (winningGoalieId != null) {
+          const goalie = playerMap.get(winningGoalieId);
+          if (goalie) {
+            goalie.wins++;
+            const goalsAgainst = goalsAgainstMap.get(winningGoalieId) ?? 0;
+            if (goalsAgainst === 0) {
+              goalie.shutouts++;
+            }
+          }
+        }
       }
     }
   }
@@ -267,6 +344,7 @@ export class LivePointsService {
           totalAssists: 0,
           attaquePoints: 0,
           defensePoints: 0,
+          gardienPoints: 0,
           players: [],
         });
       }
@@ -284,7 +362,9 @@ export class LivePointsService {
       team.totalPoints += player.points;
       team.totalGoals += player.goals;
       team.totalAssists += player.assists;
-      if (player.position === DEFENSE_POSITION) {
+      if (player.position === GOALIE_POSITION) {
+        team.gardienPoints += player.points;
+      } else if (player.position === DEFENSE_POSITION) {
         team.defensePoints += player.points;
       } else {
         team.attaquePoints += player.points;
