@@ -11,8 +11,7 @@ export const EchangeList: React.FC<EchangeListProps> = ({ echanges }) => {
 
   // Group by month (YYYY-MM)
   const echangesParMois = safeEchanges.reduce((acc, echange) => {
-    const d = new Date(echange.date);
-    const mois = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const mois = echange.date.slice(0, 7); // "YYYY-MM"
     if (acc[mois] === undefined) acc[mois] = [];
     acc[mois].push(echange);
     return acc;
@@ -27,7 +26,7 @@ export const EchangeList: React.FC<EchangeListProps> = ({ echanges }) => {
     <div className="space-y-2">
       {sortedMonths.map((mois) => {
         const monthTrades = [...echangesParMois[mois]].sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          (a, b) => b.date.localeCompare(a.date),
         );
 
         const [year, month] = mois.split('-').map(Number);

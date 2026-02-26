@@ -1,5 +1,10 @@
-import { Pool } from 'pg';
+import { Pool, types } from 'pg';
 import dotenv from 'dotenv';
+
+// Return DATE columns as plain strings (e.g. "2026-02-26") instead of
+// Date objects, which would be serialised as UTC midnight and cause a
+// -1 day shift for browsers in negative-offset timezones.
+types.setTypeParser(1082, (val: string) => val);
 
 // Charger les variables d'environnement
 dotenv.config();
