@@ -37,58 +37,58 @@ export default function Home(): JSX.Element {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main focus - Leaderboards */}
-        <div className="lg:col-span-2 space-y-8">
-          <div>
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                Classement Pool
-              </h3>
-            </div>
-            <LivePointsLeaderboard
-              teams={data?.teamLeaderboard ?? []}
-              isLoading={isLoading}
-            />
+        {/* Classement Pool — order 1 mobile, row 1 col 1-2 desktop */}
+        <div className="lg:col-span-2 order-1 lg:order-none">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              Classement Pool
+            </h3>
           </div>
-          <div>
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                Classement général
-              </h3>
-            </div>
-            <PointsLeaderboard
-              teams={rankingsData ?? []}
-              isLoading={rankingsLoading}
-            />
-          </div>
+          <LivePointsLeaderboard
+            teams={data?.teamLeaderboard ?? []}
+            isLoading={isLoading}
+          />
         </div>
 
-        {/* Sidebar - Top scorers + Latest trade */}
-        <div className="space-y-8">
-          <div>
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                Top Marqueurs
-              </h3>
-            </div>
-            <LivePointsFeed
-              players={data?.topPlayers ?? []}
-              liveGamesCount={data?.liveGamesCount ?? 0}
-              isLoading={isLoading}
-            />
+        {/* Top Marqueurs — order 2 mobile, row 1 col 3 desktop */}
+        <div className="order-2 lg:order-none">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              Top Marqueurs
+            </h3>
           </div>
-          <div>
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                Dernier Échange
-              </h3>
-            </div>
-            <HomeLatestTrade />
+          <LivePointsFeed
+            players={data?.topPlayers ?? []}
+            liveGamesCount={data?.liveGamesCount ?? 0}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Classement général — order 3 mobile, row 2 col 1-2 desktop */}
+        <div className="lg:col-span-2 order-3 lg:order-none">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              Classement général
+            </h3>
           </div>
+          <PointsLeaderboard
+            teams={rankingsData ?? []}
+            isLoading={rankingsLoading}
+          />
+        </div>
+
+        {/* Dernier Échange — order 4 mobile, row 2 col 3 desktop */}
+        <div className="order-4 lg:order-none">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              Dernier Échange
+            </h3>
+          </div>
+          <HomeLatestTrade />
         </div>
       </div>
     </Layout>
