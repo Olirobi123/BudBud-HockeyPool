@@ -45,6 +45,7 @@ function LeaderboardSkeleton() {
 
 function PlayerRow({ player }: { player: LivePlayerPoints }) {
   const hasPoints = player.points > 0;
+  const isGoalie = player.position === 'G';
   return (
     <Link
       to={`/joueur/${player.nhlPlayerId}`}
@@ -75,8 +76,17 @@ function PlayerRow({ player }: { player: LivePlayerPoints }) {
 
       {/* Stats */}
       <div className="flex items-center gap-2 shrink-0 tabular-nums text-xs">
-        <span className="w-[1.75rem] text-center text-muted-foreground">{player.goals}</span>
-        <span className="w-[1.75rem] text-center text-muted-foreground">{player.assists}</span>
+        {isGoalie ? (
+          <>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.wins ?? 0}</span>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.shutouts ?? 0}</span>
+          </>
+        ) : (
+          <>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.goals}</span>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.assists}</span>
+          </>
+        )}
         <span className="font-bold min-w-[1.5rem] text-right text-primary">
           {player.points}
         </span>
@@ -95,12 +105,16 @@ function SectionLabel({ label }: { label: string }) {
 
 function TeamExpandedRoster({ team }: { team: LiveTeamPoints }) {
   const forwards = [...team.players]
-    .filter((p) => p.position !== 'D')
+    .filter((p) => p.position !== 'D' && p.position !== 'G')
     .sort((a, b) => b.points - a.points || b.goals - a.goals);
 
   const defensemen = [...team.players]
     .filter((p) => p.position === 'D')
     .sort((a, b) => b.points - a.points || b.goals - a.goals);
+
+  const goalies = [...team.players]
+    .filter((p) => p.position === 'G')
+    .sort((a, b) => b.points - a.points);
 
   return (
     <div className="px-1 pb-3 space-y-1">
@@ -109,8 +123,8 @@ function TeamExpandedRoster({ team }: { team: LiveTeamPoints }) {
         <div className="w-8 shrink-0" />
         <span className="flex-1" />
         <div className="flex items-center gap-2 shrink-0 tabular-nums">
-          <span className="w-[1.75rem] text-center">B</span>
-          <span className="w-[1.75rem] text-center">A</span>
+          <span className="w-[1.75rem] text-center">B/V</span>
+          <span className="w-[1.75rem] text-center">A/BL</span>
           <span className="min-w-[1.5rem] text-right">Pts</span>
         </div>
       </div>
@@ -121,6 +135,10 @@ function TeamExpandedRoster({ team }: { team: LiveTeamPoints }) {
       ))}
       {defensemen.length > 0 && <SectionLabel label="Défense" />}
       {defensemen.map((player) => (
+        <PlayerRow key={player.nhlPlayerId} player={player} />
+      ))}
+      {goalies.length > 0 && <SectionLabel label="Gardiens" />}
+      {goalies.map((player) => (
         <PlayerRow key={player.nhlPlayerId} player={player} />
       ))}
     </div>

@@ -47,8 +47,17 @@ export function FeedPlayerRow({ player, rank, animationDelay }: FeedPlayerRowPro
 
       {/* Stats */}
       <div className="flex items-center gap-2 shrink-0 tabular-nums text-xs">
-        <span className="w-[1.75rem] text-center text-muted-foreground">{player.goals}</span>
-        <span className="w-[1.75rem] text-center text-muted-foreground">{player.assists}</span>
+        {player.position === 'G' ? (
+          <>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.wins ?? 0}</span>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.shutouts ?? 0}</span>
+          </>
+        ) : (
+          <>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.goals}</span>
+            <span className="w-[1.75rem] text-center text-muted-foreground">{player.assists}</span>
+          </>
+        )}
         <span className="font-bold text-primary min-w-[1.5rem] text-right">{player.points}</span>
       </div>
     </Link>

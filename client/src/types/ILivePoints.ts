@@ -9,6 +9,8 @@ export interface LivePlayerPoints {
   goals: number;
   assists: number;
   points: number;
+  wins?: number;
+  shutouts?: number;
   poolTeam?: {
     id: number;
     nom: string;
@@ -23,6 +25,7 @@ export interface LiveTeamPoints {
   totalAssists: number;
   attaquePoints: number;
   defensePoints: number;
+  gardienPoints: number;
   players: LivePlayerPoints[];
 }
 
