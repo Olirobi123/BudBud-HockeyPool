@@ -151,8 +151,10 @@ export class LivePointsService {
       ...goaliePlayers,
     ].sort((a, b) => b.points - a.points || b.goals - a.goals);
 
-    // Top 10 for the feed
-    const topPlayers = allPlayers.slice(0, TOP_PLAYERS_LIMIT);
+    // Top 10 for the feed — exclude goalies
+    const topPlayers = allPlayers
+      .filter((p) => p.position !== GOALIE_POSITION)
+      .slice(0, TOP_PLAYERS_LIMIT);
 
     // Build team leaderboard from owned players, including teams with 0 points
     const teamLeaderboard = await this.buildTeamLeaderboard(allPlayers);
@@ -230,6 +232,7 @@ export class LivePointsService {
     // Track the last goalie seen in net per team and goals against per goalie
     const lastGoalieByTeam = new Map<number, number>();
     const goalsAgainstMap = new Map<number, number>();
+    const playedGoalies = new Set<number>();
 
     // Accumulate goals/assists and track goalie activity from play-by-play
     for (const play of pbp.plays ?? []) {
@@ -238,6 +241,7 @@ export class LivePointsService {
 
       // Update last-goalie-in-net tracking (any play that includes goalieInNetId)
       if (details.goalieInNetId != null) {
+        playedGoalies.add(details.goalieInNetId);
         const goalieTeamId = goalieTeamMap.get(details.goalieInNetId);
         if (goalieTeamId != null) {
           lastGoalieByTeam.set(goalieTeamId, details.goalieInNetId);
@@ -265,6 +269,13 @@ export class LivePointsService {
           details.goalieInNetId,
           (goalsAgainstMap.get(details.goalieInNetId) ?? 0) + 1,
         );
+      }
+    }
+
+    // Remove goalies who never appeared in net (backup/healthy scratch)
+    for (const [playerId, player] of Array.from(playerMap.entries())) {
+      if (player.position === GOALIE_POSITION && !playedGoalies.has(playerId)) {
+        playerMap.delete(playerId);
       }
     }
 

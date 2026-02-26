@@ -1,4 +1,7 @@
-import { JSX } from 'react';
+import {
+  JSX, useRef, useCallback, useState, useEffect,
+} from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import useNHLScores from '@/hooks/useNHLScores';
 import { GameScore } from '@/types';
 import { cn } from '@/lib/utils';
@@ -173,6 +176,22 @@ function TickerLabel(): JSX.Element {
 
 export default function LiveScoresTicker(): JSX.Element | null {
   const { data: games, isLoading, error } = useNHLScores();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const check = () => setHasOverflow(el.scrollWidth > el.clientWidth);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [games]);
+
+  const scroll = useCallback((direction: 'left' | 'right') => {
+    scrollRef.current?.scrollBy({ left: direction === 'left' ? -320 : 320, behavior: 'smooth' });
+  }, []);
 
   // Don't render anything if loading, error, or no games
   if (isLoading || error !== null || games === undefined || games.length === 0) {
@@ -190,13 +209,35 @@ export default function LiveScoresTicker(): JSX.Element | null {
   return (
     <div className="w-full ticker-strip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-hide">
-          <TickerLabel />
-          <div className="flex items-center gap-2">
-            {sorted.map((game) => (
-              <GameCard key={game.id} game={game} />
-            ))}
+        <div className="flex items-center gap-1">
+          {hasOverflow && (
+            <button
+              type="button"
+              onClick={() => scroll('left')}
+              className="hidden md:flex flex-shrink-0 items-center justify-center w-6 h-6 rounded-full bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white transition-all"
+              aria-label="Défiler à gauche"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+          <div ref={scrollRef} className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-hide flex-1">
+            <TickerLabel />
+            <div className="flex items-center gap-2">
+              {sorted.map((game) => (
+                <GameCard key={game.id} game={game} />
+              ))}
+            </div>
           </div>
+          {hasOverflow && (
+            <button
+              type="button"
+              onClick={() => scroll('right')}
+              className="hidden md:flex flex-shrink-0 items-center justify-center w-6 h-6 rounded-full bg-white/10 text-slate-300 hover:bg-white/20 hover:text-white transition-all"
+              aria-label="Défiler à droite"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>
