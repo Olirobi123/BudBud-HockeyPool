@@ -32,7 +32,7 @@ export class EchangesService {
 
       return {
         id: String(echange.id),
-        date: new Date(echange.date).toLocaleDateString('fr-CA'),
+        date: echange.date,
         teamA: echange.equipe_source_nom,
         playersA: echange.joueurs_source,
         teamB: echange.equipe_destination_nom,
