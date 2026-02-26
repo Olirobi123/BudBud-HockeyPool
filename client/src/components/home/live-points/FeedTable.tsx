@@ -14,8 +14,8 @@ export function FeedTable({ players }: FeedTableProps) {
         <div className="w-8 shrink-0" />
         <span className="flex-1" />
         <div className="flex items-center gap-2 shrink-0 tabular-nums">
-          <span className="w-[1.75rem] text-center">B</span>
-          <span className="w-[1.75rem] text-center">A</span>
+          <span className="w-[1.75rem] text-center">B/V</span>
+          <span className="w-[1.75rem] text-center">A/BL</span>
           <span className="min-w-[1.5rem] text-right">Pts</span>
         </div>
       </div>
