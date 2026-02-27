@@ -91,21 +91,22 @@ export class LivePointsService {
 
     // Build player accumulator from all games
     const playerMap = new Map<number, PlayerAccumulator>();
+    const playedGoalies = new Set<number>();
 
     for (let i = 0; i < activeGames.length; i++) {
       const pbp = playByPlayResults[i];
       if (!pbp) continue;
 
       const game = activeGames[i];
-      this.processGamePlays(pbp, game, playerMap);
+      this.processGamePlays(pbp, game, playerMap, playedGoalies);
     }
 
-    // Separate skaters and goalies
+    // Separate skaters and goalies (only goalies with at least 1 second of TOI)
     const skaters = Array.from(playerMap.values()).filter(
       (p) => p.position !== GOALIE_POSITION,
     );
     const goalies = Array.from(playerMap.values()).filter(
-      (p) => p.position === GOALIE_POSITION,
+      (p) => p.position === GOALIE_POSITION && playedGoalies.has(p.nhlPlayerId),
     );
 
     // Batch lookup pool ownership for all players
@@ -189,6 +190,7 @@ export class LivePointsService {
     pbp: PlayByPlayResponse,
     game: GameScore,
     playerMap: Map<number, PlayerAccumulator>,
+    playedGoalies: Set<number>,
   ): void {
     const teams = [game.awayTeam, game.homeTeam];
     const teamIdToAbbrev = new Map(teams.map((t) => [t.id, t.abbrev]));
@@ -232,7 +234,6 @@ export class LivePointsService {
     // Track the last goalie seen in net per team and goals against per goalie
     const lastGoalieByTeam = new Map<number, number>();
     const goalsAgainstMap = new Map<number, number>();
-    const playedGoalies = new Set<number>();
 
     // Accumulate goals/assists and track goalie activity from play-by-play
     for (const play of pbp.plays ?? []) {
@@ -272,10 +273,13 @@ export class LivePointsService {
       }
     }
 
-    // Remove goalies who never appeared in net (backup/healthy scratch)
-    for (const [playerId, player] of Array.from(playerMap.entries())) {
-      if (player.position === GOALIE_POSITION && !playedGoalies.has(playerId)) {
-        playerMap.delete(playerId);
+    // Fallback: if no goalieInNetId event was seen (game just started, no shots yet),
+    // include all goalies from this game's roster so starting goalies aren't filtered out
+    const goalieIds = Array.from(goalieTeamMap.keys());
+    const gameHadGoalieEvents = goalieIds.some((id) => playedGoalies.has(id));
+    if (!gameHadGoalieEvents) {
+      for (const goalieId of goalieIds) {
+        playedGoalies.add(goalieId);
       }
     }
 
