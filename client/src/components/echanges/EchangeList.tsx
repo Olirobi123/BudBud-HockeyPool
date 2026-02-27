@@ -14,11 +14,11 @@ export const EchangeList: React.FC<EchangeListProps> = ({ echanges, isFiltered =
   if (safeEchanges.length === 0 && isFiltered) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-12 h-12 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center mb-4">
-          <ArrowLeftRight className="w-5 h-5 text-slate-500" />
+        <div className="w-12 h-12 rounded-xl bg-muted/60 border border-border flex items-center justify-center mb-4">
+          <ArrowLeftRight className="w-5 h-5 text-muted-foreground" />
         </div>
-        <p className="text-slate-400 text-sm font-medium">Aucun échange trouvé</p>
-        <p className="text-slate-600 text-xs mt-1">Essayez de modifier les filtres</p>
+        <p className="text-foreground text-sm font-medium">Aucun échange trouvé</p>
+        <p className="text-muted-foreground text-xs mt-1">Essayez de modifier les filtres</p>
       </div>
     );
   }

@@ -26,12 +26,13 @@ export default function useEchangesFilters(echanges: Echange[]): UseEchangesFilt
   }, [echanges]);
 
   const years = useMemo(() => {
-    const yearSet = new Set<string>();
+    const seasonSet = new Set<string>();
     echanges.forEach((e) => {
-      const year = e.date.slice(0, 4);
-      yearSet.add(year);
+      const [y, m] = e.date.split('-').map(Number);
+      const season = m >= 9 ? String(y + 1) : String(y);
+      seasonSet.add(season);
     });
-    return Array.from(yearSet).sort((a, b) => b.localeCompare(a));
+    return Array.from(seasonSet).sort((a, b) => b.localeCompare(a));
   }, [echanges]);
 
   const filtered = useMemo(
@@ -39,7 +40,9 @@ export default function useEchangesFilters(echanges: Echange[]): UseEchangesFilt
       const teamMatch = selectedTeam === ''
         || e.equipe_source_nom === selectedTeam
         || e.equipe_destination_nom === selectedTeam;
-      const yearMatch = selectedYear === '' || e.date.startsWith(selectedYear);
+      const yearMatch = selectedYear === ''
+        || (e.date >= `${Number(selectedYear) - 1}-09-01`
+          && e.date < `${selectedYear}-09-01`);
       return teamMatch && yearMatch;
     }),
     [echanges, selectedTeam, selectedYear],
