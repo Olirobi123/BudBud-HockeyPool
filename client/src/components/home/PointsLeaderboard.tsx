@@ -17,6 +17,7 @@ type RankingCategory = 'general' | 'attaque' | 'defense' | 'gardiens';
 interface CategoryConfig {
   key: RankingCategory;
   label: string;
+  mobileLabel: string;
   colLabel: string;
   pointsKey: keyof TeamPointsRanking;
   activeClass: string;
@@ -27,6 +28,7 @@ const CATEGORIES: CategoryConfig[] = [
   {
     key: 'general',
     label: 'Général',
+    mobileLabel: 'Gén',
     colLabel: 'Pts',
     pointsKey: 'total_points',
     activeClass: 'bg-blue-600/90 text-white shadow-sm',
@@ -35,6 +37,7 @@ const CATEGORIES: CategoryConfig[] = [
   {
     key: 'attaque',
     label: 'Attaque',
+    mobileLabel: 'Att',
     colLabel: 'Att',
     pointsKey: 'attaque_points',
     activeClass: 'bg-orange-500/90 text-white shadow-sm',
@@ -43,6 +46,7 @@ const CATEGORIES: CategoryConfig[] = [
   {
     key: 'defense',
     label: 'Défense',
+    mobileLabel: 'Déf',
     colLabel: 'Déf',
     pointsKey: 'defense_points',
     activeClass: 'bg-emerald-600/90 text-white shadow-sm',
@@ -51,6 +55,7 @@ const CATEGORIES: CategoryConfig[] = [
   {
     key: 'gardiens',
     label: 'Gardiens',
+    mobileLabel: 'Gar',
     colLabel: 'Gar',
     pointsKey: 'gardien_points',
     activeClass: 'bg-rose-600/90 text-white shadow-sm',
@@ -117,13 +122,14 @@ function CategoryToggle({ active, onChange }: CategoryToggleProps) {
             type="button"
             onClick={() => onChange(cat.key)}
             className={cn(
-              'px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-colors',
+              'px-1.5 sm:px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-normal sm:tracking-wide transition-colors',
               isActive
                 ? cat.activeClass
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/60',
             )}
           >
-            {cat.label}
+            <span className="sm:hidden">{cat.mobileLabel}</span>
+            <span className="hidden sm:inline">{cat.label}</span>
           </button>
         );
       })}
