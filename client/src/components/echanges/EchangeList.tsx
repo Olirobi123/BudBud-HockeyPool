@@ -1,13 +1,27 @@
 import React from 'react';
+import { ArrowLeftRight } from 'lucide-react';
 import Echange from '@/types/IEchange';
 import { EchangeCard } from './EchangeCard';
 
 interface EchangeListProps {
   echanges?: Echange[];
+  isFiltered?: boolean;
 }
 
-export const EchangeList: React.FC<EchangeListProps> = ({ echanges }) => {
+export const EchangeList: React.FC<EchangeListProps> = ({ echanges, isFiltered = false }) => {
   const safeEchanges = echanges ?? [];
+
+  if (safeEchanges.length === 0 && isFiltered) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-12 h-12 rounded-xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-center mb-4">
+          <ArrowLeftRight className="w-5 h-5 text-slate-500" />
+        </div>
+        <p className="text-slate-400 text-sm font-medium">Aucun échange trouvé</p>
+        <p className="text-slate-600 text-xs mt-1">Essayez de modifier les filtres</p>
+      </div>
+    );
+  }
 
   // Group by month (YYYY-MM)
   const echangesParMois = safeEchanges.reduce((acc, echange) => {
