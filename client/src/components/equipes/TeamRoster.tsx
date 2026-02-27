@@ -93,7 +93,7 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                   </TableRow>
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
-                  <TableCell className="max-w-0 px-2 sm:px-4">
+                  <TableCell className="max-w-0 px-2 sm:px-4 py-1.5 sm:py-2">
                     <div className="flex items-center gap-1.5">
                       <Link
                         to={`/joueur/${player.nhl_player_id}`}
@@ -103,7 +103,7 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                           <img
                             src={player.teamLogo}
                             alt=""
-                            className="w-8 h-8 sm:w-11 sm:h-11 object-contain shrink-0"
+                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
                           />
                         )}
                         <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
@@ -113,19 +113,19 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
                     {stats?.gamesPlayed ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
                     {stats?.goals ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-0 sm:px-4 hidden sm:table-cell">
+                  <TableCell className="text-center px-0 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
                     {stats?.assists ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-0 sm:px-4 font-semibold text-primary tabular-nums">
+                  <TableCell className="text-center px-0 sm:px-4 py-1.5 sm:py-2 font-semibold text-primary tabular-nums">
                     {stats?.points ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-0 sm:px-4">
+                  <TableCell className="text-center px-0 sm:px-4 py-1.5 sm:py-2">
                     {stats ? stats.ppm.toFixed(2) : '-'}
                   </TableCell>
                 </TableRow>
@@ -200,7 +200,7 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
                   </TableRow>
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
-                  <TableCell className="max-w-0 px-2 sm:px-4">
+                  <TableCell className="max-w-0 px-2 sm:px-4 py-1.5 sm:py-2">
                     <div className="flex items-center gap-1.5">
                       <Link
                         to={`/joueur/${player.nhl_player_id}`}
@@ -210,7 +210,7 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
                           <img
                             src={player.teamLogo}
                             alt=""
-                            className="w-8 h-8 sm:w-11 sm:h-11 object-contain shrink-0"
+                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
                           />
                         )}
                         <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
@@ -220,19 +220,19 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
                     {stats?.gamesPlayed ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
                     {stats?.wins ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 hidden sm:table-cell">
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
                     {stats?.shutouts ?? '-'}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 font-semibold text-primary tabular-nums">
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 font-semibold text-primary tabular-nums">
                     {poolPts}
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4">
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
                     {stats ? stats.ppm.toFixed(2) : '-'}
                   </TableCell>
                 </TableRow>
