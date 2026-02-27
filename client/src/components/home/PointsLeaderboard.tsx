@@ -17,34 +17,44 @@ type RankingCategory = 'general' | 'attaque' | 'defense' | 'gardiens';
 interface CategoryConfig {
   key: RankingCategory;
   label: string;
+  colLabel: string;
   pointsKey: keyof TeamPointsRanking;
   activeClass: string;
+  valueClass: string;
 }
 
 const CATEGORIES: CategoryConfig[] = [
   {
     key: 'general',
     label: 'Général',
+    colLabel: 'Pts',
     pointsKey: 'total_points',
-    activeClass: 'bg-amber-500/90 text-black shadow-sm',
+    activeClass: 'bg-blue-600/90 text-white shadow-sm',
+    valueClass: 'text-blue-400',
   },
   {
     key: 'attaque',
     label: 'Attaque',
+    colLabel: 'Att',
     pointsKey: 'attaque_points',
     activeClass: 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/40 shadow-sm',
+    valueClass: 'text-cyan-300',
   },
   {
     key: 'defense',
     label: 'Défense',
+    colLabel: 'Déf',
     pointsKey: 'defense_points',
-    activeClass: 'bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/40 shadow-sm',
+    activeClass: 'bg-indigo-500/20 text-indigo-300 ring-1 ring-indigo-500/40 shadow-sm',
+    valueClass: 'text-indigo-300',
   },
   {
     key: 'gardiens',
     label: 'Gardiens',
+    colLabel: 'Gar',
     pointsKey: 'gardien_points',
     activeClass: 'bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/40 shadow-sm',
+    valueClass: 'text-violet-300',
   },
 ];
 
@@ -180,34 +190,26 @@ function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
         <span className="flex-1 text-sm font-semibold text-foreground min-w-0 truncate">
           {team.nom}
         </span>
-        <span className={cn(
-          'w-9 text-center tabular-nums text-xs shrink-0',
-          activeCategory === 'attaque' ? 'text-cyan-300 font-bold' : 'text-muted-foreground',
+        {activeCategory === 'general' ? (
+          <>
+            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+              {team.attaque_points}
+            </span>
+            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+              {team.defense_points}
+            </span>
+            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+              {team.gardien_points}
+            </span>
+            <span className={cn('w-9 text-center tabular-nums text-sm font-bold shrink-0', activeCfg.valueClass)}>
+              {team.total_points}
+            </span>
+          </>
+        ) : (
+          <span className={cn('w-9 text-center tabular-nums text-sm font-bold shrink-0', activeCfg.valueClass)}>
+            {activePoints}
+          </span>
         )}
-        >
-          {team.attaque_points}
-        </span>
-        <span className={cn(
-          'w-9 text-center tabular-nums text-xs shrink-0',
-          activeCategory === 'defense' ? 'text-blue-300 font-bold' : 'text-muted-foreground',
-        )}
-        >
-          {team.defense_points}
-        </span>
-        <span className={cn(
-          'w-9 text-center tabular-nums text-xs shrink-0',
-          activeCategory === 'gardiens' ? 'text-violet-300 font-bold' : 'text-muted-foreground',
-        )}
-        >
-          {team.gardien_points}
-        </span>
-        <span className={cn(
-          'w-9 text-center tabular-nums text-sm font-bold shrink-0',
-          activeCategory === 'general' ? 'text-amber-400' : 'text-primary',
-        )}
-        >
-          {team.total_points}
-        </span>
         <DiffCell diff={diff} />
       </div>
 
@@ -225,46 +227,34 @@ function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
           )}
         </div>
         <div className="flex items-center gap-3 mt-1 pl-8 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground tabular-nums">
-          <span>
-            {'Att '}
-            <span className={cn(
-              activeCategory === 'attaque' ? 'text-cyan-300' : 'text-foreground',
-            )}
-            >
-              {team.attaque_points}
+          {activeCategory === 'general' ? (
+            <>
+              <span>
+                {'Att '}
+                <span className="text-foreground">{team.attaque_points}</span>
+              </span>
+              <span className="w-px h-3 bg-border/60" />
+              <span>
+                {'Déf '}
+                <span className="text-foreground">{team.defense_points}</span>
+              </span>
+              <span className="w-px h-3 bg-border/60" />
+              <span>
+                {'Gar '}
+                <span className="text-foreground">{team.gardien_points}</span>
+              </span>
+              <span className="w-px h-3 bg-border/60" />
+              <span>
+                {'Pts '}
+                <span className={cn('font-bold', activeCfg.valueClass)}>{team.total_points}</span>
+              </span>
+            </>
+          ) : (
+            <span>
+              {`${activeCfg.colLabel} `}
+              <span className={cn('font-bold', activeCfg.valueClass)}>{activePoints}</span>
             </span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'Déf '}
-            <span className={cn(
-              activeCategory === 'defense' ? 'text-blue-300' : 'text-foreground',
-            )}
-            >
-              {team.defense_points}
-            </span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'Gar '}
-            <span className={cn(
-              activeCategory === 'gardiens' ? 'text-violet-300' : 'text-foreground',
-            )}
-            >
-              {team.gardien_points}
-            </span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'Pts '}
-            <span className={cn(
-              'font-bold',
-              activeCategory === 'general' ? 'text-amber-400' : 'text-primary',
-            )}
-            >
-              {team.total_points}
-            </span>
-          </span>
+          )}
         </div>
       </div>
     </Link>
@@ -290,34 +280,18 @@ function RankingsList({ teams, activeCategory }: RankingsListProps) {
       <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
         <span className="w-6 shrink-0" />
         <span className="flex-1">Équipe</span>
-        <span className={cn(
-          'w-9 text-center shrink-0',
-          activeCategory === 'attaque' && 'text-cyan-300',
+        {activeCategory === 'general' ? (
+          <>
+            <span className="w-9 text-center shrink-0">Att</span>
+            <span className="w-9 text-center shrink-0">Déf</span>
+            <span className="w-9 text-center shrink-0">Gar</span>
+            <span className={cn('w-9 text-center shrink-0', activeCfg.valueClass)}>Pts</span>
+          </>
+        ) : (
+          <span className={cn('w-9 text-center shrink-0', activeCfg.valueClass)}>
+            {activeCfg.colLabel}
+          </span>
         )}
-        >
-          Att
-        </span>
-        <span className={cn(
-          'w-9 text-center shrink-0',
-          activeCategory === 'defense' && 'text-blue-300',
-        )}
-        >
-          Déf
-        </span>
-        <span className={cn(
-          'w-9 text-center shrink-0',
-          activeCategory === 'gardiens' && 'text-violet-300',
-        )}
-        >
-          Gar
-        </span>
-        <span className={cn(
-          'w-9 text-center shrink-0',
-          activeCategory === 'general' && 'text-amber-400',
-        )}
-        >
-          Pts
-        </span>
         <span className="w-10 text-center shrink-0">Diff</span>
       </div>
 
