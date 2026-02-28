@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import { Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -6,6 +7,61 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import type { TeamPointsRanking } from '@/types/IEquipes';
+
+/* ------------------------------------------------------------------ */
+/*  Ranking category                                                   */
+/* ------------------------------------------------------------------ */
+
+type RankingCategory = 'general' | 'attaque' | 'defense' | 'gardiens';
+
+interface CategoryConfig {
+  key: RankingCategory;
+  label: string;
+  mobileLabel: string;
+  colLabel: string;
+  pointsKey: keyof TeamPointsRanking;
+  activeClass: string;
+  valueClass: string;
+}
+
+const CATEGORIES: CategoryConfig[] = [
+  {
+    key: 'general',
+    label: 'Général',
+    mobileLabel: 'Gén',
+    colLabel: 'Pts',
+    pointsKey: 'total_points',
+    activeClass: 'bg-blue-600/90 text-white shadow-sm',
+    valueClass: 'text-blue-400',
+  },
+  {
+    key: 'attaque',
+    label: 'Attaque',
+    mobileLabel: 'Att',
+    colLabel: 'Att',
+    pointsKey: 'attaque_points',
+    activeClass: 'bg-orange-500/90 text-white shadow-sm',
+    valueClass: 'text-orange-400',
+  },
+  {
+    key: 'defense',
+    label: 'Défense',
+    mobileLabel: 'Déf',
+    colLabel: 'Déf',
+    pointsKey: 'defense_points',
+    activeClass: 'bg-emerald-600/90 text-white shadow-sm',
+    valueClass: 'text-emerald-400',
+  },
+  {
+    key: 'gardiens',
+    label: 'Gardiens',
+    mobileLabel: 'Gar',
+    colLabel: 'Gar',
+    pointsKey: 'gardien_points',
+    activeClass: 'bg-rose-600/90 text-white shadow-sm',
+    valueClass: 'text-rose-400',
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Skeleton                                                           */
@@ -47,6 +103,41 @@ function PointsLeaderboardEmpty() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Category toggle group                                              */
+/* ------------------------------------------------------------------ */
+
+interface CategoryToggleProps {
+  active: RankingCategory;
+  onChange: (cat: RankingCategory) => void;
+}
+
+function CategoryToggle({ active, onChange }: CategoryToggleProps) {
+  return (
+    <div className="grid grid-cols-4 sm:inline-flex gap-1 p-1 rounded-lg bg-muted/40 border border-border/40 w-full sm:w-auto">
+      {CATEGORIES.map((cat) => {
+        const isActive = active === cat.key;
+        return (
+          <button
+            key={cat.key}
+            type="button"
+            onClick={() => onChange(cat.key)}
+            className={cn(
+              'px-1.5 sm:px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-normal sm:tracking-wide transition-colors',
+              isActive
+                ? cat.activeClass
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/60',
+            )}
+          >
+            <span className="sm:hidden">{cat.mobileLabel}</span>
+            <span className="hidden sm:inline">{cat.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Rank badge                                                         */
 /* ------------------------------------------------------------------ */
 
@@ -65,7 +156,7 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Team row                                                           */
+/*  Diff cell                                                          */
 /* ------------------------------------------------------------------ */
 
 function DiffCell({ diff }: { diff: number }) {
@@ -79,8 +170,21 @@ function DiffCell({ diff }: { diff: number }) {
   );
 }
 
-function TeamRow({ team, leader }: { team: TeamPointsRanking; leader: number }) {
-  const diff = leader - team.total_points;
+/* ------------------------------------------------------------------ */
+/*  Team row                                                           */
+/* ------------------------------------------------------------------ */
+
+interface TeamRowProps {
+  team: TeamPointsRanking;
+  leader: number;
+  activeCategory: RankingCategory;
+}
+
+function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
+  const activeCfg = CATEGORIES.find((c) => c.key === activeCategory)!;
+  const activePoints = team[activeCfg.pointsKey] as number;
+  const diff = leader - activePoints;
+
   return (
     <Link
       to={`/equipes/${team.id}`}
@@ -92,18 +196,26 @@ function TeamRow({ team, leader }: { team: TeamPointsRanking; leader: number }) 
         <span className="flex-1 text-sm font-semibold text-foreground min-w-0 truncate">
           {team.nom}
         </span>
-        <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-          {team.attaque_points}
-        </span>
-        <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-          {team.defense_points}
-        </span>
-        <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-          {team.gardien_points}
-        </span>
-        <span className="w-9 text-center tabular-nums text-sm font-bold text-primary shrink-0">
-          {team.total_points}
-        </span>
+        {activeCategory === 'general' ? (
+          <>
+            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+              {team.attaque_points}
+            </span>
+            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+              {team.defense_points}
+            </span>
+            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+              {team.gardien_points}
+            </span>
+            <span className={cn('w-9 text-center tabular-nums text-sm font-bold shrink-0', activeCfg.valueClass)}>
+              {team.total_points}
+            </span>
+          </>
+        ) : (
+          <span className={cn('w-9 text-center tabular-nums text-sm font-bold shrink-0', activeCfg.valueClass)}>
+            {activePoints}
+          </span>
+        )}
         <DiffCell diff={diff} />
       </div>
 
@@ -121,25 +233,34 @@ function TeamRow({ team, leader }: { team: TeamPointsRanking; leader: number }) 
           )}
         </div>
         <div className="flex items-center gap-3 mt-1 pl-8 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground tabular-nums">
-          <span>
-            {'Att '}
-            <span className="text-foreground">{team.attaque_points}</span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'Déf '}
-            <span className="text-foreground">{team.defense_points}</span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'Gar '}
-            <span className="text-foreground">{team.gardien_points}</span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'Pts '}
-            <span className="text-sm font-bold text-primary">{team.total_points}</span>
-          </span>
+          {activeCategory === 'general' ? (
+            <>
+              <span>
+                {'Att '}
+                <span className="text-foreground">{team.attaque_points}</span>
+              </span>
+              <span className="w-px h-3 bg-border/60" />
+              <span>
+                {'Déf '}
+                <span className="text-foreground">{team.defense_points}</span>
+              </span>
+              <span className="w-px h-3 bg-border/60" />
+              <span>
+                {'Gar '}
+                <span className="text-foreground">{team.gardien_points}</span>
+              </span>
+              <span className="w-px h-3 bg-border/60" />
+              <span>
+                {'Pts '}
+                <span className={cn('font-bold', activeCfg.valueClass)}>{team.total_points}</span>
+              </span>
+            </>
+          ) : (
+            <span>
+              {`${activeCfg.colLabel} `}
+              <span className={cn('font-bold', activeCfg.valueClass)}>{activePoints}</span>
+            </span>
+          )}
         </div>
       </div>
     </Link>
@@ -150,23 +271,43 @@ function TeamRow({ team, leader }: { team: TeamPointsRanking; leader: number }) 
 /*  Main list                                                          */
 /* ------------------------------------------------------------------ */
 
-function RankingsList({ teams }: { teams: TeamPointsRanking[] }) {
-  const leader = teams[0]?.total_points ?? 0;
+interface RankingsListProps {
+  teams: TeamPointsRanking[];
+  activeCategory: RankingCategory;
+}
+
+function RankingsList({ teams, activeCategory }: RankingsListProps) {
+  const activeCfg = CATEGORIES.find((c) => c.key === activeCategory)!;
+  const leader = (teams[0]?.[activeCfg.pointsKey] as number) ?? 0;
+
   return (
     <div className="space-y-1.5">
       {/* Column headers — visible on sm+ */}
       <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
         <span className="w-6 shrink-0" />
         <span className="flex-1">Équipe</span>
-        <span className="w-9 text-center shrink-0">Att</span>
-        <span className="w-9 text-center shrink-0">Déf</span>
-        <span className="w-9 text-center shrink-0">Gar</span>
-        <span className="w-9 text-center shrink-0">Pts</span>
+        {activeCategory === 'general' ? (
+          <>
+            <span className="w-9 text-center shrink-0">Att</span>
+            <span className="w-9 text-center shrink-0">Déf</span>
+            <span className="w-9 text-center shrink-0">Gar</span>
+            <span className={cn('w-9 text-center shrink-0', activeCfg.valueClass)}>Pts</span>
+          </>
+        ) : (
+          <span className={cn('w-9 text-center shrink-0', activeCfg.valueClass)}>
+            {activeCfg.colLabel}
+          </span>
+        )}
         <span className="w-10 text-center shrink-0">Diff</span>
       </div>
 
       {teams.map((team) => (
-        <TeamRow key={team.id} team={team} leader={leader} />
+        <TeamRow
+          key={team.id}
+          team={team}
+          leader={leader}
+          activeCategory={activeCategory}
+        />
       ))}
     </div>
   );
@@ -182,19 +323,37 @@ interface PointsLeaderboardProps {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export function PointsLeaderboard({ teams, isLoading }: PointsLeaderboardProps) {
+export function PointsLeaderboard({ teams, isLoading }: PointsLeaderboardProps): JSX.Element {
+  const [activeCategory, setActiveCategory] = useState<RankingCategory>('general');
+
+  const sortedTeams = useMemo<TeamPointsRanking[]>(() => {
+    const activeCfg = CATEGORIES.find((c) => c.key === activeCategory)!;
+    return [...teams]
+      .sort((a, b) => {
+        const aVal = a[activeCfg.pointsKey] as number;
+        const bVal = b[activeCfg.pointsKey] as number;
+        return bVal - aVal;
+      })
+      .map((team, i) => ({ ...team, rank: i + 1 }));
+  }, [teams, activeCategory]);
+
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-amber-400" />
-          <span>Classement général</span>
-        </CardTitle>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-400" />
+            <span>Classement général</span>
+          </CardTitle>
+          <CategoryToggle active={activeCategory} onChange={setActiveCategory} />
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading && <PointsLeaderboardSkeleton />}
         {!isLoading && teams.length === 0 && <PointsLeaderboardEmpty />}
-        {!isLoading && teams.length > 0 && <RankingsList teams={teams} />}
+        {!isLoading && teams.length > 0 && (
+          <RankingsList teams={sortedTeams} activeCategory={activeCategory} />
+        )}
       </CardContent>
     </Card>
   );

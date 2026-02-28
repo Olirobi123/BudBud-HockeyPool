@@ -1,7 +1,10 @@
 import { ArrowLeftRight } from 'lucide-react';
+import Echange from '@/types/IEchange';
 import { useEchanges } from '@/hooks/echanges/useEchanges';
+import useEchangesFilters from '@/hooks/echanges/useEchangesFilters';
 import { ErrorDisplay } from '@/components/ui/error-display';
 import { EchangeList } from '@/components/echanges/EchangeList';
+import EchangeFilters from '@/components/echanges/EchangeFilters';
 import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
 import { usePageLoading } from '@/hooks/usePageLoading';
@@ -28,6 +31,45 @@ function HeroBanner({ count }: { count: number }) {
         </div>
       </div>
     </div>
+  );
+}
+
+interface EchangesContentProps {
+  confirmed: Echange[];
+}
+
+function EchangesContent({ confirmed }: EchangesContentProps) {
+  const {
+    teams,
+    years,
+    selectedTeam,
+    setSelectedTeam,
+    selectedYear,
+    setSelectedYear,
+    filtered,
+    hasActiveFilter,
+  } = useEchangesFilters(confirmed);
+
+  const handleReset = () => {
+    setSelectedTeam('');
+    setSelectedYear('');
+  };
+
+  return (
+    <>
+      <EchangeFilters
+        teams={teams}
+        years={years}
+        selectedTeam={selectedTeam}
+        setSelectedTeam={setSelectedTeam}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        hasActiveFilter={hasActiveFilter}
+        onReset={handleReset}
+        filteredCount={filtered.length}
+      />
+      <EchangeList echanges={filtered} isFiltered={hasActiveFilter} />
+    </>
   );
 }
 
@@ -60,7 +102,7 @@ export default function Echanges() {
 
   return (
     <Layout beforeContainer={<HeroBanner count={confirmed.length} />}>
-      <EchangeList echanges={confirmed} />
+      <EchangesContent confirmed={confirmed} />
     </Layout>
   );
 }
