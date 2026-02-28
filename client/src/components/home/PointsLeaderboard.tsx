@@ -31,8 +31,8 @@ const CATEGORIES: CategoryConfig[] = [
     mobileLabel: 'Gén',
     colLabel: 'Pts',
     pointsKey: 'total_points',
-    activeClass: 'bg-amber-500/90 text-amber-950 shadow-sm',
-    valueClass: 'text-amber-400',
+    activeClass: 'bg-blue-600/90 text-white shadow-sm',
+    valueClass: 'text-blue-400',
   },
   {
     key: 'attaque',
@@ -40,8 +40,8 @@ const CATEGORIES: CategoryConfig[] = [
     mobileLabel: 'Att',
     colLabel: 'Att',
     pointsKey: 'attaque_points',
-    activeClass: 'bg-red-600/90 text-white shadow-sm',
-    valueClass: 'text-red-400',
+    activeClass: 'bg-blue-600/90 text-white shadow-sm',
+    valueClass: 'text-blue-400',
   },
   {
     key: 'defense',
@@ -58,8 +58,8 @@ const CATEGORIES: CategoryConfig[] = [
     mobileLabel: 'Gar',
     colLabel: 'Gar',
     pointsKey: 'gardien_points',
-    activeClass: 'bg-purple-600/90 text-white shadow-sm',
-    valueClass: 'text-purple-400',
+    activeClass: 'bg-blue-600/90 text-white shadow-sm',
+    valueClass: 'text-blue-400',
   },
 ];
 
