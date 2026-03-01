@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(helmet());
 
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 
 
