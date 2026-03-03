@@ -45,13 +45,15 @@ export const QUERIES = {
       e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
       src.nom  AS equipe_source_nom,
       dest.nom AS equipe_destination_nom,
-      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_source_id
-        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
-        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre)
+        ORDER BY (ej.joueur_id IS NULL), ej.id
+      ) FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
         ARRAY[]::text[]) AS joueurs_source,
-      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_destination_id
-        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
-        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre)
+        ORDER BY (ej.joueur_id IS NULL), ej.id
+      ) FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
         ARRAY[]::text[]) AS joueurs_destination
     FROM ${TABLES.ECHANGES} e
     JOIN ${TABLES.EQUIPES} src  ON e.equipe_source_id      = src.id
@@ -66,13 +68,15 @@ export const QUERIES = {
       e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
       src.nom  AS equipe_source_nom,
       dest.nom AS equipe_destination_nom,
-      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_source_id
-        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
-        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre)
+        ORDER BY (ej.joueur_id IS NULL), ej.id
+      ) FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
         ARRAY[]::text[]) AS joueurs_source,
-      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_destination_id
-        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
-        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre)
+        ORDER BY (ej.joueur_id IS NULL), ej.id
+      ) FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
         ARRAY[]::text[]) AS joueurs_destination
     FROM ${TABLES.ECHANGES} e
     JOIN ${TABLES.EQUIPES} src  ON e.equipe_source_id      = src.id
@@ -88,13 +92,15 @@ export const QUERIES = {
       e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
       src.nom  AS equipe_source_nom,
       dest.nom AS equipe_destination_nom,
-      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_source_id
-        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
-        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre)
+        ORDER BY (ej.joueur_id IS NULL), ej.id
+      ) FILTER (WHERE ej.equipe_receptrice_id = e.equipe_source_id),
         ARRAY[]::text[]) AS joueurs_source,
-      COALESCE(array_agg(DISTINCT CASE WHEN ej.equipe_receptrice_id = e.equipe_destination_id
-        THEN COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre) END)
-        FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(j.prenom, ' ', j.nom)), ''), ej.joueur_nom_libre)
+        ORDER BY (ej.joueur_id IS NULL), ej.id
+      ) FILTER (WHERE ej.equipe_receptrice_id = e.equipe_destination_id),
         ARRAY[]::text[]) AS joueurs_destination
     FROM ${TABLES.ECHANGES} e
     JOIN ${TABLES.EQUIPES} src  ON e.equipe_source_id      = src.id
