@@ -86,7 +86,6 @@ Before implementing features, consult in this order:
 
 ### Branch Strategy
 - **main** - Production (deployed to production environment)
-- **acceptation** - Staging/QA (deployed to staging environment)
 - **dev** - Development integration branch
 - **feature/*** - Feature branches (created from `dev`)
 
@@ -96,23 +95,45 @@ When implementing a new feature or fix:
 1. **Always create a feature branch** from `dev`:
    ```bash
    git checkout dev
-   git pull origin dev
+   git pull --rebase origin dev
    git checkout -b feature/descriptive-name
    ```
 
-2. **Make commits** following conventional commit style
+2. **Make commits** following conventional commit style — **never add Claude as co-author**
 
-3. **When the feature is ready**, create a Pull Request:
+3. **Before creating a PR**, rebase on the latest `dev` to avoid conflicts and keep history linear:
+   ```bash
+   git fetch origin
+   git rebase origin/dev
+   ```
+
+4. **When the feature is ready**, create a Pull Request:
    - Target branch: `dev`
    - Use `gh pr create` to create the PR
    - Include a clear description of changes
+   - Use **Squash and merge** or **Rebase and merge** on GitHub — never "Create a merge commit"
 
-4. **Never push directly** to `main`, `acceptation`, or `dev`
+5. **Never push directly** to `main` or `dev`
 
 ### Promotion Flow
 ```
-feature/* → dev → acceptation → main
+feature/* → dev → main
 ```
+
+### Merging dev → main
+When promoting `dev` to `main`:
+
+1. **Rebase dev on main** to ensure a linear history:
+   ```bash
+   git fetch origin
+   git checkout dev
+   git rebase origin/main
+   ```
+
+2. **Create a PR** from `dev` to `main`:
+   ```bash
+   gh pr create --base main --head dev
+   ```
 
 ## Current Development Status
 
