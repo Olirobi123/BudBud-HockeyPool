@@ -26,6 +26,11 @@ Collect any missing information before starting:
 - **Ballotage type** — mars = `type_id=4`, décembre = `type_id=1`
 - **Year** — e.g. `2026`
 - **Target branch** — default is `development`
+- **Update rosters?** — Ask: *"Do you want me to automatically move players between teams (remove waived players, add drafted players to their new teams)? Or just record the ballotage history without touching rosters?"*
+  - **Yes** → run all 4 DB statements including `equipe_joueurs` changes (current ballotage, rosters need updating)
+  - **No** → only insert `mis_au_ballotage` + `repechages`, skip roster changes (historical entry, rosters already correct)
+
+Store this as `UPDATE_ROSTERS`. If **no**, skip Statements 2 and 4 in Steps 5–8, and skip the `equipe_joueurs_id_seq` reset in Step 10a.
 
 Start on `development` rather than `production` directly. This lets you verify data before it goes live and keeps mistakes easy to undo.
 
