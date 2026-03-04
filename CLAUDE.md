@@ -123,17 +123,12 @@ feature/* → dev → main
 ### Merging dev → main
 When promoting `dev` to `main`:
 
-1. **Rebase dev on main** to ensure a linear history:
-   ```bash
-   git fetch origin
-   git checkout dev
-   git rebase origin/main
-   ```
-
-2. **Create a PR** from `dev` to `main`:
+1. **Create a PR** from `dev` to `main`:
    ```bash
    gh pr create --base main --head dev
    ```
+
+2. **Merge using "Rebase and merge"** on GitHub — the rebase happens at merge time, keeping history linear.
 
 ## Current Development Status
 
