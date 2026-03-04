@@ -22,7 +22,7 @@ export const teamImages: Record<number, TeamImage> = {
   6:  { src: '/images/teams/6.png',  format: 'png' },
   7:  { src: '/images/teams/7.png',  format: 'png' },
   8:  { src: '/images/teams/8.png',  format: 'png' },
-  9:  { src: '/images/teams/9.png',  format: 'png' },
+  9:  { src: '/images/teams/9.jpg',  format: 'jpg' },
   10: { src: '/images/teams/10.png', format: 'png' },
   11: { src: '/images/teams/11.png', format: 'png' },
   12: { src: '/images/teams/12.png', format: 'png' },

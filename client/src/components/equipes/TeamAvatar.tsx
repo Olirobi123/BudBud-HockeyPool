@@ -20,6 +20,7 @@ interface TeamAvatarProps {
 export function TeamAvatar({ teamId, teamName, size = 'md', bordered = true, className = '' }: TeamAvatarProps) {
   const [imgError, setImgError] = useState(false);
   const teamImage = getTeamImage(teamId);
+
   const { outer, icon, padding } = sizeMap[size];
   const border = bordered ? 'border-4 border-white' : '';
 
@@ -38,6 +39,7 @@ export function TeamAvatar({ teamId, teamName, size = 'md', bordered = true, cla
           src={teamImage.src}
           alt={teamName}
           className={`${outer} rounded-full object-contain ${padding}`}
+          fetchPriority="high"
           onError={() => setImgError(true)}
         />
       </div>
@@ -50,6 +52,7 @@ export function TeamAvatar({ teamId, teamName, size = 'md', bordered = true, cla
         src={teamImage.src}
         alt={teamName}
         className="w-full h-full object-cover"
+        fetchPriority="high"
         onError={() => setImgError(true)}
       />
     </div>
