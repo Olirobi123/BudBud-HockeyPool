@@ -12,7 +12,7 @@
     "lint:fix": "eslint . --ext .ts --fix"
   },
   "dependencies": {
-    "@olirobi/nhl_api_client": "^1.0.3",
+    "@olirobi/nhl_api_client": "^1.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
