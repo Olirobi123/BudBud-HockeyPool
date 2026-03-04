@@ -3,6 +3,7 @@ import pool from '../config/database';
 import { QUERIES } from '../models';
 import { LivePlayerPoints, LiveTeamPoints, LivePointsResponse } from '../types';
 import { scoresService } from './scoresService';
+import { calculateGoaliePoints } from '../utils/poolRules';
 
 const ACTIVE_GAME_STATES = ['LIVE', 'CRIT', 'FINAL', 'OFF'];
 const GOALIE_POSITION = 'G';
@@ -144,7 +145,7 @@ export class LivePointsService {
       .map((p) => buildLivePlayer(p, p.goals + p.assists));
 
     const goaliePlayers: LivePlayerPoints[] = goalies
-      .map((p) => buildLivePlayer(p, p.wins * 2 + p.shutouts * 3));
+      .map((p) => buildLivePlayer(p, calculateGoaliePoints(p.wins, p.shutouts)));
 
     // Combine and sort by points descending
     const allPlayers: LivePlayerPoints[] = [
