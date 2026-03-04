@@ -11,7 +11,7 @@ interface TeamHeaderProps {
 export function TeamHeader({ team }: TeamHeaderProps) {
   return (
     <Card className="mb-6 overflow-hidden">
-      <div className="h-24 bg-gradient-to-r from-blue-600 to-cyan-500" />
+      <div className={`h-24 bg-gradient-to-r ${team.division === 'sud' ? 'from-red-600 to-rose-400' : 'from-blue-600 to-cyan-500'}`} />
       <CardContent className="relative pt-0 pb-6">
         <div className="flex flex-col md:flex-row items-center md:items-end -mt-12 px-2 gap-4">
           <div className="rounded-full p-1 bg-white shadow-lg">
