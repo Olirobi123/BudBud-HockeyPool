@@ -39,21 +39,6 @@
 
 > **Workflow Rule:** Whenever a to-do list item is marked as complete, the corresponding checklist in this documentation (Implementation.md) must also be updated to reflect the change. This rule applies to all future iterations and stages.
 
-#### Pending Optimizations (blocked on library update)
-
-**Bulk NHL stats endpoints for points calculation**
-The NHL stats REST API exposes two bulk endpoints that return all players in a single request:
-- `GET https://api.nhle.com/stats/rest/en/skater/summary?cayenneExp=seasonId=YYYYYYYY` — all skaters with goals/assists/points
-- `GET https://api.nhle.com/stats/rest/en/goalie/summary?cayenneExp=seasonId=YYYYYYYY` — all goalies with wins/shutouts
-
-These need to be added to `@olirobi/nhl_api_client` first.
-
-Once available, `pointsService.updateAllTeamPoints()` can be refactored:
-- Replace the per-team `getTeamRosterWithStats()` call (which hits `/player/{id}/landing` per player) with **2 bulk calls** at the start — one for all skaters, one for all goalies
-- Look up each pool player by `playerId` in the bulk response
-- `getTeamRosterWithStats()` keeps using the landing endpoint for the **roster display path** (it still needs `teamLogo` and richer profile data which the bulk endpoint doesn't provide)
-
-**Scope:** `server/services/pointsService.ts` only — the bulk approach only applies to the season standings cron, not the live points snapshot (which uses play-by-play data) and not the team roster display.
 
 ## Resource Links
 - [React Documentation](https://react.dev/)
