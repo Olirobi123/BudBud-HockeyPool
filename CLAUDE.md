@@ -128,7 +128,13 @@ When promoting `dev` to `main`:
    gh pr create --base main --head dev
    ```
 
-2. **Merge using "Rebase and merge"** on GitHub — the rebase happens at merge time, keeping history linear.
+2. **Merge using "Squash and merge"** on GitHub — all dev commits are squashed into one commit on main.
+
+3. **After merging**, reset dev to match main:
+   ```bash
+   git reset --hard origin/main
+   git push --force-with-lease origin dev
+   ```
 
 ## Current Development Status
 
