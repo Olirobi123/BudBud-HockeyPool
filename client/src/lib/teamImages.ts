@@ -26,8 +26,8 @@ export const teamImages: Record<number, TeamImage> = {
   10: { src: '/images/teams/10.png', format: 'png' },
   11: { src: '/images/teams/11.png', format: 'png' },
   12: { src: '/images/teams/12.png', format: 'png' },
-  13: { src: '/images/teams/13.png', format: 'png' },
-  14: { src: '/images/teams/14.jpg', format: 'png' },
+  13: { src: '/images/teams/13.jpg', format: 'jpg' },
+  14: { src: '/images/teams/14.jpg', format: 'jpg' },
 };
 
 export function getTeamImage(teamId: number): TeamImage | null {
