@@ -1,7 +1,8 @@
-import { Users, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import Equipe from '@/types/IEquipes';
+import { TeamAvatar } from './TeamAvatar';
 
 interface TeamHeaderProps {
   team: Equipe;
@@ -12,11 +13,9 @@ export function TeamHeader({ team }: TeamHeaderProps) {
     <Card className="mb-6 overflow-hidden">
       <div className="h-24 bg-gradient-to-r from-blue-600 to-cyan-500" />
       <CardContent className="relative pt-0 pb-6">
-        <div className="flex flex-col md:flex-row items-start md:items-end -mt-12 px-2 gap-4">
-          <div className="rounded-full p-2 bg-white shadow-lg">
-            <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center border-4 border-white">
-              <Users className="w-12 h-12 text-slate-400" />
-            </div>
+        <div className="flex flex-col md:flex-row items-center md:items-end -mt-12 px-2 gap-4">
+          <div className="rounded-full p-1 bg-white shadow-lg">
+            <TeamAvatar teamId={team.id} teamName={team.nom} size="xl" bordered={false} />
           </div>
 
           <div className="flex-1 mt-4 md:mt-0 md:mb-2 text-center md:text-left">
