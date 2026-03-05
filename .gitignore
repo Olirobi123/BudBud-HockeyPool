@@ -8,3 +8,7 @@ vite.config.ts.*
 tmpclaude-*
 nul
 .mcp.json
+*.xlsx
+*.skill
+*.json
+settings.local.json

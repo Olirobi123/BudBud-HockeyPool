@@ -11,6 +11,13 @@ import {
 } from '../types';
 import { QUERIES } from '../models';
 import { getCurrentSeasonNumber } from './seasonHelper';
+import {
+  FORWARD_POSITIONS,
+  MAX_ACTIVE_FORWARDS,
+  MAX_ACTIVE_DEFENSEMEN,
+  MAX_ACTIVE_GOALIES,
+  calculateGoaliePoints,
+} from '../utils/poolRules';
 
 /**
  * Extract relevant stats from NHL API response based on player position.
@@ -158,10 +165,6 @@ export class TeamsService {
     );
 
     // Mark active players: top 12 forwards and top 6 defensemen by points
-    const FORWARD_POSITIONS = ['C', 'L', 'R'];
-    const MAX_ACTIVE_FORWARDS = 12;
-    const MAX_ACTIVE_DEFENSEMEN = 6;
-
     const getPoints = (player: RosterPlayerWithStats): number => {
       if (player.nhlStats && 'points' in player.nhlStats) {
         return player.nhlStats.points;
@@ -179,11 +182,9 @@ export class TeamsService {
       .sort((a, b) => getPoints(b) - getPoints(a))
       .map((p, index) => ({ ...p, isActive: index < MAX_ACTIVE_DEFENSEMEN }));
 
-    const MAX_ACTIVE_GOALIES = 2;
-
     const getGoaliePoolPoints = (player: RosterPlayerWithStats): number => {
       if (player.nhlStats && 'wins' in player.nhlStats) {
-        return player.nhlStats.wins * 2 + player.nhlStats.shutouts * 3;
+        return calculateGoaliePoints(player.nhlStats.wins, player.nhlStats.shutouts);
       }
       return 0;
     };
