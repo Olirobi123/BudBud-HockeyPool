@@ -5,79 +5,83 @@
 | Branch | Environment | Purpose |
 |--------|-------------|---------|
 | `main` | Production | Stable, deployed code |
-| `acceptation` | Staging | QA and acceptance testing |
 | `dev` | Development | Integration of features |
 | `feature/*` | Local | Individual feature development |
+
+### Promotion Flow
+
+```
+feature/* → dev → main
+```
+
+---
 
 ## Workflow
 
 ### 1. Starting a New Feature
 
-```bash
-# Ensure dev is up to date
-git checkout dev
-git pull origin dev
+Always branch from `dev`:
 
-# Create feature branch
-git checkout -b feature/my-feature-name
+```bash
+git checkout dev
+git pull --rebase origin dev
+git checkout -b feature/descriptive-name
 ```
 
 ### 2. During Development
 
 ```bash
-# Regular commits
 git add <files>
 git commit -m "feat: description of change"
-
-# Push to remote
-git push -u origin feature/my-feature-name
 ```
 
-### 3. Feature Complete - Create PR
+Follow conventional commit style. Never add Claude as co-author.
+
+### 3. Feature Complete — Create PR
+
+Rebase on latest `dev` before opening a PR to keep history linear:
 
 ```bash
-# Ensure feature branch is up to date with dev
 git fetch origin
 git rebase origin/dev
-
-# Push and create PR
-git push origin feature/my-feature-name
-gh pr create --base dev --title "Feature: description" --body "..."
+git push -u origin feature/descriptive-name
+gh pr create --base dev --title "..." --body "..."
 ```
 
-### 4. Promotion to Staging (acceptation)
+Merge strategy on GitHub: **Squash and merge** or **Rebase and merge** — never "Create a merge commit".
 
-After PR is merged to `dev` and tested locally:
+### 4. Promoting dev → main
 
-```bash
-git checkout acceptation
-git pull origin acceptation
-git merge dev
-git push origin acceptation
-```
+1. Create a PR from `dev` to `main`:
+   ```bash
+   gh pr create --base main --head dev
+   ```
 
-### 5. Promotion to Production (main)
+2. Merge using **Squash and merge** on GitHub.
 
-After QA approval on staging:
+3. After merging, reset `dev` to match `main`:
+   ```bash
+   git fetch origin
+   git checkout dev
+   git reset --hard origin/main
+   git push --force-with-lease origin dev
+   ```
 
-```bash
-git checkout main
-git pull origin main
-git merge acceptation
-git push origin main
-```
+**Never push directly to `main` or `dev`.**
+
+---
 
 ## Commit Message Convention
 
 Use conventional commits:
 
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `style:` - Formatting, no code change
-- `refactor:` - Code restructuring
-- `test:` - Adding tests
-- `chore:` - Maintenance tasks
+- `feat:` — New feature
+- `fix:` — Bug fix
+- `docs:` — Documentation changes
+- `style:` — Formatting, no code change
+- `refactor:` — Code restructuring
+- `test:` — Adding tests
+- `chore:` — Maintenance tasks
 
 ## Branch Naming
 
@@ -85,11 +89,11 @@ Use conventional commits:
 - `feature/fix-cors-issue`
 - `feature/update-health-endpoint`
 
+---
+
 ## Environment Variables
 
-Each environment may have different values for:
-
-- `DATABASE_URL` - Database connection string
-- `ALLOWED_ORIGINS` - CORS allowed origins
-- `CRON_API_TOKEN` - API token for health checks
-- `PORT` - Server port
+- `DATABASE_URL` — Database connection string
+- `ALLOWED_ORIGINS` — CORS allowed origins
+- `CRON_API_TOKEN` — API token for cron/snapshot endpoints
+- `PORT` — Server port (default 5000)
