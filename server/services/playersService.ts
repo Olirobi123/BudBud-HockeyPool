@@ -40,9 +40,21 @@ export class PlayersService {
       return [];
     }
 
+    // TEMPORARY FIX (2026-03-06): NHL search API returns 400 with culture=en-us (library default).
+    // Bypassing nhlClient.players.search() and calling the endpoint directly with culture=fr-ca,
+    // the only culture currently accepted by search.d3.nhle.com.
+    // TODO: Remove once @olirobi/nhl_api_client is updated or NHL fixes the API.
     try {
-      const response = await this.nhlClient.players.search(query.trim()) as PlayerSearchResult[];
-      return response ?? [];
+      const encodedQuery = encodeURIComponent(query.trim());
+      const url = `https://search.d3.nhle.com/api/v1/search/player?culture=fr-ca&limit=10&q=${encodedQuery}&active=true`;
+      const response = await fetch(url, {
+        headers: { Accept: 'application/json', 'User-Agent': 'nhl-api-client' },
+      });
+      if (!response.ok) {
+        throw new Error(`NHL search API responded with status ${response.status}`);
+      }
+      const data = await response.json() as PlayerSearchResult[];
+      return data ?? [];
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Erreur lors de la recherche de joueurs:', error);
