@@ -108,10 +108,12 @@ When implementing a new feature or fix:
    ```
 
 4. **When the feature is ready**, create a Pull Request:
-   - Target branch: `dev`
-   - Use `gh pr create` to create the PR
+   - Target branch: `dev` — always pass `--base dev` explicitly:
+     ```bash
+     gh pr create --base dev --head feature/name
+     ```
    - Include a clear description of changes
-   - Use **Squash and merge** or **Rebase and merge** on GitHub — never "Create a merge commit"
+   - Use **Rebase and merge** only — never "Squash and merge" or "Create a merge commit" (squash bypasses Render/Vercel redeploy)
 
 5. **Never push directly** to `main` or `dev`
 
@@ -128,12 +130,11 @@ When promoting `dev` to `main`:
    gh pr create --base main --head dev
    ```
 
-2. **Merge using "Squash and merge"** on GitHub — all dev commits are squashed into one commit on main.
+2. **Merge using "Rebase and merge"** on GitHub — preserves commits and triggers Render/Vercel redeploy correctly. Never use "Squash and merge" (bypasses redeploy).
 
-3. **After merging**, reset dev to match main:
+3. **After merging**, sync dev to match main:
    ```bash
-   git reset --hard origin/main
-   git push --force-with-lease origin dev
+   git checkout dev && git merge origin/main --no-edit && git push origin dev
    ```
 
 ## Current Development Status
