@@ -3,11 +3,9 @@ import pool from '../config/database';
 import { QUERIES } from '../models';
 import { LivePlayerPoints, LiveTeamPoints, LivePointsResponse } from '../types';
 import { scoresService } from './scoresService';
-import { calculateGoaliePoints } from '../utils/poolRules';
+import { calculateGoaliePoints, GOALIE_POSITION, DEFENSE_POSITION } from '../utils/poolRules';
 
 const ACTIVE_GAME_STATES = ['LIVE', 'CRIT', 'FINAL', 'OFF'];
-const GOALIE_POSITION = 'G';
-const DEFENSE_POSITION = 'D';
 const TOP_PLAYERS_LIMIT = 10;
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
