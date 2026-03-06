@@ -1,11 +1,13 @@
 import pool from '../config/database';
-import { EquipePoints, EquipePointsWithTeam } from '../types';
+import { EquipePoints, EquipePointsWithTeam, Joueur, Equipe } from '../types';
 import { QUERIES } from '../models';
 import { teamsService } from './teamsService';
 import { getCurrentSeason, getCurrentSeasonNumber } from './seasonHelper';
 import { NHLClient, SkaterSummary, GoalieSummary } from '@olirobi/nhl_api_client';
 import {
   FORWARD_POSITIONS,
+  DEFENSE_POSITION,
+  GOALIE_POSITION,
   MAX_ACTIVE_FORWARDS,
   MAX_ACTIVE_DEFENSEMEN,
   MAX_ACTIVE_GOALIES,
@@ -35,9 +37,25 @@ export class PointsService {
     const seasonId = getCurrentSeasonNumber();
     const teams = await teamsService.getActiveTeams();
 
+    const { rosters, skaterMap, goalieMap } = await this.buildStatMaps(teams, seasonId);
+    const teamsUpdated = await this.computeAndPersistTeamPoints(teams, rosters, skaterMap, goalieMap, season);
+
+    return { teamsUpdated, season, timestamp: new Date().toISOString() };
+  }
+
+  /**
+   * Fetch all rosters and bulk NHL stats in parallel, then build
+   * skater/goalie lookup maps with a per-player fallback for any
+   * pool player missing from the bulk results.
+   */
+  private async buildStatMaps(
+    teams: Equipe[],
+    seasonId: number,
+  ): Promise<{ rosters: Joueur[][]; skaterMap: Map<number, SkaterSummary>; goalieMap: Map<number, GoalieSummary> }> {
     const nhlClient = new NHLClient();
-    //Bulk get des points de tout le monde avec pagination
-    const [allSkaters, allGoalies] = await Promise.all([
+
+    const [rosters, allSkaters, allGoalies] = await Promise.all([
+      Promise.all(teams.map((t) => teamsService.getTeamRoster(t.id))),
       fetchAllPages((start) => nhlClient.stats.skaters({ seasonId, limit: PAGE_SIZE, start })),
       fetchAllPages((start) => nhlClient.stats.goalies({ seasonId, limit: PAGE_SIZE, start })),
     ]);
@@ -45,14 +63,85 @@ export class PointsService {
     const skaterMap = new Map<number, SkaterSummary>(allSkaters.map((s) => [s.playerId, s]));
     const goalieMap = new Map<number, GoalieSummary>(allGoalies.map((g) => [g.playerId, g]));
 
+    await this.enrichMissingPlayers(rosters, skaterMap, goalieMap, nhlClient);
+
+    return { rosters, skaterMap, goalieMap };
+  }
+
+  /**
+   * For each pool player absent from both bulk maps, fetch their stats
+   * individually and insert a minimal entry into the appropriate map.
+   */
+  private async enrichMissingPlayers(
+    rosters: Joueur[][],
+    skaterMap: Map<number, SkaterSummary>,
+    goalieMap: Map<number, GoalieSummary>,
+    nhlClient: NHLClient,
+  ): Promise<void> {
+    const seen = new Set<number>();
+    const uniqueMissing = rosters.flat().filter((p) => {
+      if (skaterMap.has(p.nhl_player_id) || goalieMap.has(p.nhl_player_id)) return false;
+      if (seen.has(p.nhl_player_id)) return false;
+      seen.add(p.nhl_player_id);
+      return true;
+    });
+
+    if (uniqueMissing.length === 0) return;
+
+    const fallbacks = await Promise.all(
+      uniqueMissing.map(async (player) => {
+        try {
+          const stats = await nhlClient.players.get(player.nhl_player_id).stats();
+          return { player, stats };
+        } catch {
+          return { player, stats: null };
+        }
+      }),
+    );
+
+    for (const { player, stats } of fallbacks) {
+      if (!stats) continue;
+      const sub = stats.featuredStats?.regularSeason?.subSeason;
+      if (!sub) continue;
+
+      if (player.position === GOALIE_POSITION) {
+        goalieMap.set(player.nhl_player_id, {
+          playerId: player.nhl_player_id,
+          wins: sub.wins ?? 0,
+          shutouts: sub.shutouts ?? 0,
+        } as GoalieSummary);
+      } else {
+        skaterMap.set(player.nhl_player_id, {
+          playerId: player.nhl_player_id,
+          points: sub.points ?? 0,
+        } as SkaterSummary);
+      }
+    }
+  }
+
+  /**
+   * Calculate pool points for every team and upsert to the database.
+   * Returns the number of teams successfully updated.
+   */
+  private async computeAndPersistTeamPoints(
+    teams: Equipe[],
+    rosters: Joueur[][],
+    skaterMap: Map<number, SkaterSummary>,
+    goalieMap: Map<number, GoalieSummary>,
+    season: string,
+  ): Promise<number> {
+    const skaterPts = (nhlId: number) => skaterMap.get(nhlId)?.points ?? 0;
+    const goaliePoolPts = (nhlId: number) => {
+      const g = goalieMap.get(nhlId);
+      return g ? calculateGoaliePoints(g.wins, g.shutouts) : 0;
+    };
+
     let teamsUpdated = 0;
 
-    for (const team of teams) {
+    for (let i = 0; i < teams.length; i++) {
+      const team = teams[i];
+      const roster = rosters[i];
       try {
-        const roster = await teamsService.getTeamRoster(team.id);
-
-        const skaterPts = (nhlId: number) => skaterMap.get(nhlId)?.points ?? 0;
-
         // Top 12 forwards by NHL points
         const attaque_points = roster
           .filter((p) => FORWARD_POSITIONS.includes(p.position))
@@ -63,23 +152,20 @@ export class PointsService {
 
         // Top 6 defensemen by NHL points
         const defense_points = roster
-          .filter((p) => p.position === 'D')
+          .filter((p) => p.position === DEFENSE_POSITION)
           .map((p) => skaterPts(p.nhl_player_id))
           .sort((a, b) => b - a)
           .slice(0, MAX_ACTIVE_DEFENSEMEN)
           .reduce((sum, pts) => sum + pts, 0);
 
         // Top 2 goalies by pool points (2 per win + 3 per shutout)
-        const goaliePoolPts = (nhlId: number): number => {
-          const g = goalieMap.get(nhlId);
-          return g ? calculateGoaliePoints(g.wins, g.shutouts) : 0;
-        };
-        const goalies = roster.filter((p) => p.position === 'G');
-        const activeGoalies = goalies
-          .sort((a, b) => goaliePoolPts(b.nhl_player_id) - goaliePoolPts(a.nhl_player_id))
-          .slice(0, MAX_ACTIVE_GOALIES);
+        const gardien_points = roster
+          .filter((p) => p.position === GOALIE_POSITION)
+          .map((p) => ({ player: p, pts: goaliePoolPts(p.nhl_player_id) }))
+          .sort((a, b) => b.pts - a.pts)
+          .slice(0, MAX_ACTIVE_GOALIES)
+          .reduce((sum, g) => sum + g.pts, 0);
 
-        const gardien_points = activeGoalies.reduce((sum, p) => sum + goaliePoolPts(p.nhl_player_id), 0);
         const total_points = attaque_points + defense_points + gardien_points;
 
         await pool.query(QUERIES.UPSERT_EQUIPE_POINTS, [
@@ -98,11 +184,7 @@ export class PointsService {
       }
     }
 
-    return {
-      teamsUpdated,
-      season,
-      timestamp: new Date().toISOString(),
-    };
+    return teamsUpdated;
   }
 
   /**

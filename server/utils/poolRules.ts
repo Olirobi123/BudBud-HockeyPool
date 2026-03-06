@@ -4,6 +4,8 @@
  */
 
 export const FORWARD_POSITIONS = ['C', 'L', 'R'];
+export const DEFENSE_POSITION = 'D';
+export const GOALIE_POSITION = 'G';
 export const MAX_ACTIVE_FORWARDS = 12;
 export const MAX_ACTIVE_DEFENSEMEN = 6;
 export const MAX_ACTIVE_GOALIES = 2;
