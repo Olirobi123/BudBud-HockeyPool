@@ -61,7 +61,7 @@ export const QUERIES = {
     LEFT JOIN ${TABLES.ECHANGE_JOUEURS} ej ON ej.echange_id = e.id
     LEFT JOIN ${TABLES.JOUEURS} j           ON ej.joueur_id  = j.id
     GROUP BY e.id, src.nom, dest.nom
-    ORDER BY e.date DESC
+    ORDER BY e.date DESC, e.id DESC
   `,
   GET_LATEST_ECHANGE: `
     SELECT
@@ -84,7 +84,7 @@ export const QUERIES = {
     LEFT JOIN ${TABLES.ECHANGE_JOUEURS} ej ON ej.echange_id = e.id
     LEFT JOIN ${TABLES.JOUEURS} j           ON ej.joueur_id  = j.id
     GROUP BY e.id, src.nom, dest.nom
-    ORDER BY e.date DESC
+    ORDER BY e.date DESC, e.id DESC
     LIMIT 1
   `,
   GET_LATEST_TRADE_BY_TEAM: `
