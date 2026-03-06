@@ -82,7 +82,7 @@ export function InjuryBadge({ injury }: InjuryBadgeProps) {
                 <div className="text-xs text-muted-foreground">
                   Retour prévu :{' '}
                   <span className="font-medium text-foreground/80">
-                    {new Date(injury.dateRetour).toLocaleDateString('fr-CA', {
+                    {new Date(`${injury.dateRetour}T12:00:00`).toLocaleDateString('fr-CA', {
                       month: 'short',
                       day: 'numeric',
                     })}
