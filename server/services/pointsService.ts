@@ -12,6 +12,19 @@ import {
   calculateGoaliePoints,
 } from '../utils/poolRules';
 
+const PAGE_SIZE = 100;
+
+async function fetchAllPages<T>(
+  fetchPage: (start: number) => Promise<{ data: T[]; total: number }>,
+): Promise<T[]> {
+  const first = await fetchPage(0);
+  const pages = Math.ceil(first.total / PAGE_SIZE);
+  const rest = await Promise.all(
+    Array.from({ length: pages - 1 }, (_, i) => fetchPage((i + 1) * PAGE_SIZE)),
+  );
+  return [...first.data, ...rest.flatMap((p) => p.data)];
+}
+
 export class PointsService {
   /**
    * Update points for all active teams using 2 bulk NHL API calls
@@ -23,13 +36,14 @@ export class PointsService {
     const teams = await teamsService.getActiveTeams();
 
     const nhlClient = new NHLClient();
-    const [skaterRes, goalieRes] = await Promise.all([
-      nhlClient.stats.skaters({ seasonId, limit: 1000 }),
-      nhlClient.stats.goalies({ seasonId, limit: 1000 }),
+    //Bulk get des points de tout le monde avec pagination
+    const [allSkaters, allGoalies] = await Promise.all([
+      fetchAllPages((start) => nhlClient.stats.skaters({ seasonId, limit: PAGE_SIZE, start })),
+      fetchAllPages((start) => nhlClient.stats.goalies({ seasonId, limit: PAGE_SIZE, start })),
     ]);
 
-    const skaterMap = new Map<number, SkaterSummary>(skaterRes.data.map((s) => [s.playerId, s]));
-    const goalieMap = new Map<number, GoalieSummary>(goalieRes.data.map((g) => [g.playerId, g]));
+    const skaterMap = new Map<number, SkaterSummary>(allSkaters.map((s) => [s.playerId, s]));
+    const goalieMap = new Map<number, GoalieSummary>(allGoalies.map((g) => [g.playerId, g]));
 
     let teamsUpdated = 0;
 
@@ -60,8 +74,8 @@ export class PointsService {
           const g = goalieMap.get(nhlId);
           return g ? calculateGoaliePoints(g.wins, g.shutouts) : 0;
         };
-        const activeGoalies = roster
-          .filter((p) => p.position === 'G')
+        const goalies = roster.filter((p) => p.position === 'G');
+        const activeGoalies = goalies
           .sort((a, b) => goaliePoolPts(b.nhl_player_id) - goaliePoolPts(a.nhl_player_id))
           .slice(0, MAX_ACTIVE_GOALIES);
 
