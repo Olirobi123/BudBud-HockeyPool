@@ -18,7 +18,10 @@
       "Bash(npm ls:*)",
       "Bash(npm install:*)",
       "Bash(findstr:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(git rebase:*)",
+      "Bash(GIT_EDITOR=true git rebase --continue 2>&1)",
+      "Bash(EDITOR=true git -c core.editor=true rebase --continue)"
     ]
   }
 }
