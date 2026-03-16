@@ -200,7 +200,7 @@ function TeamRow({
       <button
         type="button"
         onClick={onToggle}
-        className="w-full px-2.5 py-2 hover:bg-muted/40 transition-colors text-left"
+        className="w-full px-2.5 py-2 hover:bg-muted/40 transition-colors text-left cursor-pointer"
       >
         {/* Mobile: two lines — name then stats. sm+: single row */}
         <div className="flex items-center gap-2">
