@@ -41,28 +41,6 @@
   --gray-900: 220 39% 11%; /* #111827 */
 }
 
-.dark {
-  --background: 220 39% 11%; /* #111827 */
-  --foreground: 210 20% 98%; /* #F9FAFB */
-  --muted: 215 28% 17%; /* #1F2937 */
-  --muted-foreground: 215 20% 65%; /* #9CA3AF */
-  --popover: 220 39% 11%; /* #111827 */
-  --popover-foreground: 210 20% 98%; /* #F9FAFB */
-  --card: 220 39% 11%; /* #111827 */
-  --card-foreground: 210 20% 98%; /* #F9FAFB */
-  --border: 215 28% 17%; /* #1F2937 */
-  --input: 215 28% 17%; /* #1F2937 */
-  --primary: 231 48% 48%; /* #4F46E5 */
-  --primary-foreground: 210 20% 98%; /* #F8FAFC */
-  --secondary: 215 28% 17%; /* #1F2937 */
-  --secondary-foreground: 210 20% 98%; /* #F9FAFB */
-  --accent: 188 94% 42%; /* #06B6D4 */
-  --accent-foreground: 210 20% 98%; /* #F9FAFB */
-  --destructive: 0 84% 60%; /* #EF4444 */
-  --destructive-foreground: 210 20% 98%; /* #F8FAFC */
-  --ring: 231 48% 48%; /* #4F46E5 */
-}
-
 @layer base {
   * {
     @apply border-border;
@@ -135,6 +113,25 @@
   .animate-stagger-2 { animation-delay: 0.2s; }
   .animate-stagger-3 { animation-delay: 0.3s; }
   .animate-stagger-4 { animation-delay: 0.4s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-fadeIn,
+    .animate-slide-up,
+    .animate-float,
+    .animate-shimmer,
+    .animate-glow-pulse,
+    .animate-ice-drift,
+    .ticker-scroll,
+    .animate-stagger-1,
+    .animate-stagger-2,
+    .animate-stagger-3,
+    .animate-stagger-4 {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
 
   /* Navbar glass effect — only transition background + box-shadow,
      NOT backdrop-filter (it causes white flashes on toggle) */
@@ -291,7 +288,13 @@
   50% { color: #fbbf24; }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(215 28% 17%) hsl(var(--muted));
+}
+
+/* Custom scrollbar — Chrome/Safari */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -311,7 +314,7 @@
 
 /* Smooth transitions for all interactive elements */
 button, input, select, textarea, a {
-  transition: all 0.2s ease-in-out;
+  transition: color, background-color, border-color, box-shadow, opacity 0.2s ease-in-out;
 }
 
 /* Focus styles */

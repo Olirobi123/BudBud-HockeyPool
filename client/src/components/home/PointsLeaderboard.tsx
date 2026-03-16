@@ -122,7 +122,7 @@ function CategoryToggle({ active, onChange }: CategoryToggleProps) {
             type="button"
             onClick={() => onChange(cat.key)}
             className={cn(
-              'px-1.5 sm:px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-normal sm:tracking-wide transition-colors',
+              'px-1.5 sm:px-2.5 py-2 rounded-md text-[11px] font-semibold uppercase tracking-normal sm:tracking-wide transition-colors cursor-pointer',
               isActive
                 ? cat.activeClass
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/60',
@@ -165,7 +165,7 @@ function DiffCell({ diff }: { diff: number }) {
   }
   return (
     <span className="w-10 text-center tabular-nums text-xs text-red-400/80 shrink-0">
-      {`+${diff}`}
+      {`−${diff}`}
     </span>
   );
 }
@@ -228,7 +228,7 @@ function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
           </span>
           {diff > 0 && (
             <span className="text-[10px] font-semibold tabular-nums text-red-400/80">
-              {`+${diff}`}
+              {`−${diff}`}
             </span>
           )}
         </div>
