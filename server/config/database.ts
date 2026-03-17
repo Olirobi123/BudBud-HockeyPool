@@ -12,10 +12,11 @@ dotenv.config();
 // Configuration du pool de connexion
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Paramètres de connexion additionnels
-  max: 20, // nombre maximum de clients dans le pool
-  idleTimeoutMillis: 30000, // temps maximum d'inactivité d'un client
-  connectionTimeoutMillis: 2000, // temps maximum pour établir une connexion
+  max: 3,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
 });
 
 // Tester la connexion au démarrage
