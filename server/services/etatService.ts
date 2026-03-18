@@ -40,75 +40,66 @@ export class EtatService {
 
     const nhlClient = new NHLClient();
 
-    // Collect all rows to insert before touching the DB
-    const rows: Array<[number, string, number | null, number | null, number | null, number | null, string]> = [];
+    type InsertRow = [number, string, number | null, number | null, number | null, number | null, string];
 
-    for (const player of playersResult.rows) {
-      try {
-        const stats = await nhlClient.players.get(player.nhl_player_id).stats();
-        const last5 = stats.last5Games;
+    const classifyPlayer = async (player: { nhl_player_id: number; position: string }): Promise<InsertRow | null> => {
+      const stats = await nhlClient.players.get(player.nhl_player_id).stats();
+      const last5 = stats.last5Games;
+      if (!last5 || last5.length === 0) return null;
 
-        if (!last5 || last5.length === 0) continue;
+      const isGoalie = player.position === 'G';
+      const snapshot: Last5GameSnapshot[] = last5.map((g) => ({
+        gameDate: g.gameDate,
+        opponentAbbrev: g.opponentAbbrev,
+        goals: g.goals,
+        assists: g.assists,
+        points: g.points,
+        savePctg: g.savePctg,
+        shotsAgainst: g.shotsAgainst,
+        goalsAgainst: g.goalsAgainst,
+        decision: g.decision,
+      }));
 
-        const isGoalie = player.position === 'G';
-        const snapshot: Last5GameSnapshot[] = last5.map((g) => ({
-          gameDate: g.gameDate,
-          opponentAbbrev: g.opponentAbbrev,
-          goals: g.goals,
-          assists: g.assists,
-          points: g.points,
-          savePctg: g.savePctg,
-          shotsAgainst: g.shotsAgainst,
-          goalsAgainst: g.goalsAgainst,
-          decision: g.decision,
-        }));
+      let etat: 'hot' | 'cold' | 'normal';
+      let points5Matchs: number | null = null;
+      let victoires5Matchs: number | null = null;
+      let blanchissages5Matchs: number | null = null;
+      let savePctg5Matchs: number | null = null;
 
-        let etat: 'hot' | 'cold' | 'normal';
-        let points5Matchs: number | null = null;
-        let victoires5Matchs: number | null = null;
-        let blanchissages5Matchs: number | null = null;
-        let savePctg5Matchs: number | null = null;
-
-        if (isGoalie) {
-          const wins = last5.filter((g) => g.decision === 'W').length;
-          const shutouts = last5.filter(
-            (g) => g.goalsAgainst === 0 && (g.shotsAgainst ?? 0) > 0,
-          ).length;
-
-          const totalShots = last5.reduce((s, g) => s + (g.shotsAgainst ?? 0), 0);
-          const totalSaves = last5.reduce(
-            (s, g) => s + ((g.shotsAgainst ?? 0) - (g.goalsAgainst ?? 0)),
-            0,
-          );
-          savePctg5Matchs = totalShots > 0 ? totalSaves / totalShots : null;
-          victoires5Matchs = wins;
-          blanchissages5Matchs = shutouts;
-
-          if (wins >= 3) etat = 'hot';
-          else if (wins <= 1) etat = 'cold';
-          else etat = 'normal';
-        } else {
-          const totalPts = last5.reduce((s, g) => s + (g.points ?? 0), 0);
-          points5Matchs = totalPts;
-
-          if (totalPts >= 5) etat = 'hot';
-          else if (totalPts <= 2) etat = 'cold';
-          else etat = 'normal';
-        }
-
-        rows.push([
-          player.nhl_player_id,
-          etat,
-          points5Matchs,
-          victoires5Matchs,
-          blanchissages5Matchs,
-          savePctg5Matchs,
-          JSON.stringify(snapshot),
-        ]);
-      } catch {
-        // Skip players where the NHL API call fails
+      if (isGoalie) {
+        const wins = last5.filter((g) => g.decision === 'W').length;
+        const shutouts = last5.filter(
+          (g) => g.goalsAgainst === 0 && (g.shotsAgainst ?? 0) > 0,
+        ).length;
+        const totalShots = last5.reduce((s, g) => s + (g.shotsAgainst ?? 0), 0);
+        const totalSaves = last5.reduce(
+          (s, g) => s + ((g.shotsAgainst ?? 0) - (g.goalsAgainst ?? 0)),
+          0,
+        );
+        savePctg5Matchs = totalShots > 0 ? totalSaves / totalShots : null;
+        victoires5Matchs = wins;
+        blanchissages5Matchs = shutouts;
+        if (wins >= 3) etat = 'hot';
+        else if (wins <= 1) etat = 'cold';
+        else etat = 'normal';
+      } else {
+        const totalPts = last5.reduce((s, g) => s + (g.points ?? 0), 0);
+        points5Matchs = totalPts;
+        if (totalPts >= 5) etat = 'hot';
+        else if (totalPts <= 2) etat = 'cold';
+        else etat = 'normal';
       }
-    }
+
+      return [player.nhl_player_id, etat, points5Matchs, victoires5Matchs, blanchissages5Matchs, savePctg5Matchs, JSON.stringify(snapshot)];
+    };
+
+    // Fetch all players in parallel — individual failures are skipped
+    const results = await Promise.allSettled(
+      playersResult.rows.map((player) => classifyPlayer(player)),
+    );
+    const rows = results
+      .filter((r): r is PromiseFulfilledResult<InsertRow> => r.status === 'fulfilled' && r.value !== null)
+      .map((r) => r.value);
 
     // Transaction: truncate then bulk insert (removes players no longer in the pool)
     const client = await pool.connect();
