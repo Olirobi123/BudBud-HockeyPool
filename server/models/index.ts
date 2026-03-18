@@ -304,17 +304,10 @@ export const QUERIES = {
 
   // État joueurs (hot/cold/normal)
   GET_ALL_ETAT: `SELECT * FROM ${TABLES.ETAT_JOUEURS}`,
-  UPSERT_ETAT: `
+  TRUNCATE_ETAT: `TRUNCATE TABLE ${TABLES.ETAT_JOUEURS}`,
+  INSERT_ETAT: `
     INSERT INTO ${TABLES.ETAT_JOUEURS} (nhl_player_id, etat, points_5_matchs, victoires_5_matchs, blanchissages_5_matchs, save_pctg_5_matchs, derniers_matchs, last_update)
     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-    ON CONFLICT (nhl_player_id) DO UPDATE SET
-      etat                   = EXCLUDED.etat,
-      points_5_matchs        = EXCLUDED.points_5_matchs,
-      victoires_5_matchs     = EXCLUDED.victoires_5_matchs,
-      blanchissages_5_matchs = EXCLUDED.blanchissages_5_matchs,
-      save_pctg_5_matchs     = EXCLUDED.save_pctg_5_matchs,
-      derniers_matchs        = EXCLUDED.derniers_matchs,
-      last_update            = NOW()
   `,
 
   // Live Points: batch ownership lookup by NHL player IDs

@@ -40,6 +40,9 @@ export class EtatService {
 
     const nhlClient = new NHLClient();
 
+    // Collect all rows to insert before touching the DB
+    const rows: Array<[number, string, number | null, number | null, number | null, number | null, string]> = [];
+
     for (const player of playersResult.rows) {
       try {
         const stats = await nhlClient.players.get(player.nhl_player_id).stats();
@@ -69,14 +72,13 @@ export class EtatService {
         if (isGoalie) {
           const wins = last5.filter((g) => g.decision === 'W').length;
           const shutouts = last5.filter(
-            (g) => g.goalsAgainst === 0 && (g.shotsAgainst ?? 0) > 0
+            (g) => g.goalsAgainst === 0 && (g.shotsAgainst ?? 0) > 0,
           ).length;
 
-          // Weighted average save%
           const totalShots = last5.reduce((s, g) => s + (g.shotsAgainst ?? 0), 0);
           const totalSaves = last5.reduce(
             (s, g) => s + ((g.shotsAgainst ?? 0) - (g.goalsAgainst ?? 0)),
-            0
+            0,
           );
           savePctg5Matchs = totalShots > 0 ? totalSaves / totalShots : null;
           victoires5Matchs = wins;
@@ -94,7 +96,7 @@ export class EtatService {
           else etat = 'normal';
         }
 
-        await pool.query(QUERIES.UPSERT_ETAT, [
+        rows.push([
           player.nhl_player_id,
           etat,
           points5Matchs,
@@ -104,8 +106,24 @@ export class EtatService {
           JSON.stringify(snapshot),
         ]);
       } catch {
-        // Skip players where the NHL API call fails; preserve stale data
+        // Skip players where the NHL API call fails
       }
+    }
+
+    // Transaction: truncate then bulk insert (removes players no longer in the pool)
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query(QUERIES.TRUNCATE_ETAT);
+      for (const row of rows) {
+        await client.query(QUERIES.INSERT_ETAT, row);
+      }
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
     }
   }
 }
