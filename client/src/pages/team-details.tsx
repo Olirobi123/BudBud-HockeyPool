@@ -4,6 +4,7 @@ import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
 import { useTeam, useTeamRoster, useTeamLatestTrade, useTeamDraftPicks } from '@/hooks/useTeam';
 import { useInjuries } from '@/hooks/useInjuries';
+import { useEtat } from '@/hooks/useEtat';
 import { usePageLoading } from '@/hooks/usePageLoading';
 import { TeamHeader } from '@/components/equipes/TeamHeader';
 import { TeamRoster } from '@/components/equipes/TeamRoster';
@@ -24,6 +25,7 @@ export default function TeamDetails() {
   const { data: latestTrade, isLoading: isLoadingTrade } = useTeamLatestTrade(idNum);
   const { data: draftPicks, isLoading: isLoadingDraftPicks } = useTeamDraftPicks(idNum);
   const { data: injuries } = useInjuries();
+  const { data: etat } = useEtat();
 
   // Gestion automatique du loading de la page
   usePageLoading({ dependencies: [isLoadingTeam] });
@@ -74,7 +76,7 @@ export default function TeamDetails() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="effectif" className="mt-4">
-            <TeamRoster roster={roster || []} isLoading={isLoadingRoster} injuries={injuries} />
+            <TeamRoster roster={roster || []} isLoading={isLoadingRoster} injuries={injuries} etat={etat} />
           </TabsContent>
           <TabsContent value="trophees" className="mt-4">
             <TeamTrophies teamId={idNum} />
@@ -92,7 +94,7 @@ export default function TeamDetails() {
       <div className="hidden lg:grid lg:grid-cols-3 gap-8 items-start">
         {/* Main Content: Roster (Left, larger) */}
         <div className="lg:col-span-2">
-          <TeamRoster roster={roster || []} isLoading={isLoadingRoster} injuries={injuries} />
+          <TeamRoster roster={roster || []} isLoading={isLoadingRoster} injuries={injuries} etat={etat} />
         </div>
 
         {/* Sidebar: sticky, no stretching */}

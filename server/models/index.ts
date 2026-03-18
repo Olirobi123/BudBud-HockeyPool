@@ -15,6 +15,7 @@ export const TABLES = {
   MIS_AU_BALLOTAGE: 'mis_au_ballotage',
   TYPES_REPECHAGE: 'types_repechage',
   BLESSURES: 'blessures',
+  ETAT_JOUEURS: 'etat_joueurs',
 } as const;
 
 export const QUERIES = {
@@ -297,6 +298,24 @@ export const QUERIES = {
 
   // Joueurs for injury name matching
   GET_ALL_JOUEURS_FOR_INJURY_MATCH: `SELECT nhl_player_id, nom, prenom FROM ${TABLES.JOUEURS}`,
+
+  // Joueurs with position (for état snapshot)
+  GET_ALL_JOUEURS_WITH_POSITION: `SELECT nhl_player_id, position FROM ${TABLES.JOUEURS}`,
+
+  // État joueurs (hot/cold/normal)
+  GET_ALL_ETAT: `SELECT * FROM ${TABLES.ETAT_JOUEURS}`,
+  UPSERT_ETAT: `
+    INSERT INTO ${TABLES.ETAT_JOUEURS} (nhl_player_id, etat, points_5_matchs, victoires_5_matchs, blanchissages_5_matchs, save_pctg_5_matchs, derniers_matchs, last_update)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+    ON CONFLICT (nhl_player_id) DO UPDATE SET
+      etat                   = EXCLUDED.etat,
+      points_5_matchs        = EXCLUDED.points_5_matchs,
+      victoires_5_matchs     = EXCLUDED.victoires_5_matchs,
+      blanchissages_5_matchs = EXCLUDED.blanchissages_5_matchs,
+      save_pctg_5_matchs     = EXCLUDED.save_pctg_5_matchs,
+      derniers_matchs        = EXCLUDED.derniers_matchs,
+      last_update            = NOW()
+  `,
 
   // Live Points: batch ownership lookup by NHL player IDs
   GET_BATCH_OWNERSHIP_BY_NHL_IDS: `
