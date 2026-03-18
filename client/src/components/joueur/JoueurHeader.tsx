@@ -57,7 +57,7 @@ export default function JoueurHeader({ player }: Props) {
               <Badge className="bg-secondary text-primary-foreground hover:bg-slate-500 cursor-pointer">Agent libre</Badge>
             }
             {injury && <InjuryBadge injury={injury} />}
-            {etatInfo && etatInfo.etat !== 'normal' && (
+            {!injury && etatInfo && etatInfo.etat !== 'normal' && (
               <EtatBadge etat={etatInfo} position={player.position ?? 'C'} />
             )}
           </div>
