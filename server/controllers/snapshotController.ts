@@ -29,7 +29,7 @@ export class SnapshotController {
    * Save a nightly snapshot of hot/cold/normal état for all pool players (cron endpoint)
    */
   saveEtat = asyncHandler(async (_req: Request, res: Response) => {
-    await etatService.saveEtatSnapshot();
+    etatService.saveEtatSnapshot();
     sendSuccess(res, { saved: true });
   });
 }
