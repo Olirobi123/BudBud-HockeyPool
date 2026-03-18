@@ -1,6 +1,6 @@
 import { NHLClient } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
-import { QUERIES } from '../models';
+import { QUERIES, TABLES } from '../models';
 import { EtatInfo, Last5GameSnapshot } from '../types';
 
 export class EtatService {
@@ -93,21 +93,34 @@ export class EtatService {
       return [player.nhl_player_id, etat, points5Matchs, victoires5Matchs, blanchissages5Matchs, savePctg5Matchs, JSON.stringify(snapshot)];
     };
 
-    // Fetch all players in parallel — individual failures are skipped
-    const results = await Promise.allSettled(
-      playersResult.rows.map((player) => classifyPlayer(player)),
-    );
-    const rows = results
+    // Fetch all players in batches of 15 to avoid overwhelming the NHL API
+    const CONCURRENCY = 25;
+    const allResults: PromiseSettledResult<InsertRow | null>[] = [];
+    for (let i = 0; i < playersResult.rows.length; i += CONCURRENCY) {
+      const batch = playersResult.rows.slice(i, i + CONCURRENCY);
+      const batchResults = await Promise.allSettled(batch.map((player) => classifyPlayer(player)));
+      allResults.push(...batchResults);
+    }
+    const rows = allResults
       .filter((r): r is PromiseFulfilledResult<InsertRow> => r.status === 'fulfilled' && r.value !== null)
       .map((r) => r.value);
 
-    // Transaction: truncate then bulk insert (removes players no longer in the pool)
+    // Transaction: truncate then single bulk insert (removes players no longer in the pool)
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
       await client.query(QUERIES.TRUNCATE_ETAT);
-      for (const row of rows) {
-        await client.query(QUERIES.INSERT_ETAT, row);
+      if (rows.length > 0) {
+        const params: (number | string | null)[] = [];
+        const valueClauses = rows.map((row, i) => {
+          const base = i * 7;
+          params.push(...row);
+          return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}, $${base + 7}, NOW())`;
+        });
+        await client.query(
+          `INSERT INTO ${TABLES.ETAT_JOUEURS} (nhl_player_id, etat, points_5_matchs, victoires_5_matchs, blanchissages_5_matchs, save_pctg_5_matchs, derniers_matchs, last_update) VALUES ${valueClauses.join(', ')}`,
+          params,
+        );
       }
       await client.query('COMMIT');
     } catch (err) {
