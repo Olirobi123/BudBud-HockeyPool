@@ -3,7 +3,9 @@ import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { usePlayerOwnership } from '@/hooks/joueur/usePlayerOwnership';
 import { useInjuries } from '@/hooks/useInjuries';
+import { useEtat } from '@/hooks/useEtat';
 import { InjuryBadge } from '@/components/equipes/InjuryBadge';
+import { EtatBadge } from '@/components/equipes/EtatBadge';
 import PlayerDetails from '@/types/IPlayerDetails';
 
 type Props = {
@@ -13,7 +15,9 @@ export default function JoueurHeader({ player }: Props) {
   const nhlId = player.playerId?.toString() ?? '';
   const { data: ownership, isLoading: ownershipLoading } = usePlayerOwnership(nhlId);
   const { data: injuries } = useInjuries();
+  const { data: etats } = useEtat();
   const injury = player.playerId !== undefined ? injuries?.[player.playerId] : undefined;
+  const etatInfo = player.playerId !== undefined ? etats?.[player.playerId] : undefined;
 
   return (
     <div className="relative h-64 rounded-xl overflow-hidden mb-8 md:h-80">
@@ -53,6 +57,9 @@ export default function JoueurHeader({ player }: Props) {
               <Badge className="bg-secondary text-primary-foreground hover:bg-slate-500 cursor-pointer">Agent libre</Badge>
             }
             {injury && <InjuryBadge injury={injury} />}
+            {etatInfo && etatInfo.etat !== 'normal' && (
+              <EtatBadge etat={etatInfo} position={player.position ?? 'C'} />
+            )}
           </div>
         </div>
       </div>
