@@ -115,7 +115,7 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
                       {injuries?.[player.nhl_player_id] && (
                         <InjuryBadge injury={injuries[player.nhl_player_id]} />
                       )}
-                      {etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
+                      {!injuries?.[player.nhl_player_id] && etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
                         <EtatBadge etat={etat[player.nhl_player_id]} position={player.position} />
                       )}
                     </div>
@@ -225,7 +225,7 @@ function GoaliesTable({ goalies, injuries, etat }: { goalies: RosterPlayerWithSt
                       {injuries?.[player.nhl_player_id] && (
                         <InjuryBadge injury={injuries[player.nhl_player_id]} />
                       )}
-                      {etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
+                      {!injuries?.[player.nhl_player_id] && etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
                         <EtatBadge etat={etat[player.nhl_player_id]} position={player.position} />
                       )}
                     </div>
