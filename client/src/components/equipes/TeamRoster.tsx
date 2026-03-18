@@ -12,12 +12,15 @@ import {
   RosterPlayerWithStats, isGoalieStats, isSkaterStats,
 } from '@/types';
 import { InjuryInfo } from '@/types/IInjury';
+import { EtatInfo } from '@/types/IEtat';
 import { InjuryBadge } from './InjuryBadge';
+import { EtatBadge } from './EtatBadge';
 
 interface TeamRosterProps {
   roster: RosterPlayerWithStats[];
   isLoading: boolean;
   injuries?: Record<number, InjuryInfo>;
+  etat?: Record<number, EtatInfo>;
 }
 
 function sortByPoints(players: RosterPlayerWithStats[]): RosterPlayerWithStats[] {
@@ -51,9 +54,10 @@ interface SkaterGroupTableProps {
   players: RosterPlayerWithStats[];
   title: string;
   injuries?: Record<number, InjuryInfo>;
+  etat?: Record<number, EtatInfo>;
 }
 
-function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
+function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTableProps) {
   if (players.length === 0) return null;
 
   const sortedPlayers = sortByPoints(players);
@@ -111,6 +115,9 @@ function SkaterGroupTable({ players, title, injuries }: SkaterGroupTableProps) {
                       {injuries?.[player.nhl_player_id] && (
                         <InjuryBadge injury={injuries[player.nhl_player_id]} />
                       )}
+                      {etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
+                        <EtatBadge etat={etat[player.nhl_player_id]} position={player.position} />
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
@@ -157,7 +164,7 @@ function getGoaliePoolPoints(player: RosterPlayerWithStats): number {
   return 0;
 }
 
-function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[]; injuries?: Record<number, InjuryInfo> }) {
+function GoaliesTable({ goalies, injuries, etat }: { goalies: RosterPlayerWithStats[]; injuries?: Record<number, InjuryInfo>; etat?: Record<number, EtatInfo> }) {
   if (goalies.length === 0) return null;
 
   const sorted = [...goalies].sort((a, b) => getGoaliePoolPoints(b) - getGoaliePoolPoints(a));
@@ -218,6 +225,9 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
                       {injuries?.[player.nhl_player_id] && (
                         <InjuryBadge injury={injuries[player.nhl_player_id]} />
                       )}
+                      {etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
+                        <EtatBadge etat={etat[player.nhl_player_id]} position={player.position} />
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
@@ -257,7 +267,7 @@ function GoaliesTable({ goalies, injuries }: { goalies: RosterPlayerWithStats[];
   );
 }
 
-export function TeamRoster({ roster, isLoading, injuries }: TeamRosterProps) {
+export function TeamRoster({ roster, isLoading, injuries, etat }: TeamRosterProps) {
   const forwards = roster.filter((p) => ['C', 'L', 'R'].includes(p.position));
   const defensemen = roster.filter((p) => p.position === 'D');
   const goalies = roster.filter((p) => p.position === 'G');
@@ -283,9 +293,9 @@ export function TeamRoster({ roster, isLoading, injuries }: TeamRosterProps) {
           </div>
         ) : (
           <div className="space-y-6">
-            <SkaterGroupTable players={forwards} title="Attaquants" injuries={injuries} />
-            <SkaterGroupTable players={defensemen} title="Défenseurs" injuries={injuries} />
-            <GoaliesTable goalies={goalies} injuries={injuries} />
+            <SkaterGroupTable players={forwards} title="Attaquants" injuries={injuries} etat={etat} />
+            <SkaterGroupTable players={defensemen} title="Défenseurs" injuries={injuries} etat={etat} />
+            <GoaliesTable goalies={goalies} injuries={injuries} etat={etat} />
           </div>
         )}
       </CardContent>
