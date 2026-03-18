@@ -1,31 +1,15 @@
-import * as React from 'react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { Hospital } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { InjuryInfo } from '@/types/IInjury';
+import { useMobileTooltip } from '@/hooks/useMobileTooltip';
+import { BADGE_TOOLTIP_CLASS } from './badgeTooltipClass';
 
 interface InjuryBadgeProps {
   injury: InjuryInfo;
 }
 
 export function InjuryBadge({ injury }: InjuryBadgeProps) {
-  const [open, setOpen] = React.useState(false);
-  const isMobile = React.useRef('ontouchstart' in window || navigator.maxTouchPoints > 0).current;
-
-  // On mobile, close tooltip when tapping outside
-  React.useEffect(() => {
-    if (!isMobile || !open) return;
-    const handleOutside = () => setOpen(false);
-    document.addEventListener('pointerdown', handleOutside, { once: true });
-    return () => document.removeEventListener('pointerdown', handleOutside);
-  }, [isMobile, open]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (isMobile) {
-      e.stopPropagation();
-      setOpen((prev) => !prev);
-    }
-  };
+  const { open, setOpen, isMobile, handleClick } = useMobileTooltip();
 
   return (
     <TooltipPrimitive.Provider delayDuration={isMobile ? 0 : 200}>
@@ -42,17 +26,7 @@ export function InjuryBadge({ injury }: InjuryBadgeProps) {
             side="top"
             align="center"
             sideOffset={6}
-            className={cn(
-              'relative overflow-hidden rounded-xl',
-              'bg-gradient-to-br from-white/95 to-white/90 dark:from-slate-900/95 dark:to-slate-800/90',
-              'backdrop-blur-xl',
-              'border border-white/20 dark:border-white/10',
-              'shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]',
-              'animate-in fade-in-0 zoom-in-95 duration-200',
-              'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:duration-150',
-              'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
-              'px-4 py-3 max-w-xs z-50'
-            )}
+            className={BADGE_TOOLTIP_CLASS}
           >
             <div className="relative z-10 space-y-1">
               {/* Status */}
