@@ -178,6 +178,16 @@ export class PointsService {
 
         const total_points = attaque_points + defense_points + gardien_points;
 
+        // Tiebreaker stats: goals and games played for active scoring players
+        const total_buts =
+          forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.goals ?? 0), 0) +
+          defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.goals ?? 0), 0);
+
+        const total_matchs =
+          forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0) +
+          defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0) +
+          goalieEntries.slice(0, MAX_ACTIVE_GOALIES).reduce((sum, g) => sum + (goalieMap.get(g.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
+
         if (isTroisRivieres) {
           // eslint-disable-next-line no-console
           console.log(`\n[DEBUG TR] ===== ${team.nom} (id=${team.id}) =====`);
@@ -210,6 +220,8 @@ export class PointsService {
           defense_points,
           gardien_points,
           total_points,
+          total_buts,
+          total_matchs,
         ]);
 
         teamsUpdated++;

@@ -138,6 +138,8 @@ export interface EquipePoints {
   defense_points: number;
   gardien_points: number;
   total_points: number;
+  total_buts: number;
+  total_matchs: number;
   last_update_at?: Date;
 }
 
@@ -145,6 +147,53 @@ export interface EquipePointsWithTeam extends EquipePoints {
   equipe_nom: string;
   division?: string;
   dg_name?: string;
+}
+
+// Series Playoffs
+export interface SeriesPlayoff {
+  id: number;
+  saison: string;
+  ronde: 1 | 2 | 3;
+  division: string | null;
+  position: number;
+  equipe_a_id: number | null;
+  equipe_b_id: number | null;
+  gagnant_id: number | null;
+  equipe_a_nom?: string;
+  equipe_b_nom?: string;
+  gagnant_nom?: string;
+}
+
+export interface SemaineBaseline {
+  id: number;
+  equipe_id: number;
+  saison: string;
+  semaine: number;
+  total_points: number;
+  attaque_points: number;
+  defense_points: number;
+  gardien_points: number;
+  total_buts: number;
+  total_matchs: number;
+  snapshot_at?: Date;
+}
+
+export interface EquipeSemainePoints {
+  id: number;
+  equipe_id: number;
+  saison: string;
+  semaine: number;
+  debut_semaine: string;
+  fin_semaine: string;
+  attaque_points: number;
+  defense_points: number;
+  gardien_points: number;
+  total_points: number;
+  total_buts: number;
+  total_matchs: number;
+  last_update_at?: Date;
+  equipe_nom?: string;
+  division?: string;
 }
 
 // Stats for skaters (C, LW, RW, D)

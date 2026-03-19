@@ -1,0 +1,87 @@
+import { Trophy } from 'lucide-react';
+import Layout from '@/components/Layout';
+import { PlayoffBracket } from '@/components/series/PlayoffBracket';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSeries } from '@/hooks/series/useSeries';
+
+function SeriesSkeleton() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {Array.from({ length: 3 }).map((_, col) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <div key={col} className="flex flex-col gap-4">
+          <Skeleton className="h-4 w-32" />
+          {Array.from({ length: col === 0 ? 4 : col === 1 ? 2 : 1 }).map((_, i) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <div key={i} className="rounded-xl border border-border/40 overflow-hidden">
+              <Skeleton className="h-10 w-full" />
+              <div className="h-px bg-border/40" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function Series(): JSX.Element {
+  const { data, isLoading, error } = useSeries();
+
+  return (
+    <Layout bgClassName="bg-background" mainPadding="py-12">
+      {/* Page header */}
+      <div className="flex items-center gap-4 mb-10">
+        <div className="flex items-center gap-3">
+          <div className="w-1 h-8 rounded-full bg-gradient-to-b from-amber-400 to-orange-500" />
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground uppercase tracking-wide">
+            Séries Éliminatoires
+          </h1>
+        </div>
+        <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
+        <Trophy className="w-6 h-6 text-amber-400 shrink-0" />
+      </div>
+
+      {/* Season label */}
+      {data && (
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-8">
+          {`Saison ${data.saison.slice(0, 4)}–${data.saison.slice(4)}`}
+        </p>
+      )}
+
+      {/* Content */}
+      {isLoading && <SeriesSkeleton />}
+
+      {error && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-6 text-center">
+          <p className="text-sm text-red-400">
+            Erreur lors du chargement des séries. Veuillez réessayer.
+          </p>
+        </div>
+      )}
+
+      {!isLoading && !error && !data && (
+        <div className="rounded-xl border border-border/40 px-4 py-12 text-center">
+          <Trophy className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">
+            Les séries éliminatoires n&apos;ont pas encore commencé.
+          </p>
+        </div>
+      )}
+
+      {!isLoading && !error && data && (
+        <>
+          {data.rondeActive === null && data.quartsDeFinale.length === 0 && (
+            <div className="rounded-xl border border-border/40 px-4 py-12 text-center mb-8">
+              <Trophy className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">
+                Les séries éliminatoires débutent le 23 mars 2026.
+              </p>
+            </div>
+          )}
+          {data.quartsDeFinale.length > 0 && <PlayoffBracket data={data} />}
+        </>
+      )}
+    </Layout>
+  );
+}

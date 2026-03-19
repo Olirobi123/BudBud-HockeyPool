@@ -16,6 +16,9 @@ export const TABLES = {
   TYPES_REPECHAGE: 'types_repechage',
   BLESSURES: 'blessures',
   ETAT_JOUEURS: 'etat_joueurs',
+  EQUIPE_SEMAINE_POINTS: 'equipe_semaine_points',
+  SERIES_PLAYOFFS: 'series_playoffs',
+  SERIES_SEMAINE_BASELINE: 'series_semaine_baseline',
 } as const;
 
 export const QUERIES = {
@@ -201,13 +204,15 @@ export const QUERIES = {
 
   // Equipe Points (classement)
   UPSERT_EQUIPE_POINTS: `
-    INSERT INTO ${TABLES.EQUIPE_POINTS} (equipe_id, season, attaque_points, defense_points, gardien_points, total_points, last_update_at)
-    VALUES ($1, $2, $3, $4, $5, $6, NOW())
+    INSERT INTO ${TABLES.EQUIPE_POINTS} (equipe_id, season, attaque_points, defense_points, gardien_points, total_points, total_buts, total_matchs, last_update_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
     ON CONFLICT (equipe_id, season) DO UPDATE SET
       attaque_points = EXCLUDED.attaque_points,
       defense_points = EXCLUDED.defense_points,
       gardien_points = EXCLUDED.gardien_points,
       total_points = EXCLUDED.total_points,
+      total_buts = EXCLUDED.total_buts,
+      total_matchs = EXCLUDED.total_matchs,
       last_update_at = NOW()
   `,
   GET_RANKINGS_BY_SEASON: `
@@ -318,5 +323,87 @@ export const QUERIES = {
     LEFT JOIN ${TABLES.EQUIPE_JOUEURS} ej ON ej.joueur_id = j.id
     LEFT JOIN ${TABLES.EQUIPES} e ON ej.equipe_id = e.id
     WHERE j.nhl_player_id = ANY($1)
+  `,
+
+  // Series Playoffs
+  GET_CURRENT_EQUIPE_POINTS_ALL: `
+    SELECT ep.equipe_id, ep.season, ep.attaque_points, ep.defense_points,
+           ep.gardien_points, ep.total_points, ep.total_buts, ep.total_matchs,
+           e.nom as equipe_nom, e.division
+    FROM ${TABLES.EQUIPE_POINTS} ep
+    JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
+    WHERE ep.season = $1 AND e.active = true
+    ORDER BY ep.total_points DESC
+  `,
+  GET_RANKINGS_BY_DIVISION_FOR_SERIES: `
+    SELECT ep.equipe_id, ep.season, ep.total_points,
+           e.nom as equipe_nom, e.division
+    FROM ${TABLES.EQUIPE_POINTS} ep
+    JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
+    WHERE e.division = $1 AND ep.season = $2 AND e.active = true
+    ORDER BY ep.total_points DESC
+  `,
+  INSERT_SERIES: `
+    INSERT INTO ${TABLES.SERIES_PLAYOFFS} (saison, ronde, division, position, equipe_a_id, equipe_b_id, gagnant_id)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    ON CONFLICT (saison, ronde, position) DO UPDATE SET
+      equipe_a_id = EXCLUDED.equipe_a_id,
+      equipe_b_id = EXCLUDED.equipe_b_id,
+      gagnant_id = EXCLUDED.gagnant_id
+  `,
+  UPDATE_SERIES_WINNER: `
+    UPDATE ${TABLES.SERIES_PLAYOFFS}
+    SET gagnant_id = $1
+    WHERE saison = $2 AND ronde = $3 AND position = $4
+  `,
+  GET_SERIES_BY_SAISON: `
+    SELECT
+      sp.*,
+      ea.nom as equipe_a_nom, ea.division as equipe_a_division,
+      eb.nom as equipe_b_nom, eb.division as equipe_b_division,
+      eg.nom as gagnant_nom
+    FROM ${TABLES.SERIES_PLAYOFFS} sp
+    LEFT JOIN ${TABLES.EQUIPES} ea ON sp.equipe_a_id = ea.id
+    LEFT JOIN ${TABLES.EQUIPES} eb ON sp.equipe_b_id = eb.id
+    LEFT JOIN ${TABLES.EQUIPES} eg ON sp.gagnant_id = eg.id
+    WHERE sp.saison = $1
+    ORDER BY sp.ronde, sp.position
+  `,
+  UPSERT_SEMAINE_BASELINE: `
+    INSERT INTO ${TABLES.SERIES_SEMAINE_BASELINE}
+      (equipe_id, saison, semaine, total_points, attaque_points, defense_points, gardien_points, total_buts, total_matchs, snapshot_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+    ON CONFLICT (equipe_id, saison, semaine) DO UPDATE SET
+      total_points = EXCLUDED.total_points,
+      attaque_points = EXCLUDED.attaque_points,
+      defense_points = EXCLUDED.defense_points,
+      gardien_points = EXCLUDED.gardien_points,
+      total_buts = EXCLUDED.total_buts,
+      total_matchs = EXCLUDED.total_matchs,
+      snapshot_at = NOW()
+  `,
+  GET_SEMAINE_BASELINE: `
+    SELECT *
+    FROM ${TABLES.SERIES_SEMAINE_BASELINE}
+    WHERE saison = $1 AND semaine = $2
+  `,
+  UPSERT_SEMAINE_POINTS: `
+    INSERT INTO ${TABLES.EQUIPE_SEMAINE_POINTS}
+      (equipe_id, saison, semaine, debut_semaine, fin_semaine, attaque_points, defense_points, gardien_points, total_points, total_buts, total_matchs, last_update_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+    ON CONFLICT (equipe_id, saison, semaine) DO UPDATE SET
+      attaque_points = EXCLUDED.attaque_points,
+      defense_points = EXCLUDED.defense_points,
+      gardien_points = EXCLUDED.gardien_points,
+      total_points = EXCLUDED.total_points,
+      total_buts = EXCLUDED.total_buts,
+      total_matchs = EXCLUDED.total_matchs,
+      last_update_at = NOW()
+  `,
+  GET_SEMAINE_POINTS: `
+    SELECT esp.*, e.nom as equipe_nom, e.division
+    FROM ${TABLES.EQUIPE_SEMAINE_POINTS} esp
+    JOIN ${TABLES.EQUIPES} e ON esp.equipe_id = e.id
+    WHERE esp.saison = $1 AND esp.semaine = $2
   `,
 } as const;
