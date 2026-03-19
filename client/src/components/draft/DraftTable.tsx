@@ -105,7 +105,7 @@ export function DraftTable({
                           key={pick.rang}
                           className="hover:bg-muted/50 transition-colors"
                         >
-                          <TableCell className="font-semibold text-primary">
+                          <TableCell className="font-semibold text-foreground">
                             {pick.rang}
                           </TableCell>
                           <TableCell className="text-foreground">
@@ -146,7 +146,7 @@ export function DraftTable({
                   key={pick.rang}
                   className="hover:bg-muted/50 transition-colors"
                 >
-                  <TableCell className="font-semibold text-primary">
+                  <TableCell className="font-semibold text-foreground">
                     {pick.rang}
                   </TableCell>
                   <TableCell className="text-foreground">{pick.nom}</TableCell>
