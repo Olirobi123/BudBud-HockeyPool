@@ -75,7 +75,7 @@ export function DraftTable({
             <Card key={`round-${round}`} className="border-border/50 shadow-sm">
               <CardHeader className="bg-muted/30 border-b border-border/50">
                 <CardTitle className="text-lg font-semibold flex items-center gap-3">
-                  <span className="text-foreground">
+                  <span className="text-primary">
                     Ronde
                     {' '}
                     {round}
