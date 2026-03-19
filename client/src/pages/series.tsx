@@ -59,15 +59,15 @@ export default function Series(): JSX.Element {
   return (
     <Layout bgClassName="bg-background" mainPadding="py-12">
       {/* Page header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="flex items-center gap-3">
-          <div className="w-1 h-8 rounded-full bg-gradient-to-b from-amber-400 to-orange-500" />
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground uppercase tracking-wide">
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-1 h-8 rounded-full bg-gradient-to-b from-amber-400 to-orange-500 shrink-0" />
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground uppercase tracking-wide truncate">
             Séries Éliminatoires
           </h1>
         </div>
-        <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
         <div className="flex items-center gap-2 shrink-0">
+          <Trophy className="w-5 h-5 text-amber-400" />
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Saison
           </span>
