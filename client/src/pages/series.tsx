@@ -1,8 +1,15 @@
 import { useState } from 'react';
-import { Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { PlayoffBracket } from '@/components/series/PlayoffBracket';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useSeries } from '@/hooks/series/useSeries';
 
 // First year playoffs were tracked; upper bound = current season end year
@@ -10,8 +17,17 @@ const FIRST_YEAR = 2026;
 const now = new Date();
 const LAST_YEAR = Math.max(FIRST_YEAR, now.getMonth() >= 8 ? now.getFullYear() + 1 : now.getFullYear());
 
+const YEARS = Array.from(
+  { length: LAST_YEAR - FIRST_YEAR + 1 },
+  (_, i) => FIRST_YEAR + i,
+);
+
 function yearToSaison(year: number): string {
   return `${year - 1}${year}`;
+}
+
+function yearLabel(year: number): string {
+  return `Saison ${year - 1}–${year}`;
 }
 
 function SeriesSkeleton() {
@@ -51,32 +67,21 @@ export default function Series(): JSX.Element {
           </h1>
         </div>
         <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
-        <Trophy className="w-6 h-6 text-amber-400 shrink-0" />
-      </div>
-
-      {/* Year selector */}
-      <div className="flex items-center gap-2 mb-8">
-        <button
-          type="button"
-          onClick={() => setSelectedYear((y) => Math.max(FIRST_YEAR, y - 1))}
-          disabled={selectedYear <= FIRST_YEAR}
-          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          aria-label="Année précédente"
+        <Select
+          value={String(selectedYear)}
+          onValueChange={(v) => setSelectedYear(Number(v))}
         >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <span className="text-sm font-semibold text-foreground tabular-nums min-w-[7rem] text-center">
-          {`Saison ${selectedYear - 1}–${selectedYear}`}
-        </span>
-        <button
-          type="button"
-          onClick={() => setSelectedYear((y) => Math.min(LAST_YEAR, y + 1))}
-          disabled={selectedYear >= LAST_YEAR}
-          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          aria-label="Année suivante"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
+          <SelectTrigger className="w-[9rem] h-8 text-xs font-semibold border-border/60 bg-muted/30 hover:bg-muted/60 focus:ring-0 focus:ring-offset-0 shrink-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {YEARS.map((year) => (
+              <SelectItem key={year} value={String(year)} className="text-xs">
+                {yearLabel(year)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Content */}
