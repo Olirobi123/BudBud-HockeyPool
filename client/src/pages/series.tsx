@@ -27,7 +27,7 @@ function yearToSaison(year: number): string {
 }
 
 function yearLabel(year: number): string {
-  return `Saison ${year - 1}–${year}`;
+  return `${year - 1}-${String(year).slice(2)}`;
 }
 
 function SeriesSkeleton() {
@@ -67,21 +67,26 @@ export default function Series(): JSX.Element {
           </h1>
         </div>
         <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
-        <Select
-          value={String(selectedYear)}
-          onValueChange={(v) => setSelectedYear(Number(v))}
-        >
-          <SelectTrigger className="w-[9rem] h-8 text-xs font-semibold border-border/60 bg-muted/30 hover:bg-muted/60 focus:ring-0 focus:ring-offset-0 shrink-0">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {YEARS.map((year) => (
-              <SelectItem key={year} value={String(year)} className="text-xs">
-                {yearLabel(year)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Saison
+          </span>
+          <Select
+            value={String(selectedYear)}
+            onValueChange={(v) => setSelectedYear(Number(v))}
+          >
+            <SelectTrigger className="w-[6rem] h-8 text-xs font-semibold border-border/60 bg-muted/30 hover:bg-muted/60 focus:ring-0 focus:ring-offset-0">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {YEARS.map((year) => (
+                <SelectItem key={year} value={String(year)} className="text-xs">
+                  {yearLabel(year)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Content */}
@@ -99,7 +104,7 @@ export default function Series(): JSX.Element {
         <div className="rounded-xl border border-border/40 px-4 py-12 text-center">
           <Trophy className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">
-            {`Aucune série disponible pour la saison ${selectedYear - 1}–${selectedYear}.`}
+            {`Aucune série disponible pour la saison ${yearLabel(selectedYear)}.`}
           </p>
         </div>
       )}
