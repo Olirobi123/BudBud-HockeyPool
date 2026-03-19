@@ -41,8 +41,8 @@ export default function JoueurTabsLastFive({ player }: Props) {
                       <TableHead className="px-1.5 sm:px-4">B</TableHead>
                       <TableHead className="px-1.5 sm:px-4">P</TableHead>
                       <TableHead className="px-1.5 sm:px-4">PTS</TableHead>
-                      <TableHead className="px-1.5 sm:px-4">+/-</TableHead>
-                      <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">TJ</TableHead>
+                      <TableHead className="px-1.5 sm:px-4 hidden sm:table-cell">+/-</TableHead>
+                      <TableHead className="px-1.5 sm:px-4">TJ</TableHead>
                     </>
                   )}
                 </TableRow>
@@ -69,8 +69,8 @@ export default function JoueurTabsLastFive({ player }: Props) {
                         <TableCell className="px-1.5 sm:px-4">{game.goals}</TableCell>
                         <TableCell className="px-1.5 sm:px-4">{game.assists}</TableCell>
                         <TableCell className="px-1.5 sm:px-4">{game.points}</TableCell>
-                        <TableCell className="px-1.5 sm:px-4">{game.plusMinus}</TableCell>
-                        <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{game.toi}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4 hidden sm:table-cell">{game.plusMinus}</TableCell>
+                        <TableCell className="px-1.5 sm:px-4">{game.toi}</TableCell>
                       </>
                     )}
                   </TableRow>

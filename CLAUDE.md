@@ -101,21 +101,16 @@ When implementing a new feature or fix:
 
 2. **Make commits** following conventional commit style — **never add Claude as co-author**
 
-3. **Before creating a PR**, rebase on the latest `dev` to avoid conflicts and keep history linear:
+3. **When the feature is ready**, merge directly into `dev` (no PR required):
    ```bash
    git fetch origin
    git rebase origin/dev
+   git checkout dev
+   git merge feature/descriptive-name --no-edit
+   git push origin dev
    ```
 
-4. **When the feature is ready**, create a Pull Request:
-   - Target branch: `dev` — always pass `--base dev` explicitly:
-     ```bash
-     gh pr create --base dev --head feature/name
-     ```
-   - Include a clear description of changes
-   - Use **Rebase and merge** only — never "Squash and merge" or "Create a merge commit" (squash bypasses Render/Vercel redeploy)
-
-5. **Never push directly** to `main` or `dev`
+4. **Never push directly** to `main`
 
 ### Promotion Flow
 ```
