@@ -53,8 +53,11 @@ function enrichMatchup(
   };
 }
 
-const fetchSeries = async (): Promise<SeriesData> => {
-  const response = await fetch(`${BACKEND_URL}/api/series`);
+const fetchSeries = async (saison?: string): Promise<SeriesData> => {
+  const url = saison
+    ? `${BACKEND_URL}/api/series?saison=${saison}`
+    : `${BACKEND_URL}/api/series`;
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error('Erreur lors du chargement des séries');
   }
@@ -81,10 +84,10 @@ const fetchSeries = async (): Promise<SeriesData> => {
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
-export function useSeries() {
+export function useSeries(saison?: string) {
   return useQuery<SeriesData>({
-    queryKey: ['series'],
-    queryFn: fetchSeries,
+    queryKey: ['series', saison ?? 'current'],
+    queryFn: () => fetchSeries(saison),
     staleTime: FIVE_MINUTES,
     gcTime: FIVE_MINUTES,
   });

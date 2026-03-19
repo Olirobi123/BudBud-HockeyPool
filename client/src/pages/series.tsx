@@ -1,8 +1,18 @@
-import { Trophy } from 'lucide-react';
+import { useState } from 'react';
+import { Trophy, ChevronLeft, ChevronRight } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { PlayoffBracket } from '@/components/series/PlayoffBracket';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSeries } from '@/hooks/series/useSeries';
+
+// First year playoffs were tracked; upper bound = current season end year
+const FIRST_YEAR = 2026;
+const now = new Date();
+const LAST_YEAR = Math.max(FIRST_YEAR, now.getMonth() >= 8 ? now.getFullYear() + 1 : now.getFullYear());
+
+function yearToSaison(year: number): string {
+  return `${year - 1}${year}`;
+}
 
 function SeriesSkeleton() {
   return (
@@ -26,12 +36,14 @@ function SeriesSkeleton() {
 }
 
 export default function Series(): JSX.Element {
-  const { data, isLoading, error } = useSeries();
+  const [selectedYear, setSelectedYear] = useState<number>(LAST_YEAR);
+  const saison = yearToSaison(selectedYear);
+  const { data, isLoading, error } = useSeries(saison);
 
   return (
     <Layout bgClassName="bg-background" mainPadding="py-12">
       {/* Page header */}
-      <div className="flex items-center gap-4 mb-10">
+      <div className="flex items-center gap-4 mb-8">
         <div className="flex items-center gap-3">
           <div className="w-1 h-8 rounded-full bg-gradient-to-b from-amber-400 to-orange-500" />
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground uppercase tracking-wide">
@@ -42,12 +54,30 @@ export default function Series(): JSX.Element {
         <Trophy className="w-6 h-6 text-amber-400 shrink-0" />
       </div>
 
-      {/* Season label */}
-      {data && (
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-8">
-          {`Saison ${data.saison.slice(0, 4)}–${data.saison.slice(4)}`}
-        </p>
-      )}
+      {/* Year selector */}
+      <div className="flex items-center gap-2 mb-8">
+        <button
+          type="button"
+          onClick={() => setSelectedYear((y) => Math.max(FIRST_YEAR, y - 1))}
+          disabled={selectedYear <= FIRST_YEAR}
+          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          aria-label="Année précédente"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <span className="text-sm font-semibold text-foreground tabular-nums min-w-[7rem] text-center">
+          {`Saison ${selectedYear - 1}–${selectedYear}`}
+        </span>
+        <button
+          type="button"
+          onClick={() => setSelectedYear((y) => Math.min(LAST_YEAR, y + 1))}
+          disabled={selectedYear >= LAST_YEAR}
+          className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          aria-label="Année suivante"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
 
       {/* Content */}
       {isLoading && <SeriesSkeleton />}
@@ -60,27 +90,17 @@ export default function Series(): JSX.Element {
         </div>
       )}
 
-      {!isLoading && !error && !data && (
+      {!isLoading && !error && (!data || data.quartsDeFinale.length === 0) && (
         <div className="rounded-xl border border-border/40 px-4 py-12 text-center">
           <Trophy className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">
-            Les séries éliminatoires n&apos;ont pas encore commencé.
+            {`Aucune série disponible pour la saison ${selectedYear - 1}–${selectedYear}.`}
           </p>
         </div>
       )}
 
-      {!isLoading && !error && data && (
-        <>
-          {data.rondeActive === null && data.quartsDeFinale.length === 0 && (
-            <div className="rounded-xl border border-border/40 px-4 py-12 text-center mb-8">
-              <Trophy className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">
-                Les séries éliminatoires débutent le 23 mars 2026.
-              </p>
-            </div>
-          )}
-          {data.quartsDeFinale.length > 0 && <PlayoffBracket data={data} />}
-        </>
+      {!isLoading && !error && data && data.quartsDeFinale.length > 0 && (
+        <PlayoffBracket data={data} />
       )}
     </Layout>
   );
