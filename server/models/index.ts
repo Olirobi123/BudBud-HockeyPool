@@ -317,12 +317,18 @@ export const QUERIES = {
 
   // Live Points: batch ownership lookup by NHL player IDs
   GET_BATCH_OWNERSHIP_BY_NHL_IDS: `
-    SELECT j.nhl_player_id, j.nom, j.prenom, j.position,
+    SELECT j.nhl_player_id, j.nom, j.prenom, j.position, j.compte_points,
            e.id as equipe_id, e.nom as equipe_nom
     FROM ${TABLES.JOUEURS} j
     LEFT JOIN ${TABLES.EQUIPE_JOUEURS} ej ON ej.joueur_id = j.id
     LEFT JOIN ${TABLES.EQUIPES} e ON ej.equipe_id = e.id
     WHERE j.nhl_player_id = ANY($1)
+  `,
+
+  // Update compte_points flag: true for active top players, false for all others
+  UPDATE_COMPTE_POINTS: `
+    UPDATE ${TABLES.JOUEURS}
+    SET compte_points = (nhl_player_id = ANY($1::int[]))
   `,
 
   // Series Playoffs

@@ -35,12 +35,49 @@ export class PointsService {
   async updateAllTeamPoints(): Promise<{ teamsUpdated: number; season: string; timestamp: string }> {
     const season = getCurrentSeason();
     const seasonId = getCurrentSeasonNumber();
+
+    await this.snapshotPreviousClassement(season);
+
     const teams = await teamsService.getActiveTeams();
 
     const { rosters, skaterMap, goalieMap } = await this.buildStatMaps(teams, seasonId);
     const teamsUpdated = await this.computeAndPersistTeamPoints(teams, rosters, skaterMap, goalieMap, season);
 
     return { teamsUpdated, season, timestamp: new Date().toISOString() };
+  }
+
+  /**
+   * Snapshot current equipe_points totals into api_store key `classement_prev`
+   * before running the NHL API update, so snapshotService can compute daily diffs.
+   */
+  private async snapshotPreviousClassement(season: string): Promise<void> {
+    try {
+      const result = await pool.query(QUERIES.GET_CURRENT_EQUIPE_POINTS_ALL, [season]);
+      const teams: Record<string, number> = {};
+      for (const row of result.rows as { equipe_id: number; total_points: number }[]) {
+        teams[String(row.equipe_id)] = row.total_points;
+      }
+      await pool.query(QUERIES.UPSERT_API_STORE, [
+        'classement_prev',
+        { updatedAt: new Date().toISOString(), teams },
+      ]);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to snapshot classement_prev:', error);
+    }
+  }
+
+  /**
+   * Set compte_points = true for all active top-roster players (top 12F / 6D / 2G
+   * across all teams), and false for everyone else.
+   */
+  private async updateComptePoints(activeNhlIds: number[]): Promise<void> {
+    try {
+      await pool.query(QUERIES.UPDATE_COMPTE_POINTS, [activeNhlIds]);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to update compte_points:', error);
+    }
   }
 
   /**
@@ -143,6 +180,7 @@ export class PointsService {
     };
 
     let teamsUpdated = 0;
+    const activeNhlIds: number[] = [];
 
     for (let i = 0; i < teams.length; i++) {
       const team = teams[i];
@@ -177,6 +215,11 @@ export class PointsService {
           .reduce((sum, g) => sum + g.pts, 0);
 
         const total_points = attaque_points + defense_points + gardien_points;
+
+        // Collect active player NHL IDs for compte_points update
+        forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
+        defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
+        goalieEntries.slice(0, MAX_ACTIVE_GOALIES).forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
 
         // Tiebreaker stats: goals and games played for active scoring players
         const total_buts =
@@ -230,6 +273,8 @@ export class PointsService {
         console.error(`Failed to update points for team ${team.id} (${team.nom}):`, error);
       }
     }
+
+    await this.updateComptePoints(activeNhlIds);
 
     return teamsUpdated;
   }

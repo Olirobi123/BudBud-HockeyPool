@@ -246,6 +246,7 @@ export interface LiveTeamPoints {
   equipeId: number;
   equipeNom: string;
   totalPoints: number;
+  totalPJ: number;
   totalGoals: number;
   totalAssists: number;
   attaquePoints: number;

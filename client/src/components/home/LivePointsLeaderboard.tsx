@@ -213,13 +213,7 @@ function TeamRow({
             {team.equipeNom}
           </span>
           <span className="hidden sm:block w-8 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-            {team.players.length}
-          </span>
-          <span className="hidden sm:block w-8 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-            {team.totalGoals}
-          </span>
-          <span className="hidden sm:block w-8 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-            {team.totalAssists}
+            {team.totalPJ ?? 0}
           </span>
           <span className="hidden sm:block w-9 text-center tabular-nums text-sm font-bold text-primary shrink-0">
             {team.totalPoints}
@@ -236,17 +230,7 @@ function TeamRow({
         <div className="flex items-center gap-3 mt-1 pl-8 sm:hidden text-[10px] font-semibold uppercase tracking-wider text-muted-foreground tabular-nums">
           <span>
             {'PJ '}
-            <span className="text-foreground">{team.players.length}</span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'B '}
-            <span className="text-foreground">{team.totalGoals}</span>
-          </span>
-          <span className="w-px h-3 bg-border/60" />
-          <span>
-            {'A '}
-            <span className="text-foreground">{team.totalAssists}</span>
+            <span className="text-foreground">{team.totalPJ ?? 0}</span>
           </span>
           <span className="w-px h-3 bg-border/60" />
           <span>
@@ -277,8 +261,6 @@ function LeaderboardList({ teams, expandedTeamId, onToggle }: {
         <span className="w-6 shrink-0" />
         <span className="flex-1">Équipe</span>
         <span className="w-8 text-center shrink-0">PJ</span>
-        <span className="w-8 text-center shrink-0">B</span>
-        <span className="w-8 text-center shrink-0">A</span>
         <span className="w-9 text-center shrink-0">Pts</span>
         <span className="w-4 shrink-0" />
       </div>
