@@ -39,8 +39,8 @@ function OpponentPill({ game }: { game: Game }) {
 function SkaterRow({ game }: { game: Game }) {
   const pts = game.points ?? 0;
   return (
-    <div className="flex items-center gap-3 px-4 py-2 border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors">
-      <div className="w-[44px] flex-shrink-0">
+    <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors">
+      <div className="w-[40px] flex-shrink-0">
         <p className="text-xs font-semibold text-foreground">
           {game.gameDate ? format(new Date(game.gameDate), 'd MMM', { locale: fr }) : '—'}
         </p>
@@ -48,18 +48,18 @@ function SkaterRow({ game }: { game: Game }) {
 
       <OpponentPill game={game} />
 
-      <div className="flex items-center gap-4 flex-1 justify-center">
+      <div className="flex items-center gap-3 flex-1 justify-center">
         <StatBlock label="B" value={game.goals ?? 0} showLabel={false} />
         <StatBlock label="A" value={game.assists ?? 0} showLabel={false} />
         <StatBlock label="PTS" value={pts} accent={pts > 0} showLabel={false} />
       </div>
 
-      <div className="flex items-center gap-3 ml-auto">
+      <div className="flex items-center gap-2 sm:gap-3 ml-auto">
         <span className={`hidden sm:block text-sm font-bold tabular-nums w-[28px] flex-none text-center ${(game.plusMinus ?? 0) > 0 ? 'text-green-500' : (game.plusMinus ?? 0) < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
           {(game.plusMinus ?? 0) > 0 ? '+' : ''}
           {game.plusMinus ?? 0}
         </span>
-        <span className="text-sm font-bold tabular-nums text-muted-foreground w-[40px] flex-none text-center">{game.toi ?? '—'}</span>
+        <span className="text-xs sm:text-sm font-bold tabular-nums text-muted-foreground w-[36px] flex-none text-center">{game.toi ?? '—'}</span>
       </div>
     </div>
   );
@@ -69,8 +69,8 @@ function GoalieRow({ game }: { game: Game }) {
   const dec = game.decision;
   const decColor = dec === 'W' ? 'text-green-500' : dec === 'L' ? 'text-red-500' : dec === 'O' ? 'text-amber-500' : 'text-muted-foreground';
   return (
-    <div className="flex items-center gap-3 px-4 py-2 border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors">
-      <div className="w-[44px] flex-shrink-0">
+    <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 border-b border-border/60 last:border-0 hover:bg-muted/30 transition-colors">
+      <div className="w-[40px] flex-shrink-0">
         <p className="text-xs font-semibold text-foreground">
           {game.gameDate ? format(new Date(game.gameDate), 'd MMM', { locale: fr }) : '—'}
         </p>
@@ -78,7 +78,7 @@ function GoalieRow({ game }: { game: Game }) {
 
       <OpponentPill game={game} />
 
-      <div className="flex items-center gap-4 flex-1 justify-center">
+      <div className="flex items-center gap-3 flex-1 justify-center">
         <span className={`text-xl font-black tabular-nums leading-none w-[48px] flex-none text-center ${decColor}`}>
           {dec ?? '—'}
         </span>
@@ -99,20 +99,20 @@ function SkaterTotals({ games }: { games: Game[] }) {
   const pts = g + a;
   const pm = games.reduce((s, x) => s + (x.plusMinus ?? 0), 0);
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/40 border-t border-border">
-      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-[44px]">Total</span>
+    <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 bg-muted/40 border-t border-border">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-[40px]">Total</span>
       <div className="w-[52px]" />
-      <div className="flex items-center gap-4 flex-1 justify-center">
+      <div className="flex items-center gap-3 flex-1 justify-center">
         <span className="text-sm font-black tabular-nums text-foreground w-[36px] flex-none text-center">{g}</span>
         <span className="text-sm font-black tabular-nums text-foreground w-[36px] flex-none text-center">{a}</span>
         <span className="text-sm font-black tabular-nums text-primary w-[36px] flex-none text-center">{pts}</span>
       </div>
-      <div className="flex items-center gap-3 ml-auto">
+      <div className="flex items-center gap-2 sm:gap-3 ml-auto">
         <span className={`hidden sm:block text-sm font-black tabular-nums w-[28px] flex-none text-center ${pm > 0 ? 'text-green-500' : pm < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
           {pm > 0 ? '+' : ''}
           {pm}
         </span>
-        <span className="w-[40px]" />
+        <span className="w-[36px]" />
       </div>
     </div>
   );
@@ -126,10 +126,10 @@ function GoalieTotals({ games }: { games: Game[] }) {
   const avgSv = gamesWithSv.reduce((s, x) => s + (x.savePctg ?? 0), 0) / (gamesWithSv.length || 1);
   const totalGA = games.reduce((s, x) => s + (x.goalsAgainst ?? 0), 0);
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/40 border-t border-border">
-      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-[44px]">Moy.</span>
+    <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 bg-muted/40 border-t border-border">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-[40px]">Moy.</span>
       <div className="w-[52px]" />
-      <div className="flex items-center gap-4 flex-1 justify-center">
+      <div className="flex items-center gap-3 flex-1 justify-center">
         <span className="text-sm font-black tabular-nums text-foreground w-[48px] flex-none text-center">
           {wins}-{losses}-{ot}
         </span>
@@ -162,14 +162,14 @@ export default function JoueurTabsLastFive({ player }: Props) {
         ) : (
           <CardContent className="p-0">
             {/* column headers */}
-            <div className="flex items-center gap-3 px-4 py-2 bg-muted/20 border-b border-border/60">
-              <div className="w-[44px]">
+            <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 bg-muted/20 border-b border-border/60">
+              <div className="w-[40px]">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Date</span>
               </div>
               <div className="w-[52px]">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Adv.</span>
               </div>
-              <div className="flex items-center gap-4 flex-1 justify-center">
+              <div className="flex items-center gap-3 flex-1 justify-center">
                 {isGoalie ? (
                   <>
                     {[
@@ -201,14 +201,14 @@ export default function JoueurTabsLastFive({ player }: Props) {
                 )}
               </div>
               {!isGoalie && (
-                <div className="flex items-center gap-3 ml-auto">
+                <div className="flex items-center gap-2 sm:gap-3 ml-auto">
                   <StatTooltip description="Différentiel">
                     <span className="hidden sm:block text-[9px] font-bold uppercase tracking-widest text-muted-foreground w-[28px] flex-none text-center cursor-help">
                       +/-
                     </span>
                   </StatTooltip>
                   <StatTooltip description="Temps de jeu">
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground w-[40px] flex-none text-center cursor-help">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground w-[36px] flex-none text-center cursor-help">
                       TJ
                     </span>
                   </StatTooltip>

@@ -95,7 +95,7 @@ function DraftEventItem(
               {event.rang}
             </span>
             {event.round !== null && (
-              <span className="text-[10px] text-blue-500/60 mt-1 tabular-nums">
+              <span className="text-[10px] text-blue-500/60 mt-1 tabular-nums whitespace-nowrap">
                 Ronde
                 {' '}
                 {event.round}
