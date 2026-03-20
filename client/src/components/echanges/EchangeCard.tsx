@@ -6,6 +6,7 @@ import Echange from '@/types/IEchange';
 interface EchangeCardProps {
   echange: Echange;
   animationDelay?: string;
+  highlightPlayer?: string;
 }
 
 function TeamHeader({ name, color }: { name: string; color: 'primary' | 'accent' }) {
@@ -22,20 +23,31 @@ function TeamHeader({ name, color }: { name: string; color: 'primary' | 'accent'
   );
 }
 
-function PlayerList({ players, color }: { players: string[]; color: 'primary' | 'accent' }) {
+function PlayerList(
+  { players, color, highlightPlayer }: {
+    players: string[];
+    color: 'primary' | 'accent';
+    highlightPlayer?: string;
+  },
+) {
   return (
     <ul className="space-y-1">
-      {players.map((joueur) => (
-        <li key={joueur} className="text-sm text-muted-foreground flex gap-1.5">
-          <span className={`flex-shrink-0 mt-0.5 text-xs ${color === 'primary' ? 'text-primary/50' : 'text-accent/60'}`}>›</span>
-          <span className="whitespace-pre-wrap">{joueur}</span>
-        </li>
-      ))}
+      {players.map((joueur) => {
+        const isHighlighted = highlightPlayer !== undefined && joueur === highlightPlayer;
+        return (
+          <li key={joueur} className="text-sm flex gap-1.5">
+            <span className={`flex-shrink-0 mt-0.5 text-xs ${color === 'primary' ? 'text-primary/50' : 'text-accent/60'}`}>›</span>
+            <span className={`whitespace-pre-wrap ${isHighlighted ? 'font-bold text-foreground' : 'text-muted-foreground'}`}>
+              {joueur}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, animationDelay }) => (
+export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, animationDelay, highlightPlayer }) => (
   <Card
     className="overflow-hidden hover:shadow-md transition-all duration-200 animate-slide-up"
     style={{ animationDelay, animationFillMode: 'both' }}
@@ -55,13 +67,13 @@ export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, animationDela
         <div className="pb-3 border-b border-border">
           <TeamHeader name={echange.equipe_source_nom} color="primary" />
           <div className="mt-2">
-            <PlayerList players={echange.joueurs_source} color="primary" />
+            <PlayerList players={echange.joueurs_source} color="primary" highlightPlayer={highlightPlayer} />
           </div>
         </div>
         <div>
           <TeamHeader name={echange.equipe_destination_nom} color="accent" />
           <div className="mt-2">
-            <PlayerList players={echange.joueurs_destination} color="accent" />
+            <PlayerList players={echange.joueurs_destination} color="accent" highlightPlayer={highlightPlayer} />
           </div>
         </div>
       </div>
@@ -77,10 +89,10 @@ export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, animationDela
         </div>
         {/* Row 2: player lists — always starts at same y */}
         <div className="pr-5 pt-2 border-r border-border">
-          <PlayerList players={echange.joueurs_source} color="primary" />
+          <PlayerList players={echange.joueurs_source} color="primary" highlightPlayer={highlightPlayer} />
         </div>
         <div className="pl-5 pt-2">
-          <PlayerList players={echange.joueurs_destination} color="accent" />
+          <PlayerList players={echange.joueurs_destination} color="accent" highlightPlayer={highlightPlayer} />
         </div>
       </div>
     </CardContent>

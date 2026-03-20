@@ -319,4 +319,55 @@ export const QUERIES = {
     LEFT JOIN ${TABLES.EQUIPES} e ON ej.equipe_id = e.id
     WHERE j.nhl_player_id = ANY($1)
   `,
+
+  // Player history (trades, drafts, ballotage) by NHL player ID
+  GET_PLAYER_TRADE_HISTORY: `
+    SELECT
+      e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
+      src.nom  AS equipe_source_nom,
+      dest.nom AS equipe_destination_nom,
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(jall.prenom, ' ', jall.nom)), ''), ejall.joueur_nom_libre)
+        ORDER BY (ejall.joueur_id IS NULL), ejall.id
+      ) FILTER (WHERE ejall.equipe_receptrice_id = e.equipe_source_id),
+        ARRAY[]::text[]) AS joueurs_source,
+      COALESCE(array_agg(
+        COALESCE(NULLIF(TRIM(CONCAT(jall.prenom, ' ', jall.nom)), ''), ejall.joueur_nom_libre)
+        ORDER BY (ejall.joueur_id IS NULL), ejall.id
+      ) FILTER (WHERE ejall.equipe_receptrice_id = e.equipe_destination_id),
+        ARRAY[]::text[]) AS joueurs_destination
+    FROM ${TABLES.JOUEURS} j
+    JOIN ${TABLES.ECHANGE_JOUEURS} ej_player ON ej_player.joueur_id = j.id
+    JOIN ${TABLES.ECHANGES} e                ON e.id = ej_player.echange_id
+    JOIN ${TABLES.EQUIPES} src               ON src.id = e.equipe_source_id
+    JOIN ${TABLES.EQUIPES} dest              ON dest.id = e.equipe_destination_id
+    LEFT JOIN ${TABLES.ECHANGE_JOUEURS} ejall ON ejall.echange_id = e.id
+    LEFT JOIN ${TABLES.JOUEURS} jall          ON jall.id = ejall.joueur_id
+    WHERE j.nhl_player_id = $1
+    GROUP BY e.id, e.date, e.equipe_source_id, e.equipe_destination_id,
+             e.statut_confirmer, src.nom, dest.nom
+    ORDER BY e.date ASC, e.id ASC
+  `,
+
+  GET_PLAYER_DRAFT_HISTORY: `
+    SELECT r.id, r.annee, r.round, r.rang, r.equipe_id,
+           e.nom AS equipe_nom, r.type_id, tr.nom AS type_nom
+    FROM repechages r
+    JOIN ${TABLES.JOUEURS} j          ON r.joueur_id = j.id
+    JOIN ${TABLES.EQUIPES} e          ON e.id = r.equipe_id
+    JOIN ${TABLES.TYPES_REPECHAGE} tr ON tr.id = r.type_id
+    WHERE j.nhl_player_id = $1
+    ORDER BY r.annee ASC, r.type_id ASC, r.rang ASC
+  `,
+
+  GET_PLAYER_BALLOTAGE_HISTORY: `
+    SELECT m.id, m.annee, m.equipe_id,
+           e.nom AS equipe_nom, m.type_id, tr.nom AS type_nom
+    FROM ${TABLES.MIS_AU_BALLOTAGE} m
+    JOIN ${TABLES.JOUEURS} j          ON m.joueur_id = j.id
+    JOIN ${TABLES.EQUIPES} e          ON e.id = m.equipe_id
+    JOIN ${TABLES.TYPES_REPECHAGE} tr ON tr.id = m.type_id
+    WHERE j.nhl_player_id = $1
+    ORDER BY m.annee ASC, m.type_id ASC
+  `,
 } as const;

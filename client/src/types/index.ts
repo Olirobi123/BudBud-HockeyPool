@@ -9,3 +9,7 @@ export type {
 export type { Joueur, RosterPlayerWithStats, SkaterStats, GoalieStats } from './IRoster';
 export { isGoalieStats, isSkaterStats } from './IRoster';
 export type { TropheeGagnant, GroupedTrophee, TropheeType } from './ITrophee';
+export type {
+  HistoireEvent, HistoireEchangeEvent, HistoireRepechageEvent, HistoireBallotageEvent,
+  PlayerHistoryResponse,
+} from './IHistoire';
