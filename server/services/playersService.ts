@@ -2,7 +2,11 @@ import { Pool } from 'pg';
 import { NHLClient, PlayerStatsResponse, PlayerSearchResult } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
 import { QUERIES } from '../models';
-import { Joueur, Equipe } from '../types';
+import {
+  Joueur, Equipe,
+  HistoireEchangeEvent, HistoireRepechageEvent, HistoireBallotageEvent,
+  HistoireEvent, PlayerHistoryResponse,
+} from '../types';
 
 export class PlayersService {
   private nhlClient: NHLClient;
@@ -102,6 +106,86 @@ export class PlayersService {
       console.error('Erreur lors de la récupération de l\'équipe du joueur:', error);
       throw new Error('Erreur lors de la récupération de l\'équipe du joueur');
     }
+  }
+
+  /**
+   * Récupérer l'historique complet d'un joueur dans le pool
+   */
+  async getPlayerHistory(nhlId: number): Promise<PlayerHistoryResponse> {
+    const joueur = await this.getPlayerByNhlId(nhlId);
+    if (!joueur) return { joueur_id: null, events: [] };
+
+    const [tradesResult, draftResult, ballotageResult] = await Promise.all([
+      this.pool.query(QUERIES.GET_PLAYER_TRADE_HISTORY, [nhlId]),
+      this.pool.query(QUERIES.GET_PLAYER_DRAFT_HISTORY, [nhlId]),
+      this.pool.query(QUERIES.GET_PLAYER_BALLOTAGE_HISTORY, [nhlId]),
+    ]);
+
+    const tradeEvents: HistoireEchangeEvent[] = tradesResult.rows.map((row) => ({
+      type: 'echange' as const,
+      sort_date: String(row.date),
+      id: row.id,
+      date: String(row.date),
+      statut_confirmer: row.statut_confirmer,
+      equipe_source_id: row.equipe_source_id,
+      equipe_source_nom: row.equipe_source_nom,
+      equipe_destination_id: row.equipe_destination_id,
+      equipe_destination_nom: row.equipe_destination_nom,
+      joueurs_source: row.joueurs_source ?? [],
+      joueurs_destination: row.joueurs_destination ?? [],
+    }));
+
+    // Chronological order of draft types within a year: annuel → décembre → mars
+    const TYPE_SLOT: Record<number, string> = {
+      2: '1', // Draft annuel
+      3: '2', // Draft d'expansion
+      1: '3', // Ballotage / repêchage de décembre
+      4: '4', // Ballotage / repêchage de mars
+    };
+
+    const draftSortDate = (annee: number, typeId: number): string => (
+      `${annee}-${TYPE_SLOT[typeId] ?? '9'}`
+    );
+
+    const draftEvents: HistoireRepechageEvent[] = draftResult.rows.map((row) => ({
+      type: 'repechage' as const,
+      sort_date: draftSortDate(row.annee, row.type_id),
+      id: row.id,
+      annee: row.annee,
+      round: row.round ?? null,
+      rang: row.rang,
+      equipe_id: row.equipe_id,
+      equipe_nom: row.equipe_nom,
+      type_id: row.type_id,
+      type_nom: row.type_nom,
+    }));
+
+    const ballotageEvents: HistoireBallotageEvent[] = ballotageResult.rows.map((row) => ({
+      type: 'ballotage' as const,
+      sort_date: draftSortDate(row.annee, row.type_id),
+      id: row.id,
+      annee: row.annee,
+      equipe_id: row.equipe_id,
+      equipe_nom: row.equipe_nom,
+      type_id: row.type_id,
+      type_nom: row.type_nom,
+    }));
+
+    const typePriority = (type: HistoireEvent['type']): number => {
+      if (type === 'ballotage') return 0;
+      if (type === 'repechage') return 1;
+      return 2;
+    };
+
+    const events: HistoireEvent[] = [
+      ...tradeEvents, ...draftEvents, ...ballotageEvents,
+    ].sort((a, b) => {
+      const dateCompare = a.sort_date.localeCompare(b.sort_date);
+      if (dateCompare !== 0) return dateCompare;
+      return typePriority(a.type) - typePriority(b.type);
+    });
+
+    return { joueur_id: joueur.id, events };
   }
 
   /**
