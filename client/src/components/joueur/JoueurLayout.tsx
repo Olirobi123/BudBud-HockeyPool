@@ -5,6 +5,7 @@ import JoueurTabs from './JoueurTabs';
 import JoueurTabsOverview from './JoueurTabsOverview';
 import JoueurTabsStats from './JoueurTabsStats';
 import JoueurTabsLastFive from './JoueurTabsLastFive';
+import JoueurTabsHistoire from './JoueurTabsHistoire';
 
 type Props = {
   player: PlayerDetails;
@@ -18,6 +19,7 @@ export default function JoueurLayout({ player }: Props) {
         <JoueurTabsOverview player={player} />
         <JoueurTabsLastFive player={player} />
         <JoueurTabsStats player={player} />
+        <JoueurTabsHistoire player={player} />
       </JoueurTabs>
     </Layout>
   );

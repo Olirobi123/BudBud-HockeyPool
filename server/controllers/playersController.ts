@@ -86,6 +86,19 @@ export class PlayersController {
   });
 
   /**
+   * Récupérer l'historique complet d'un joueur dans le pool
+   */
+  getPlayerHistory = asyncHandler(async (req: Request, res: Response) => {
+    const nhlIdNum = parseInt(req.params.nhlId, 10);
+    if (Number.isNaN(nhlIdNum)) {
+      sendServerError(res, 'NHL ID invalide');
+      return;
+    }
+    const history = await playersService.getPlayerHistory(nhlIdNum);
+    sendSuccess(res, history);
+  });
+
+  /**
    * Récupérer un joueur de la base locale par son ID interne
    */
   getPlayerById = asyncHandler(async (req: Request, res: Response) => {
