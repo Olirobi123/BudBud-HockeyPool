@@ -377,14 +377,13 @@ export const QUERIES = {
   `,
   UPSERT_SEMAINE_BASELINE: `
     INSERT INTO ${TABLES.SERIES_SEMAINE_BASELINE}
-      (equipe_id, saison, semaine, total_points, attaque_points, defense_points, gardien_points, total_buts, total_matchs, snapshot_at)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+      (equipe_id, saison, semaine, total_points, attaque_points, defense_points, gardien_points, total_matchs, snapshot_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
     ON CONFLICT (equipe_id, saison, semaine) DO UPDATE SET
       total_points = EXCLUDED.total_points,
       attaque_points = EXCLUDED.attaque_points,
       defense_points = EXCLUDED.defense_points,
       gardien_points = EXCLUDED.gardien_points,
-      total_buts = EXCLUDED.total_buts,
       total_matchs = EXCLUDED.total_matchs,
       snapshot_at = NOW()
   `,
@@ -395,14 +394,13 @@ export const QUERIES = {
   `,
   UPSERT_SEMAINE_POINTS: `
     INSERT INTO ${TABLES.EQUIPE_SEMAINE_POINTS}
-      (equipe_id, saison, semaine, debut_semaine, fin_semaine, attaque_points, defense_points, gardien_points, total_points, total_buts, total_matchs, last_update_at)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+      (equipe_id, saison, semaine, debut_semaine, fin_semaine, attaque_points, defense_points, gardien_points, total_points, total_matchs, last_update_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
     ON CONFLICT (equipe_id, saison, semaine) DO UPDATE SET
       attaque_points = EXCLUDED.attaque_points,
       defense_points = EXCLUDED.defense_points,
       gardien_points = EXCLUDED.gardien_points,
       total_points = EXCLUDED.total_points,
-      total_buts = EXCLUDED.total_buts,
       total_matchs = EXCLUDED.total_matchs,
       last_update_at = NOW()
   `,
@@ -411,6 +409,11 @@ export const QUERIES = {
     FROM ${TABLES.EQUIPE_SEMAINE_POINTS} esp
     JOIN ${TABLES.EQUIPES} e ON esp.equipe_id = e.id
     WHERE esp.saison = $1 AND esp.semaine = $2
+  `,
+  GET_SEMAINE_POINTS_MATCHS: `
+    SELECT equipe_id, total_matchs
+    FROM ${TABLES.EQUIPE_SEMAINE_POINTS}
+    WHERE saison = $1 AND semaine = $2
   `,
 
   // Player history (trades, drafts, ballotage) by NHL player ID

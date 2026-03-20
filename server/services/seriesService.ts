@@ -5,6 +5,7 @@ import {
   SeriesPlayoff,
   SemaineBaseline,
   EquipeSemainePoints,
+  LiveTeamPoints,
 } from '../types';
 
 // Playoff schedule: semaine → { debut, fin }
@@ -14,27 +15,75 @@ const PLAYOFF_WEEKS: Record<number, { debut: string; fin: string }> = {
   3: { debut: '2026-04-06', fin: '2026-04-12' }, // Final week
 };
 
-function getRondeActive(): 1 | 2 | 3 | null {
-  const now = new Date();
-  const today = now.toISOString().slice(0, 10);
-  for (const [semaineStr, range] of Object.entries(PLAYOFF_WEEKS)) {
-    if (today >= range.debut && today <= range.fin) {
-      return parseInt(semaineStr) as 1 | 2 | 3;
+export class SeriesService {
+  getRondeActive(): 1 | 2 | 3 | null {
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+    for (const [semaineStr, range] of Object.entries(PLAYOFF_WEEKS)) {
+      if (today >= range.debut && today <= range.fin) {
+        return parseInt(semaineStr) as 1 | 2 | 3;
+      }
+    }
+    // Also active if we're past the start of playoffs but not yet in a week window
+    const playoffStart = '2026-03-23';
+    const playoffEnd = '2026-04-12';
+    if (today >= playoffStart && today <= playoffEnd) {
+      if (today < PLAYOFF_WEEKS[1].debut) return 1;
+      if (today < PLAYOFF_WEEKS[2].debut) return 1;
+      if (today < PLAYOFF_WEEKS[3].debut) return 2;
+      return 3;
+    }
+    return null;
+  }
+
+  /**
+   * Update daily series points and PJ for the active playoff round.
+   * Called from snapshotService after saving live_points.
+   */
+  async updateDailySeries(
+    saison: string,
+    semaine: number,
+    leaderboard: Pick<LiveTeamPoints, 'equipeId' | 'totalPJ'>[],
+  ): Promise<void> {
+    const week = PLAYOFF_WEEKS[semaine];
+    if (!week) return;
+
+    const [baselineResult, currentResult, existingPjResult] = await Promise.all([
+      pool.query(QUERIES.GET_SEMAINE_BASELINE, [saison, semaine]),
+      pool.query(QUERIES.GET_CURRENT_EQUIPE_POINTS_ALL, [saison]),
+      pool.query(QUERIES.GET_SEMAINE_POINTS_MATCHS, [saison, semaine]),
+    ]);
+
+    const baselineMap = new Map<number, SemaineBaseline>(
+      baselineResult.rows.map((r: SemaineBaseline) => [r.equipe_id, r]),
+    );
+    const existingPjMap = new Map<number, number>(
+      existingPjResult.rows.map((r: { equipe_id: number; total_matchs: number }) => [
+        r.equipe_id,
+        r.total_matchs,
+      ]),
+    );
+    const dailyPjMap = new Map<number, number>(leaderboard.map((t) => [t.equipeId, t.totalPJ]));
+
+    for (const current of currentResult.rows) {
+      const baseline = baselineMap.get(current.equipe_id);
+      if (!baseline) continue;
+
+      const attaque = Math.max(0, current.attaque_points - baseline.attaque_points);
+      const defense = Math.max(0, current.defense_points - baseline.defense_points);
+      const gardien = Math.max(0, current.gardien_points - baseline.gardien_points);
+      const total   = Math.max(0, current.total_points   - baseline.total_points);
+
+      const dailyPj = dailyPjMap.get(current.equipe_id) ?? 0;
+      const newPj = (existingPjMap.get(current.equipe_id) ?? 0) + dailyPj;
+
+      await pool.query(QUERIES.UPSERT_SEMAINE_POINTS, [
+        current.equipe_id, saison, semaine, week.debut, week.fin,
+        attaque, defense, gardien, total, newPj,
+      ]);
     }
   }
-  // Also active if we're past the start of playoffs but not yet in a week window
-  const playoffStart = '2026-03-23';
-  const playoffEnd = '2026-04-12';
-  if (today >= playoffStart && today <= playoffEnd) {
-    if (today < PLAYOFF_WEEKS[1].debut) return 1;
-    if (today < PLAYOFF_WEEKS[2].debut) return 1;
-    if (today < PLAYOFF_WEEKS[3].debut) return 2;
-    return 3;
-  }
-  return null;
-}
 
-export class SeriesService {
   /**
    * Initialize the bracket from current division standings.
    * Seeds the 4 QF matchups into series_playoffs.
@@ -86,7 +135,6 @@ export class SeriesService {
         row.attaque_points,
         row.defense_points,
         row.gardien_points,
-        row.total_buts,
         row.total_matchs,
       ]);
     }
@@ -123,7 +171,6 @@ export class SeriesService {
         Math.max(0, current.defense_points - baseline.defense_points),
         Math.max(0, current.gardien_points - baseline.gardien_points),
         Math.max(0, current.total_points - baseline.total_points),
-        Math.max(0, current.total_buts - baseline.total_buts),
         Math.max(0, current.total_matchs - baseline.total_matchs),
       ]);
     }
@@ -196,11 +243,6 @@ export class SeriesService {
       return ppgA > ppgB ? a.equipe_id : b.equipe_id;
     }
 
-    // Rule 3: most goals
-    if (a.total_buts !== b.total_buts) {
-      return a.total_buts > b.total_buts ? a.equipe_id : b.equipe_id;
-    }
-
     // Fallback: team A wins (should never happen)
     return a.equipe_id;
   }
@@ -231,7 +273,7 @@ export class SeriesService {
       quartsDeFinale: all.filter((r) => r.ronde === 1),
       demiFinales: all.filter((r) => r.ronde === 2),
       finale: all.find((r) => r.ronde === 3) ?? null,
-      rondeActive: getRondeActive(),
+      rondeActive: this.getRondeActive(),
       weekPoints: {
         1: week1.rows,
         2: week2.rows,

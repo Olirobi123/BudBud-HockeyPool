@@ -2,6 +2,7 @@ import pool from '../config/database';
 import { QUERIES } from '../models';
 import { livePointsService } from './livePointsService';
 import { getCurrentSeason } from './seasonHelper';
+import { seriesService } from './seriesService';
 
 const FULL_KEY = 'live_points';
 
@@ -29,6 +30,11 @@ export class SnapshotService {
     const patched = { ...response, teamLeaderboard: patchedLeaderboard };
 
     await pool.query(QUERIES.UPSERT_API_STORE, [FULL_KEY, patched]);
+
+    const ronde = seriesService.getRondeActive();
+    if (ronde !== null) {
+      await seriesService.updateDailySeries(season, ronde, patched.teamLeaderboard);
+    }
   }
 }
 
