@@ -117,6 +117,9 @@ export class SeriesService {
     await pool.query(QUERIES.INSERT_SERIES, [s, 2, 'nord', 5, null, null, null]);
     await pool.query(QUERIES.INSERT_SERIES, [s, 2, 'sud',  6, null, null, null]);
     await pool.query(QUERIES.INSERT_SERIES, [s, 3, null,   7, null, null, null]);
+
+    // Snapshot QF baseline automatically
+    await this.snapshotWeekBaseline(s, 1);
   }
 
   /**
