@@ -50,6 +50,94 @@ function RosterSkeleton() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Shared badge helper                                                 */
+/* ------------------------------------------------------------------ */
+
+function PlayerBadge({
+  nhlId, injuries, etat, position,
+}: {
+  nhlId: number;
+  injuries?: Record<number, InjuryInfo>;
+  etat?: Record<number, EtatInfo>;
+  position: string;
+}) {
+  if (injuries?.[nhlId]) return <InjuryBadge injury={injuries[nhlId]} />;
+  if (etat?.[nhlId] && etat[nhlId].etat !== 'normal') {
+    return <EtatBadge etat={etat[nhlId]} position={position} />;
+  }
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Mobile row — div-based, full control                               */
+/* ------------------------------------------------------------------ */
+
+interface MobileSkaterRowProps {
+  player: RosterPlayerWithStats;
+  injuries?: Record<number, InjuryInfo>;
+  etat?: Record<number, EtatInfo>;
+}
+
+function MobileSkaterRow({ player, injuries, etat }: MobileSkaterRowProps) {
+  const stats = player.nhlStats && isSkaterStats(player.nhlStats) ? player.nhlStats : null;
+
+  return (
+    <div className={`flex items-start px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
+      {player.teamLogo
+        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2 mt-0.5" />
+        : <span className="w-7 shrink-0 mr-2" />}
+      <div className="flex-1 min-w-0 pt-px">
+        <div className="flex items-start gap-1 min-w-0">
+          <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug">
+            {player.prenom} {player.nom}
+          </Link>
+          <span className="inline-flex items-center shrink-0 mt-0.5">
+            <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
+          </span>
+        </div>
+      </div>
+      <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats?.gamesPlayed ?? '-'}</span>
+      <span className="w-8 text-center text-xs font-bold text-primary tabular-nums shrink-0 pt-px">{stats?.points ?? '-'}</span>
+      <span className="w-9 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats ? stats.ppm.toFixed(2) : '-'}</span>
+    </div>
+  );
+}
+
+function MobileGoalieRow({ player, injuries, etat }: MobileSkaterRowProps) {
+  const stats = player.nhlStats && isGoalieStats(player.nhlStats) ? player.nhlStats : null;
+  const poolPts = player.nhlStats && isGoalieStats(player.nhlStats)
+    ? player.nhlStats.wins * 2 + player.nhlStats.shutouts * 3
+    : 0;
+
+  return (
+    <div className={`flex items-start px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
+      {player.teamLogo
+        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2 mt-0.5" />
+        : <span className="w-7 shrink-0 mr-2" />}
+      <div className="flex-1 min-w-0 pt-px">
+        <div className="flex items-start gap-1 min-w-0">
+          <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug">
+            {player.prenom} {player.nom}
+          </Link>
+          <span className="inline-flex items-center shrink-0 mt-0.5">
+            <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
+          </span>
+        </div>
+      </div>
+      <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats?.gamesPlayed ?? '-'}</span>
+      <span className="w-10 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">
+        {stats ? `${stats.wins}·${stats.shutouts}` : '-'}
+      </span>
+      <span className="w-8 text-right text-sm font-bold text-primary tabular-nums shrink-0 pt-px">{poolPts}</span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Skater group — table on desktop, div list on mobile               */
+/* ------------------------------------------------------------------ */
+
 interface SkaterGroupTableProps {
   players: RosterPlayerWithStats[];
   title: string;
@@ -66,23 +154,52 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
   return (
     <div>
       <h4 className="text-sm font-medium text-muted-foreground mb-2">{title}</h4>
-      <Table>
+
+      {/* ── Mobile list ── */}
+      <div className="min-[480px]:hidden divide-y divide-border/40">
+        <div className="flex items-center px-1 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide border-b border-border/40">
+          <span className="w-7 shrink-0 mr-2" />
+          <span className="flex-1 min-w-0">Joueur</span>
+          <span className="w-8 text-center shrink-0">PJ</span>
+          <span className="w-8 text-center shrink-0 text-primary">Pts</span>
+          <span className="w-9 text-center shrink-0">PPM</span>
+        </div>
+        {sortedPlayers.map((player, index) => (
+          <Fragment key={player.id}>
+            {player.isActive === false && index > 0 && sortedPlayers[index - 1].isActive === true && (
+              <div className="border-t-2 border-dashed border-muted-foreground/30 my-0.5" />
+            )}
+            <MobileSkaterRow player={player} injuries={injuries} etat={etat} />
+          </Fragment>
+        ))}
+        <div className="flex items-center px-1 py-2 border-t-2 bg-muted/40">
+          <span className="w-7 shrink-0 mr-2" />
+          <span className="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total</span>
+          <span className="w-8 shrink-0" />
+          <span className="w-8 text-center shrink-0">
+            <span className="inline-flex items-center justify-center min-w-[2rem] rounded-md bg-primary/15 text-primary text-base font-bold px-2 py-0.5 tabular-nums">
+              {totalPoints}
+            </span>
+          </span>
+          <span className="w-9 shrink-0" />
+        </div>
+      </div>
+
+      {/* ── Desktop table ── */}
+      <Table className="hidden min-[480px]:table">
         <TableHeader>
           <TableRow>
             <TableHead className="w-full px-2 sm:px-4">Joueur</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">B</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4 hidden sm:table-cell">A</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-0 sm:px-4 text-primary font-semibold">Pts</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-0 sm:px-4">PPM</TableHead>
+            <TableHead className="w-12 text-center px-4 hidden md:table-cell">B</TableHead>
+            <TableHead className="w-12 text-center px-4 hidden md:table-cell">A</TableHead>
+            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 text-primary font-semibold">Pts</TableHead>
+            <TableHead className="w-12 sm:w-16 text-center px-1 sm:px-4">PPM</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedPlayers.map((player, index) => {
-            const stats = player.nhlStats && isSkaterStats(player.nhlStats)
-              ? player.nhlStats
-              : null;
-
+            const stats = player.nhlStats && isSkaterStats(player.nhlStats) ? player.nhlStats : null;
             const showSeparator = player.isActive === false
               && index > 0
               && sortedPlayers[index - 1].isActive === true;
@@ -98,43 +215,24 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
                   <TableCell className="max-w-0 px-2 sm:px-4 py-1.5 sm:py-2">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <Link
                         to={`/joueur/${player.nhl_player_id}`}
                         className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 flex-1"
                       >
                         {player.teamLogo && (
-                          <img
-                            src={player.teamLogo}
-                            alt=""
-                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
-                          />
+                          <img src={player.teamLogo} alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain shrink-0" />
                         )}
-                        <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
+                        <span className="truncate">{player.prenom} {player.nom}</span>
                       </Link>
-                      {injuries?.[player.nhl_player_id] && (
-                        <InjuryBadge injury={injuries[player.nhl_player_id]} />
-                      )}
-                      {!injuries?.[player.nhl_player_id] && etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
-                        <EtatBadge etat={etat[player.nhl_player_id]} position={player.position} />
-                      )}
+                      <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
-                    {stats?.gamesPlayed ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
-                    {stats?.goals ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-center px-0 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
-                    {stats?.assists ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-center px-0 sm:px-4 py-1.5 sm:py-2 font-semibold text-primary tabular-nums">
-                    {stats?.points ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-center px-0 sm:px-4 py-1.5 sm:py-2">
-                    {stats ? stats.ppm.toFixed(2) : '-'}
-                  </TableCell>
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">{stats?.gamesPlayed ?? '-'}</TableCell>
+                  <TableCell className="text-center px-4 py-2 hidden md:table-cell">{stats?.goals ?? '-'}</TableCell>
+                  <TableCell className="text-center px-4 py-2 hidden md:table-cell">{stats?.assists ?? '-'}</TableCell>
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 font-semibold text-primary tabular-nums">{stats?.points ?? '-'}</TableCell>
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">{stats ? stats.ppm.toFixed(2) : '-'}</TableCell>
                 </TableRow>
               </Fragment>
             );
@@ -142,8 +240,8 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
           <TableRow className="bg-muted/50 font-semibold border-t-2">
             <TableCell className="text-right">Total</TableCell>
             <TableCell />
-            <TableCell className="hidden sm:table-cell" />
-            <TableCell className="hidden sm:table-cell" />
+            <TableCell className="hidden md:table-cell" />
+            <TableCell className="hidden md:table-cell" />
             <TableCell className="text-center">
               <span className="inline-flex items-center justify-center min-w-[2.5rem] rounded-md bg-primary/15 text-primary text-lg font-bold px-2 py-0.5 tabular-nums">
                 {totalPoints}
@@ -157,6 +255,10 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Goalies group                                                       */
+/* ------------------------------------------------------------------ */
+
 function getGoaliePoolPoints(player: RosterPlayerWithStats): number {
   if (player.nhlStats && isGoalieStats(player.nhlStats)) {
     return player.nhlStats.wins * 2 + player.nhlStats.shutouts * 3;
@@ -164,35 +266,66 @@ function getGoaliePoolPoints(player: RosterPlayerWithStats): number {
   return 0;
 }
 
-function GoaliesTable({ goalies, injuries, etat }: { goalies: RosterPlayerWithStats[]; injuries?: Record<number, InjuryInfo>; etat?: Record<number, EtatInfo> }) {
+function GoaliesTable({ goalies, injuries, etat }: {
+  goalies: RosterPlayerWithStats[];
+  injuries?: Record<number, InjuryInfo>;
+  etat?: Record<number, EtatInfo>;
+}) {
   if (goalies.length === 0) return null;
 
   const sorted = [...goalies].sort((a, b) => getGoaliePoolPoints(b) - getGoaliePoolPoints(a));
-  const totalPoints = sorted
-    .filter((p) => p.isActive)
-    .reduce((sum, p) => sum + getGoaliePoolPoints(p), 0);
+  const totalPoints = sorted.filter((p) => p.isActive).reduce((sum, p) => sum + getGoaliePoolPoints(p), 0);
 
   return (
     <div>
       <h4 className="text-sm font-medium text-muted-foreground mb-2">Gardiens</h4>
-      <Table>
+
+      {/* ── Mobile list ── */}
+      <div className="min-[480px]:hidden divide-y divide-border/40">
+        <div className="flex items-center px-1 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide border-b border-border/40">
+          <span className="w-7 shrink-0 mr-2" />
+          <span className="flex-1 min-w-0">Joueur</span>
+          <span className="w-8 text-center shrink-0">PJ</span>
+          <span className="w-10 text-center shrink-0">V·BL</span>
+          <span className="w-8 text-right shrink-0 text-primary">Pts</span>
+        </div>
+        {sorted.map((player, index) => (
+          <Fragment key={player.id}>
+            {player.isActive === false && index > 0 && sorted[index - 1].isActive === true && (
+              <div className="border-t-2 border-dashed border-muted-foreground/30 my-0.5" />
+            )}
+            <MobileGoalieRow player={player} injuries={injuries} etat={etat} />
+          </Fragment>
+        ))}
+        <div className="flex items-center px-1 py-2 border-t-2 bg-muted/40">
+          <span className="w-7 shrink-0 mr-2" />
+          <span className="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total</span>
+          <span className="w-8 shrink-0" />
+          <span className="w-10 shrink-0" />
+          <span className="w-8 text-right shrink-0">
+            <span className="inline-flex items-center justify-center min-w-[2rem] rounded-md bg-primary/15 text-primary text-base font-bold px-2 py-0.5 tabular-nums">
+              {totalPoints}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      {/* ── Desktop table ── */}
+      <Table className="hidden min-[480px]:table">
         <TableHeader>
           <TableRow>
             <TableHead className="w-full px-2 sm:px-4">Joueur</TableHead>
             <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4">PJ</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">V</TableHead>
-            <TableHead className="w-10 sm:w-12 text-center px-1 sm:px-4 hidden sm:table-cell">BL</TableHead>
+            <TableHead className="w-12 text-center px-4 hidden md:table-cell">V</TableHead>
+            <TableHead className="w-12 text-center px-4 hidden md:table-cell">BL</TableHead>
             <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4 text-primary font-semibold">Pts</TableHead>
-            <TableHead className="w-10 sm:w-16 text-center px-1 sm:px-4">PPM</TableHead>
+            <TableHead className="w-12 sm:w-16 text-center px-1 sm:px-4">PPM</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sorted.map((player, index) => {
-            const stats = player.nhlStats && isGoalieStats(player.nhlStats)
-              ? player.nhlStats
-              : null;
+            const stats = player.nhlStats && isGoalieStats(player.nhlStats) ? player.nhlStats : null;
             const poolPts = getGoaliePoolPoints(player);
-
             const showSeparator = player.isActive === false
               && index > 0
               && sorted[index - 1].isActive === true;
@@ -208,43 +341,24 @@ function GoaliesTable({ goalies, injuries, etat }: { goalies: RosterPlayerWithSt
                 )}
                 <TableRow className={player.isActive === false ? 'opacity-50' : ''}>
                   <TableCell className="max-w-0 px-2 sm:px-4 py-1.5 sm:py-2">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <Link
                         to={`/joueur/${player.nhl_player_id}`}
                         className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 flex-1"
                       >
                         {player.teamLogo && (
-                          <img
-                            src={player.teamLogo}
-                            alt=""
-                            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0"
-                          />
+                          <img src={player.teamLogo} alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain shrink-0" />
                         )}
-                        <span className="break-words leading-tight">{player.prenom} {player.nom}</span>
+                        <span className="truncate">{player.prenom} {player.nom}</span>
                       </Link>
-                      {injuries?.[player.nhl_player_id] && (
-                        <InjuryBadge injury={injuries[player.nhl_player_id]} />
-                      )}
-                      {!injuries?.[player.nhl_player_id] && etat?.[player.nhl_player_id] && etat[player.nhl_player_id].etat !== 'normal' && (
-                        <EtatBadge etat={etat[player.nhl_player_id]} position={player.position} />
-                      )}
+                      <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
-                    {stats?.gamesPlayed ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
-                    {stats?.wins ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 hidden sm:table-cell">
-                    {stats?.shutouts ?? '-'}
-                  </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 font-semibold text-primary tabular-nums">
-                    {poolPts}
-                  </TableCell>
-                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">
-                    {stats ? stats.ppm.toFixed(2) : '-'}
-                  </TableCell>
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">{stats?.gamesPlayed ?? '-'}</TableCell>
+                  <TableCell className="text-center px-4 py-2 hidden md:table-cell">{stats?.wins ?? '-'}</TableCell>
+                  <TableCell className="text-center px-4 py-2 hidden md:table-cell">{stats?.shutouts ?? '-'}</TableCell>
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2 font-semibold text-primary tabular-nums">{poolPts}</TableCell>
+                  <TableCell className="text-center px-1 sm:px-4 py-1.5 sm:py-2">{stats ? stats.ppm.toFixed(2) : '-'}</TableCell>
                 </TableRow>
               </Fragment>
             );
@@ -252,8 +366,8 @@ function GoaliesTable({ goalies, injuries, etat }: { goalies: RosterPlayerWithSt
           <TableRow className="bg-muted/50 font-semibold border-t-2">
             <TableCell className="text-right">Total</TableCell>
             <TableCell />
-            <TableCell className="hidden sm:table-cell" />
-            <TableCell className="hidden sm:table-cell" />
+            <TableCell className="hidden md:table-cell" />
+            <TableCell className="hidden md:table-cell" />
             <TableCell className="text-center">
               <span className="inline-flex items-center justify-center min-w-[2.5rem] rounded-md bg-primary/15 text-primary text-lg font-bold px-2 py-0.5 tabular-nums">
                 {totalPoints}
@@ -266,6 +380,10 @@ function GoaliesTable({ goalies, injuries, etat }: { goalies: RosterPlayerWithSt
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Export                                                              */
+/* ------------------------------------------------------------------ */
 
 export function TeamRoster({ roster, isLoading, injuries, etat }: TeamRosterProps) {
   const forwards = roster.filter((p) => ['C', 'L', 'R'].includes(p.position));

@@ -13,6 +13,7 @@ import snapshotRoutes from './routes/snapshot';
 import misAuBallotageRoutes from './routes/misAuBallotage';
 import injuriesRoutes from './routes/injuries';
 import etatRoutes from './routes/etat';
+import seriesRoutes from './routes/series';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -53,6 +54,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Routes pour l'état des joueurs (hot/cold/normal)
   app.use('/api/etat', etatRoutes);
+
+  // Routes pour les séries éliminatoires
+  app.use('/api/series', seriesRoutes);
 
   const httpServer = createServer(app);
 

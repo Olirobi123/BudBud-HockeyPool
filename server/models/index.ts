@@ -16,6 +16,9 @@ export const TABLES = {
   TYPES_REPECHAGE: 'types_repechage',
   BLESSURES: 'blessures',
   ETAT_JOUEURS: 'etat_joueurs',
+  EQUIPE_SEMAINE_POINTS: 'equipe_semaine_points',
+  SERIES_PLAYOFFS: 'series_playoffs',
+  SERIES_SEMAINE_BASELINE: 'series_semaine_baseline',
 } as const;
 
 export const QUERIES = {
@@ -198,16 +201,26 @@ export const QUERIES = {
     WHERE tg.equipe_id = $1
     ORDER BY tg.annee DESC, t.id
   `,
+  // Insert trophée playoff si pas encore attribué pour cette année
+  INSERT_TROPHEE_PLAYOFF_IF_ABSENT: `
+    INSERT INTO ${TABLES.TROPHEE_GAGNANTS} (trophee_id, annee, equipe_id)
+    SELECT 5, $1, $2
+    WHERE NOT EXISTS (
+      SELECT 1 FROM ${TABLES.TROPHEE_GAGNANTS} WHERE trophee_id = 5 AND annee = $1
+    )
+  `,
 
   // Equipe Points (classement)
   UPSERT_EQUIPE_POINTS: `
-    INSERT INTO ${TABLES.EQUIPE_POINTS} (equipe_id, season, attaque_points, defense_points, gardien_points, total_points, last_update_at)
-    VALUES ($1, $2, $3, $4, $5, $6, NOW())
+    INSERT INTO ${TABLES.EQUIPE_POINTS} (equipe_id, season, attaque_points, defense_points, gardien_points, total_points, total_buts, total_matchs, last_update_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
     ON CONFLICT (equipe_id, season) DO UPDATE SET
       attaque_points = EXCLUDED.attaque_points,
       defense_points = EXCLUDED.defense_points,
       gardien_points = EXCLUDED.gardien_points,
       total_points = EXCLUDED.total_points,
+      total_buts = EXCLUDED.total_buts,
+      total_matchs = EXCLUDED.total_matchs,
       last_update_at = NOW()
   `,
   GET_RANKINGS_BY_SEASON: `
@@ -312,7 +325,7 @@ export const QUERIES = {
 
   // Live Points: batch ownership lookup by NHL player IDs
   GET_BATCH_OWNERSHIP_BY_NHL_IDS: `
-    SELECT j.nhl_player_id, j.nom, j.prenom, j.position,
+    SELECT j.nhl_player_id, j.nom, j.prenom, j.position, j.compte_points,
            e.id as equipe_id, e.nom as equipe_nom
     FROM ${TABLES.JOUEURS} j
     LEFT JOIN ${TABLES.EQUIPE_JOUEURS} ej ON ej.joueur_id = j.id

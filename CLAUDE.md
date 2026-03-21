@@ -72,6 +72,7 @@ Before implementing features, consult in this order:
 3. `/Docs/project_structure.md` - File naming and folder structure
 4. `/Docs/UI_UX_doc.md` - Design system and responsive requirements
 5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (12 tables)
+6. `/Docs/Cron_Jobs.md` - Cron schedule, manual playoff actions, and endpoint reference
 6. `/Docs/Git_Workflow.md` - Branching strategy and deployment process
 
 ## Key Constraints

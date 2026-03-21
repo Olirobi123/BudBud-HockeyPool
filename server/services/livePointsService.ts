@@ -29,6 +29,7 @@ interface OwnershipRow {
   nom: string;
   prenom: string;
   position: string;
+  compte_points: boolean;
   equipe_id: number | null;
   equipe_nom: string | null;
 }
@@ -157,7 +158,7 @@ export class LivePointsService {
       .slice(0, TOP_PLAYERS_LIMIT);
 
     // Build team leaderboard from owned players, including teams with 0 points
-    const teamLeaderboard = await this.buildTeamLeaderboard(allPlayers);
+    const teamLeaderboard = await this.buildTeamLeaderboard(allPlayers, ownershipMap);
 
     return this.cacheAndReturn({
       topPlayers,
@@ -343,7 +344,7 @@ export class LivePointsService {
     }
   }
 
-  private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[]): Promise<LiveTeamPoints[]> {
+  private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[], ownershipMap: Map<number, OwnershipRow>): Promise<LiveTeamPoints[]> {
     const teamMap = new Map<number, LiveTeamPoints>();
 
     // Seed all active pool teams so teams with 0 points still appear
@@ -354,6 +355,7 @@ export class LivePointsService {
           equipeId: row.id,
           equipeNom: row.nom,
           totalPoints: 0,
+          totalPJ: 0,
           totalGoals: 0,
           totalAssists: 0,
           attaquePoints: 0,
@@ -376,6 +378,9 @@ export class LivePointsService {
       team.totalPoints += player.points;
       team.totalGoals += player.goals;
       team.totalAssists += player.assists;
+      if (ownershipMap.get(player.nhlPlayerId)?.compte_points) {
+        team.totalPJ += 1;
+      }
       if (player.position === GOALIE_POSITION) {
         team.gardienPoints += player.points;
       } else if (player.position === DEFENSE_POSITION) {
