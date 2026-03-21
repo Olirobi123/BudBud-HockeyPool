@@ -95,7 +95,7 @@ function DraftEventItem(
               {event.rang}
             </span>
             {event.round !== null && (
-              <span className="text-[10px] text-blue-500/60 mt-1 tabular-nums whitespace-nowrap">
+              <span className="text-[10px] text-blue-500/60 mt-1 tabular-nums">
                 Ronde
                 {' '}
                 {event.round}
@@ -190,7 +190,7 @@ export default function JoueurTabsHistoire({ player }: Props) {
       )}
 
       {!isLoading && isEmpty && (
-        <div className="flex flex-col items-center gap-4 py-20 text-center min-h-[60vh] justify-center">
+        <div className="flex flex-col items-center gap-4 py-20 text-center">
           <div className="w-14 h-14 rounded-full border border-border flex items-center justify-center">
             <History className="w-6 h-6 text-muted-foreground" />
           </div>
