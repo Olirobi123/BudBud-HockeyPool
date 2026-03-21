@@ -98,8 +98,8 @@ function MobileSkaterRow({ player, injuries, etat }: MobileSkaterRowProps) {
         </div>
       </div>
       <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats?.gamesPlayed ?? '-'}</span>
-      <span className="w-10 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats ? stats.ppm.toFixed(2) : '-'}</span>
-      <span className="w-8 text-right text-sm font-bold text-primary tabular-nums shrink-0 pt-px">{stats?.points ?? '-'}</span>
+      <span className="w-8 text-center text-xs font-bold text-primary tabular-nums shrink-0 pt-px">{stats?.points ?? '-'}</span>
+      <span className="w-9 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats ? stats.ppm.toFixed(2) : '-'}</span>
     </div>
   );
 }
@@ -161,8 +161,8 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
           <span className="w-7 shrink-0 mr-2" />
           <span className="flex-1 min-w-0">Joueur</span>
           <span className="w-8 text-center shrink-0">PJ</span>
-          <span className="w-10 text-center shrink-0">PPM</span>
-          <span className="w-8 text-right shrink-0 text-primary">Pts</span>
+          <span className="w-8 text-center shrink-0 text-primary">Pts</span>
+          <span className="w-9 text-center shrink-0">PPM</span>
         </div>
         {sortedPlayers.map((player, index) => (
           <Fragment key={player.id}>
@@ -176,12 +176,12 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
           <span className="w-7 shrink-0 mr-2" />
           <span className="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total</span>
           <span className="w-8 shrink-0" />
-          <span className="w-10 shrink-0" />
-          <span className="w-8 text-right shrink-0">
+          <span className="w-8 text-center shrink-0">
             <span className="inline-flex items-center justify-center min-w-[2rem] rounded-md bg-primary/15 text-primary text-base font-bold px-2 py-0.5 tabular-nums">
               {totalPoints}
             </span>
           </span>
+          <span className="w-9 shrink-0" />
         </div>
       </div>
 

@@ -130,11 +130,12 @@ function MobileBracket({ data }: { data: SeriesData }) {
   return (
     <div className="lg:hidden flex flex-col gap-8">
       <RoundColumn
-        title="Quarts de finale"
-        matchups={quartsDeFinale}
-        isActive={rondeActive === 1}
-        rondeNum={1}
-        labelFn={qfLabel}
+        title="Grande Finale"
+        matchups={finale ? [finale] : []}
+        isActive={rondeActive === 3}
+        rondeNum={3}
+        labelFn={finaleLabel}
+        isFinale
       />
       <RoundColumn
         title="Demi-finales"
@@ -144,12 +145,11 @@ function MobileBracket({ data }: { data: SeriesData }) {
         labelFn={sfLabel}
       />
       <RoundColumn
-        title="Grande Finale"
-        matchups={finale ? [finale] : []}
-        isActive={rondeActive === 3}
-        rondeNum={3}
-        labelFn={finaleLabel}
-        isFinale
+        title="Quarts de finale"
+        matchups={quartsDeFinale}
+        isActive={rondeActive === 1}
+        rondeNum={1}
+        labelFn={qfLabel}
       />
     </div>
   );

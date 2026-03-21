@@ -61,7 +61,7 @@ export default function Series(): JSX.Element {
   return (
     <Layout bgClassName="bg-background" mainPadding="py-12">
       {/* Page header */}
-      <div className="flex items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-1 h-8 rounded-full bg-gradient-to-b from-amber-400 to-orange-500 shrink-0" />
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground uppercase tracking-wide truncate">
