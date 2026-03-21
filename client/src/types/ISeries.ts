@@ -3,7 +3,6 @@ export interface SeriesTeamWeek {
   equipe_nom: string;
   division: string;
   total_points: number;
-  total_buts: number;
   total_matchs: number;
   attaque_points: number;
   defense_points: number;

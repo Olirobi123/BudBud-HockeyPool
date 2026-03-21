@@ -12,35 +12,31 @@ interface RoundColumnProps {
   isActive: boolean;
   rondeNum: 1 | 2 | 3;
   labelFn: (m: SeriesMatchup) => string;
+  isFinale?: boolean;
 }
 
 function RoundColumn({
-  title, matchups, isActive, labelFn,
+  title, matchups, isActive, rondeNum, labelFn, isFinale = false,
 }: RoundColumnProps) {
+  const activeColor = isFinale
+    ? { line: 'bg-gradient-to-r from-amber-500/60 to-transparent', lineR: 'bg-gradient-to-l from-amber-500/60 to-transparent', text: 'text-amber-400' }
+    : { line: 'bg-gradient-to-r from-cyan-500/60 to-transparent', lineR: 'bg-gradient-to-l from-cyan-500/60 to-transparent', text: 'text-cyan-400' };
+
   return (
     <div className="flex flex-col gap-3">
       {/* Round header */}
       <div className="flex items-center gap-2 mb-1">
-        <div
-          className={cn(
-            'h-px flex-1',
-            isActive ? 'bg-gradient-to-r from-cyan-500/60 to-transparent' : 'bg-border/30',
-          )}
-        />
+        <div className={cn('h-px flex-1', isActive ? activeColor.line : 'bg-border/30')} />
         <span
           className={cn(
-            'text-[11px] font-bold uppercase tracking-widest px-2 shrink-0',
-            isActive ? 'text-cyan-400' : 'text-muted-foreground/60',
+            'font-bold uppercase tracking-widest px-2 shrink-0',
+            isFinale ? 'text-xs' : 'text-[11px]',
+            isActive ? activeColor.text : 'text-muted-foreground/60',
           )}
         >
           {title}
         </span>
-        <div
-          className={cn(
-            'h-px flex-1',
-            isActive ? 'bg-gradient-to-l from-cyan-500/60 to-transparent' : 'bg-border/30',
-          )}
-        />
+        <div className={cn('h-px flex-1', isActive ? activeColor.lineR : 'bg-border/30')} />
       </div>
 
       {/* Matchup cards */}
@@ -50,6 +46,7 @@ function RoundColumn({
             key={m.id}
             matchup={m}
             label={labelFn(m)}
+            isFinale={isFinale && rondeNum === 3}
           />
         ))}
       </div>
@@ -66,18 +63,20 @@ function DesktopBracket({ data }: { data: SeriesData }) {
     quartsDeFinale, demiFinales, finale, rondeActive,
   } = data;
 
-  const nordQF = quartsDeFinale.filter((m) => m.division === 'nord');
-  const sudQF = quartsDeFinale.filter((m) => m.division === 'sud');
+  const hasDivisions = quartsDeFinale.some((m) => m.division !== null);
 
-  const nordSF = demiFinales.filter((m) => m.division === 'nord');
-  const sudSF = demiFinales.filter((m) => m.division === 'sud');
+  const nordQF = hasDivisions ? quartsDeFinale.filter((m) => m.division === 'nord') : quartsDeFinale;
+  const sudQF = hasDivisions ? quartsDeFinale.filter((m) => m.division === 'sud') : [];
 
-  const qfLabel = (m: SeriesMatchup) => `Division ${m.division === 'nord' ? 'Nord' : 'Sud'}`;
-  const sfLabel = (m: SeriesMatchup) => `Demi-finale ${m.division === 'nord' ? 'Nord' : 'Sud'}`;
+  const nordSF = hasDivisions ? demiFinales.filter((m) => m.division === 'nord') : demiFinales;
+  const sudSF = hasDivisions ? demiFinales.filter((m) => m.division === 'sud') : [];
+
+  const qfLabel = (m: SeriesMatchup) => (m.division ? `Division ${m.division === 'nord' ? 'Nord' : 'Sud'}` : '1/4 de finale');
+  const sfLabel = (m: SeriesMatchup) => (m.division ? `Demi-finale ${m.division === 'nord' ? 'Nord' : 'Sud'}` : 'Demi-finale');
   const finaleLabel = () => 'Grande Finale';
 
   return (
-    <div className="hidden lg:grid grid-cols-3 gap-8 items-start">
+    <div className="hidden lg:grid grid-cols-3 gap-8 items-center">
       {/* Column 1: QF */}
       <div className="flex flex-col gap-6">
         <RoundColumn
@@ -89,8 +88,8 @@ function DesktopBracket({ data }: { data: SeriesData }) {
         />
       </div>
 
-      {/* Column 2: SF — vertically centered relative to QF */}
-      <div className="flex flex-col gap-6 mt-8">
+      {/* Column 2: SF */}
+      <div className="flex flex-col gap-6">
         <RoundColumn
           title="Demi-finales"
           matchups={[...nordSF, ...sudSF]}
@@ -100,14 +99,15 @@ function DesktopBracket({ data }: { data: SeriesData }) {
         />
       </div>
 
-      {/* Column 3: Final — vertically centered */}
-      <div className="flex flex-col gap-6 mt-16">
+      {/* Column 3: Finale */}
+      <div className="flex flex-col gap-6">
         <RoundColumn
           title="Grande Finale"
           matchups={finale ? [finale] : []}
           isActive={rondeActive === 3}
           rondeNum={3}
           labelFn={finaleLabel}
+          isFinale
         />
       </div>
     </div>
@@ -123,8 +123,8 @@ function MobileBracket({ data }: { data: SeriesData }) {
     quartsDeFinale, demiFinales, finale, rondeActive,
   } = data;
 
-  const qfLabel = (m: SeriesMatchup) => `${m.division === 'nord' ? 'Nord' : 'Sud'} — 1/4 de finale`;
-  const sfLabel = (m: SeriesMatchup) => `${m.division === 'nord' ? 'Nord' : 'Sud'} — Demi-finale`;
+  const qfLabel = (m: SeriesMatchup) => (m.division ? `${m.division === 'nord' ? 'Nord' : 'Sud'} — 1/4 de finale` : '1/4 de finale');
+  const sfLabel = (m: SeriesMatchup) => (m.division ? `${m.division === 'nord' ? 'Nord' : 'Sud'} — Demi-finale` : 'Demi-finale');
   const finaleLabel = () => 'Grande Finale';
 
   return (
@@ -149,6 +149,7 @@ function MobileBracket({ data }: { data: SeriesData }) {
         isActive={rondeActive === 3}
         rondeNum={3}
         labelFn={finaleLabel}
+        isFinale
       />
     </div>
   );

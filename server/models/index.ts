@@ -201,6 +201,14 @@ export const QUERIES = {
     WHERE tg.equipe_id = $1
     ORDER BY tg.annee DESC, t.id
   `,
+  // Insert trophée playoff si pas encore attribué pour cette année
+  INSERT_TROPHEE_PLAYOFF_IF_ABSENT: `
+    INSERT INTO ${TABLES.TROPHEE_GAGNANTS} (trophee_id, annee, equipe_id)
+    SELECT 5, $1, $2
+    WHERE NOT EXISTS (
+      SELECT 1 FROM ${TABLES.TROPHEE_GAGNANTS} WHERE trophee_id = 5 AND annee = $1
+    )
+  `,
 
   // Equipe Points (classement)
   UPSERT_EQUIPE_POINTS: `

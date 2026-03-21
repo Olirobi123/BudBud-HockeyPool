@@ -227,6 +227,10 @@ export class SeriesService {
     } else if (ronde === 2 && winners.length === 2) {
       await pool.query(QUERIES.INSERT_SERIES, [saison, 3, null, 7, winners[0].gagnantId, winners[1].gagnantId, null]);
       await this.snapshotWeekBaseline(saison, 3);
+    } else if (ronde === 3 && winners.length === 1) {
+      // Auto-attribuer le trophée Playoffs au champion
+      const annee = parseInt(saison.slice(4)); // '20242025' → 2025
+      await pool.query(QUERIES.INSERT_TROPHEE_PLAYOFF_IF_ABSENT, [annee, winners[0].gagnantId]);
     }
   }
 

@@ -173,7 +173,6 @@ export interface SemaineBaseline {
   attaque_points: number;
   defense_points: number;
   gardien_points: number;
-  total_buts: number;
   total_matchs: number;
   snapshot_at?: Date;
 }
@@ -189,7 +188,6 @@ export interface EquipeSemainePoints {
   defense_points: number;
   gardien_points: number;
   total_points: number;
-  total_buts: number;
   total_matchs: number;
   last_update_at?: Date;
   equipe_nom?: string;

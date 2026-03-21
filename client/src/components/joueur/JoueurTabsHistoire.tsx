@@ -190,7 +190,7 @@ export default function JoueurTabsHistoire({ player }: Props) {
       )}
 
       {!isLoading && isEmpty && (
-        <div className="flex flex-col items-center gap-4 py-20 text-center">
+        <div className="flex flex-col items-center gap-4 py-20 text-center min-h-[60vh] justify-center">
           <div className="w-14 h-14 rounded-full border border-border flex items-center justify-center">
             <History className="w-6 h-6 text-muted-foreground" />
           </div>

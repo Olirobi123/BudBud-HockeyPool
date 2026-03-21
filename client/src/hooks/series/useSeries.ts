@@ -37,7 +37,6 @@ function enrichMatchup(
       equipe_nom: w?.equipe_nom ?? nom ?? '',
       division: w?.division ?? '',
       total_points: w?.total_points ?? 0,
-      total_buts: w?.total_buts ?? 0,
       total_matchs: w?.total_matchs ?? 0,
       attaque_points: w?.attaque_points ?? 0,
       defense_points: w?.defense_points ?? 0,

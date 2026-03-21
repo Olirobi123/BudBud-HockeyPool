@@ -11,15 +11,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useSeries } from '@/hooks/series/useSeries';
+import { usePageLoading } from '@/hooks/usePageLoading';
 
 // First year playoffs were tracked; upper bound = current season end year
-const FIRST_YEAR = 2026;
+const FIRST_YEAR = 2023;
 const now = new Date();
 const LAST_YEAR = Math.max(FIRST_YEAR, now.getMonth() >= 8 ? now.getFullYear() + 1 : now.getFullYear());
 
 const YEARS = Array.from(
   { length: LAST_YEAR - FIRST_YEAR + 1 },
-  (_, i) => FIRST_YEAR + i,
+  (_, i) => LAST_YEAR - i,
 );
 
 function yearToSaison(year: number): string {
@@ -55,6 +56,7 @@ export default function Series(): JSX.Element {
   const [selectedYear, setSelectedYear] = useState<number>(LAST_YEAR);
   const saison = yearToSaison(selectedYear);
   const { data, isLoading, error } = useSeries(saison);
+  usePageLoading({ dependencies: [isLoading] });
 
   return (
     <Layout bgClassName="bg-background" mainPadding="py-12">
@@ -101,7 +103,7 @@ export default function Series(): JSX.Element {
       )}
 
       {!isLoading && !error && (!data || data.quartsDeFinale.length === 0) && (
-        <div className="rounded-xl border border-border/40 px-4 py-12 text-center">
+        <div className="rounded-xl border border-border/40 px-4 py-12 text-center min-h-[60vh] flex flex-col items-center justify-center">
           <Trophy className="w-12 h-12 text-muted-foreground/20 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">
             {`Aucune série disponible pour la saison ${yearLabel(selectedYear)}.`}
