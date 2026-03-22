@@ -158,7 +158,7 @@ export class LivePointsService {
       .slice(0, TOP_PLAYERS_LIMIT);
 
     // Build team leaderboard from owned players, including teams with 0 points
-    const teamLeaderboard = await this.buildTeamLeaderboard(allPlayers, ownershipMap);
+    const teamLeaderboard = await this.buildTeamLeaderboard(allPlayers, ownershipMap, isSnapshotCall);
 
     return this.cacheAndReturn({
       topPlayers,
@@ -344,7 +344,23 @@ export class LivePointsService {
     }
   }
 
-  private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[], ownershipMap: Map<number, OwnershipRow>): Promise<LiveTeamPoints[]> {
+  private async fetchDailyPointsDiff(): Promise<Map<number, number>> {
+    const { getCurrentSeason } = await import('./seasonHelper');
+    const season = getCurrentSeason();
+    const [prevResult, currResult] = await Promise.all([
+      pool.query(QUERIES.GET_API_STORE, ['classement_prev']),
+      pool.query(QUERIES.GET_CURRENT_EQUIPE_POINTS_ALL, [season]),
+    ]);
+    const prevTeams: Record<string, number> = prevResult.rows[0]?.json_response?.teams ?? {};
+    return new Map<number, number>(
+      (currResult.rows as { equipe_id: number; total_points: number }[]).map((r) => [
+        r.equipe_id,
+        Math.max(0, r.total_points - (prevTeams[String(r.equipe_id)] ?? 0)),
+      ]),
+    );
+  }
+
+  private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[], ownershipMap: Map<number, OwnershipRow>, isSnapshotCall: boolean): Promise<LiveTeamPoints[]> {
     const teamMap = new Map<number, LiveTeamPoints>();
 
     // Seed all active pool teams so teams with 0 points still appear
@@ -369,18 +385,34 @@ export class LivePointsService {
       console.error('Error fetching active teams for leaderboard:', error);
     }
 
+    // For snapshot calls, totalPoints is derived from the diff (current equipe_points − yesterday's
+    // baseline) so that any NHL point retractions are automatically reflected.
+    let diffMap: Map<number, number> | null = null;
+    if (isSnapshotCall) {
+      try {
+        diffMap = await this.fetchDailyPointsDiff();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching daily points diff:', error);
+      }
+    }
+
     for (const player of allPlayers) {
       if (!player.poolTeam) continue;
 
       const team = teamMap.get(player.poolTeam.id);
       if (!team) continue;
 
-      team.totalPoints += player.points;
       team.totalGoals += player.goals;
       team.totalAssists += player.assists;
-      if (ownershipMap.get(player.nhlPlayerId)?.compte_points) {
+
+      if (!isSnapshotCall) {
         team.totalPJ += 1;
+      } else if (ownershipMap.get(player.nhlPlayerId)?.compte_points) {
+        team.totalPJ += 1;
+        team.totalPoints += player.points;
       }
+
       if (player.position === GOALIE_POSITION) {
         team.gardienPoints += player.points;
       } else if (player.position === DEFENSE_POSITION) {
@@ -389,6 +421,13 @@ export class LivePointsService {
         team.attaquePoints += player.points;
       }
       team.players.push(player);
+    }
+
+    //Set diff pts
+    if (diffMap) {
+      Array.from(teamMap.values()).forEach((team) => {
+        team.totalPoints = diffMap!.get(team.equipeId) ?? 0;
+      });
     }
 
     return Array.from(teamMap.values())
