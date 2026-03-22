@@ -141,7 +141,7 @@ export class PlayersService {
       3: '2', // Draft d'expansion
       1: '3', // Ballotage / repêchage de décembre
       4: '4', // Ballotage / repêchage de mars
-      5: '5', // Draft de dissolution
+      5: '0', // Draft de dissolution
     };
 
     const draftSortDate = (annee: number, typeId: number): string => (
