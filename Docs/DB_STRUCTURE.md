@@ -11,9 +11,6 @@
 ## Tables et structure détaillée
 
 ### 1. `echanges`
-- **Taille de la table** : 8192 bytes
-- **Taille des index** : 24 kB
-- **Taille totale** : 32 kB
 
 #### Colonnes
 | Nom                   | Type     | Null | Par défaut                                      |
@@ -23,10 +20,6 @@
 | equipe_source_id      | integer  | Non  | -                                               |
 | equipe_destination_id | integer  | Non  | -                                               |
 | statut_confirmer      | boolean  | Oui  | false                                           |
-
-#### Index
-- `echanges_pkey` (16 kB) : UNIQUE sur `id`
-- `idx_echanges_date` : Index sur `date DESC` pour les tris chronologiques
 
 #### Contraintes
 - `PRIMARY KEY (id)`
@@ -40,7 +33,7 @@
 
 ### 2. `echange_joueurs` (Table de jonction)
 
-Table de jonction reliant les échanges aux joueurs reçus par chaque équipe. Remplace la colonne `echanges.details` (texte délimité).
+Table de jonction reliant les échanges aux joueurs reçus par chaque équipe. Remplace la colonne `echanges.details`.
 
 #### Colonnes
 | Nom                   | Type    | Null | Par défaut                                           |
@@ -51,29 +44,20 @@ Table de jonction reliant les échanges aux joueurs reçus par chaque équipe. R
 | joueur_id             | integer | Oui  | -                                                    |
 | joueur_nom_libre      | text    | Oui  | -                                                    |
 
-#### Index
-- `echange_joueurs_pkey` : UNIQUE sur `id`
-- `idx_echange_joueurs_echange_id` : Index sur `echange_id` pour les jointures
-- `idx_echange_joueurs_joueur_id` : Index partiel sur `joueur_id WHERE joueur_id IS NOT NULL`
-
 #### Contraintes
 - `PRIMARY KEY (id)`
 - `FOREIGN KEY (echange_id)` → `echanges(id) ON DELETE CASCADE`
 - `FOREIGN KEY (equipe_receptrice_id)` → `equipes(id)`
 - `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
-- `CHECK (joueur_id IS NOT NULL OR joueur_nom_libre IS NOT NULL)` — au moins un des deux doit être renseigné
+- `CHECK (joueur_id IS NOT NULL OR joueur_nom_libre IS NOT NULL)`
 
 #### Notes
-- `joueur_id` : Lien vers `joueurs` quand le joueur est enregistré dans le pool
-- `joueur_nom_libre` : Nom textuel libre pour les joueurs non enregistrés (picks de repêchage, joueurs hors-pool)
-- `equipe_receptrice_id` : L'équipe qui **reçoit** ce joueur dans l'échange
+- `joueur_nom_libre` : pour les joueurs non enregistrés dans le pool (picks de repêchage, etc.)
+- `equipe_receptrice_id` : l'équipe qui **reçoit** ce joueur dans l'échange
 
 ---
 
-### 4. `equipes`
-- **Taille de la table** : 8192 bytes
-- **Taille des index** : 24 kB
-- **Taille totale** : 32 kB
+### 3. `equipes`
 
 #### Colonnes
 | Nom       | Type              | Null | Par défaut                          |
@@ -84,175 +68,60 @@ Table de jonction reliant les échanges aux joueurs reçus par chaque équipe. R
 | division  | character varying | Oui  | -                                   |
 | dg_name   | text              | Oui  | -                                   |
 
-#### Index
-- `equipes_pkey` (16 kB) : UNIQUE sur `id`
-
 #### Contraintes
 - `PRIMARY KEY (id)`
 
 #### Notes
-- `division` : Division du pool à laquelle appartient l'équipe
-- `dg_name` : Nom du directeur général (DG) de l'équipe dans le pool
-- `nhl_player_ids` : **SUPPRIMÉ** — ancienne colonne tableau remplacée par la table de jonction `equipe_joueurs`
+- `nhl_player_ids` : **SUPPRIMÉ** — remplacé par la table de jonction `equipe_joueurs`
 
 ---
 
-### 5. `repechages`
-- **Taille de la table** : 16 kB
-- **Taille des index** : 64 kB
-- **Taille totale** : 80 kB
+### 4. `equipe_joueurs` (Table de jonction)
+
+Table de jonction reliant les équipes aux joueurs (remplace `equipes.nhl_player_ids`).
 
 #### Colonnes
-| Nom        | Type                | Null | Par défaut                                      |
-|------------|---------------------|------|-------------------------------------------------|
-| id         | integer             | Non  | nextval('repechages_id_seq'::regclass)          |
-| annee      | integer             | Non  | -                                               |
-| type_id    | integer             | Oui  | -                                               |
-| equipe_id  | integer             | Oui  | -                                               |
-| joueur     | character varying   | Non  | -                                               |
-| joueur_id  | integer             | Oui  | -                                               |
-| rang       | integer             | Non  | -                                               |
-| round      | integer             | Oui  | -                                               |
-
-#### Index
-- `repechages_pkey` (16 kB) : UNIQUE sur `id`
-- `idx_repechages_joueur_id` : Index sur `joueur_id` pour les jointures avec `joueurs`
-
-#### Contraintes
-- `PRIMARY KEY (id)`
-- `FOREIGN KEY (type_id)` → `types_repechage(id)`
-- `FOREIGN KEY (equipe_id)` → `equipes(id)`
-- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
-
-#### Notes
-- `joueur` : Colonne VARCHAR conservée pour compatibilité ascendante (peut être dépréciée plus tard)
-- `joueur_id` : Lien vers la table `joueurs` pour une meilleure intégrité des données
-
----
-
-### 6. `trophee_gagnants`
-- **Taille de la table** : 8192 bytes
-- **Taille des index** : 16 kB
-- **Taille totale** : 24 kB
-
-#### Colonnes
-| Nom        | Type                | Null | Par défaut                                      |
-|------------|---------------------|------|-------------------------------------------------|
-| id         | integer             | Non  | nextval('trophee_gagnants_id_seq'::regclass)    |
-| trophee_id | integer             | Oui  | -                                               |
-| annee      | integer             | Non  | -                                               |
-| equipe_id  | integer             | Oui  | -                                               |
-
-#### Index
-- `trophee_gagnants_pkey` (8192 bytes) : UNIQUE sur `id`
-
-#### Contraintes
-- `PRIMARY KEY (id)`
-- `FOREIGN KEY (trophee_id)` → `trophees(id)`
-- `FOREIGN KEY (equipe_id)` → `equipes(id)`
-
----
-
-### 7. `trophees`
-- **Taille de la table** : 8192 bytes
-- **Taille des index** : 16 kB
-- **Taille totale** : 24 kB
-
-#### Colonnes
-| Nom   | Type                | Null | Par défaut                                      |
-|-------|---------------------|------|-------------------------------------------------|
-| id    | integer             | Non  | nextval('trophees_id_seq'::regclass)            |
-| nom   | character varying   | Non  | -                                               |
-
-#### Index
-- `trophees_pkey` (8192 bytes) : UNIQUE sur `id`
-
-#### Contraintes
-- `PRIMARY KEY (id)`
-
-#### Données initiales
-| id | nom      |
-|----|----------|
-| 1  | Général  |
-| 2  | Attaque  |
-| 3  | Défense  |
-| 4  | Gardien  |
-| 5  | Playoffs |
-
----
-
-### 8. `equipe_joueurs` (Table de jonction)
-- **Taille de la table** : 16 kB
-- **Taille des index** : 88 kB
-- **Taille totale** : 104 kB
-
-Table de jonction reliant les equipes aux joueurs (remplace `equipes.nhl_player_ids`).
-
-#### Colonnes
-| Nom        | Type    | Null | Par defaut                                      |
+| Nom        | Type    | Null | Par défaut                                      |
 |------------|---------|------|-------------------------------------------------|
 | id         | integer | Non  | nextval('equipe_joueurs_id_seq'::regclass)      |
 | equipe_id  | integer | Non  | -                                               |
 | joueur_id  | integer | Non  | -                                               |
 
-#### Index
-- `equipe_joueurs_pkey` (16 kB) : UNIQUE sur `id`
-- `equipe_joueurs_joueur_id_key` (16 kB) : UNIQUE sur `joueur_id`
-- `idx_equipe_joueurs_equipe_id` (16 kB) : Index sur `equipe_id` pour les recherches par equipe
-- `idx_equipe_joueurs_joueur_id` (16 kB) : Index sur `joueur_id` pour les recherches par joueur
-
 #### Contraintes
 - `PRIMARY KEY (id)`
-- `FOREIGN KEY (equipe_id) REFERENCES equipes(id) ON DELETE CASCADE`
-- `FOREIGN KEY (joueur_id) REFERENCES joueurs(id) ON DELETE CASCADE`
-- `UNIQUE (joueur_id)` - Un joueur ne peut etre que sur une equipe
-
-#### Notes
-- Remplace l'approche par tableau `equipes.nhl_player_ids`
-- Permet des jointures efficaces pour recuperer les effectifs
-- La contrainte UNIQUE sur `joueur_id` garantit qu'un joueur n'est que sur une seule equipe
+- `FOREIGN KEY (equipe_id)` → `equipes(id) ON DELETE CASCADE`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE CASCADE`
+- `UNIQUE (joueur_id)` — un joueur ne peut être que sur une seule équipe
 
 ---
 
-### 9. `joueurs`
-- **Taille de la table** : 24 kB
-- **Taille des index** : 96 kB
-- **Taille totale** : 120 kB
+### 5. `joueurs`
 
 #### Colonnes
-| Nom            | Type                | Null | Par défaut                                      |
-|----------------|---------------------|------|-------------------------------------------------|
-| id             | integer             | Non  | nextval('joueurs_id_seq'::regclass)             |
-| nhl_player_id  | integer             | Non  | -                                               |
-| nom            | character varying   | Non  | -                                               |
-| prenom         | character varying   | Non  | -                                               |
-| position       | character varying   | Non  | -                                               |
-| created_at     | timestamp           | Oui  | NOW()                                           |
-| updated_at     | timestamp           | Oui  | NOW()                                           |
-
-#### Index
-- `joueurs_pkey` : UNIQUE sur `id`
-- `idx_joueurs_nhl_player_id` : UNIQUE sur `nhl_player_id` pour les recherches rapides depuis l'API NHL
-- `idx_joueurs_position` : Index sur `position` pour le filtrage des effectifs
+| Nom            | Type              | Null | Par défaut                                      |
+|----------------|-------------------|------|-------------------------------------------------|
+| id             | integer           | Non  | nextval('joueurs_id_seq'::regclass)             |
+| nhl_player_id  | integer           | Non  | -                                               |
+| nom            | character varying | Non  | -                                               |
+| prenom         | character varying | Non  | -                                               |
+| position       | character varying | Non  | -                                               |
+| created_at     | timestamp         | Oui  | NOW()                                           |
+| updated_at     | timestamp         | Oui  | NOW()                                           |
+| compte_points  | boolean           | Oui  | true                                            |
 
 #### Contraintes
 - `PRIMARY KEY (id)`
 - `UNIQUE (nhl_player_id)`
 
 #### Notes
-- **But** : Registre central des joueurs liant les joueurs NHL aux joueurs du pool
-- `nhl_player_id` : Identifiant unique du joueur dans l'API NHL (contrainte UNIQUE pour garantir un seul enregistrement par joueur NHL)
-- `position` : Valeurs possibles : 'C', 'LW', 'RW', 'D', 'G'
-- `nom` et `prenom` : Stockés pour l'affichage (peuvent être synchronisés depuis l'API NHL)
+- `position` : valeurs possibles `'C'`, `'LW'`, `'RW'`, `'D'`, `'G'`
+- `compte_points` : si `false`, le joueur ne compte pas pour le PJ/PTS du leaderboard live (ex. : joueur échangé en cours de saison)
 
 ---
 
-### 10. `equipe_points`
-- **Taille de la table** : 8192 bytes
-- **Taille des index** : 72 kB
-- **Taille totale** : 80 kB
+### 6. `equipe_points`
 
-Stocke les points cumulés par équipe par saison, décomposés par catégorie (attaque, défense, gardien).
+Stocke les points cumulés par équipe par saison, décomposés par catégorie.
 
 #### Colonnes
 | Nom              | Type    | Null | Par défaut |
@@ -264,45 +133,76 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie (
 | defense_points   | integer | Non  | 0          |
 | gardien_points   | integer | Non  | 0          |
 | total_points     | integer | Non  | 0          |
+| total_buts       | integer | Non  | 0          |
+| total_matchs     | integer | Non  | 0          |
 | last_update_at   | date    | Oui  | now()      |
-
-#### Index
-- `equipe_stats_pkey` (16 kB) : UNIQUE sur `id`
-- `equipe_points_equipe_id_season_unique` (16 kB) : UNIQUE sur `(equipe_id, season)`
 
 #### Contraintes
 - `PRIMARY KEY (id)`
 - `FOREIGN KEY (equipe_id)` → `equipes(id)`
-- `UNIQUE (equipe_id, season)` - Une seule ligne de points par équipe par saison
+- `UNIQUE (equipe_id, season)`
 
 #### Notes
-- `season` : Format texte (ex. `'20242025'`) correspondant à la saison NHL
-- Les points sont divisés en 3 catégories reflétant les positions : attaque (C/LW/RW), défense (D), gardien (G)
-- `total_points` est la somme des 3 catégories
+- `season` : format `'20242025'`
+- `total_points` = somme de `attaque_points + defense_points + gardien_points`
 
 ---
 
-### 11. `types_repechage`
-- **Taille de la table** : 8192 bytes
-- **Taille des index** : 16 kB
-- **Taille totale** : 24 kB
+### 7. `repechages`
 
 #### Colonnes
-| Nom   | Type                | Null | Par défaut                                      |
-|-------|---------------------|------|-------------------------------------------------|
-| id    | integer             | Non  | nextval('types_repechage_id_seq'::regclass)     |
-| nom   | character varying   | Non  | -                                               |
-
-#### Index
-- `types_repechage_pkey` (16 kB) : UNIQUE sur `id`
+| Nom        | Type              | Null | Par défaut                                      |
+|------------|-------------------|------|-------------------------------------------------|
+| id         | integer           | Non  | nextval('repechages_id_seq'::regclass)          |
+| annee      | integer           | Non  | -                                               |
+| type_id    | integer           | Oui  | -                                               |
+| equipe_id  | integer           | Oui  | -                                               |
+| joueur     | character varying | Non  | -                                               |
+| joueur_id  | integer           | Oui  | -                                               |
+| rang       | integer           | Non  | -                                               |
+| round      | integer           | Oui  | -                                               |
 
 #### Contraintes
 - `PRIMARY KEY (id)`
+- `FOREIGN KEY (type_id)` → `types_repechage(id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
 
 ---
 
-### Données de référence : `types_repechage`
+### 8. `choix_repechage`
 
+Stocke les choix de repêchage futurs détenus par chaque équipe (picks échangeables).
+
+#### Colonnes
+| Nom              | Type    | Null | Par défaut                                        |
+|------------------|---------|------|---------------------------------------------------|
+| id               | integer | Non  | nextval('choix_repechage_id_seq'::regclass)       |
+| annee            | integer | Non  | -                                                 |
+| round            | integer | Non  | -                                                 |
+| equipe_id        | integer | Non  | -                                                 |
+| equipe_source_id | integer | Oui  | -                                                 |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `FOREIGN KEY (equipe_source_id)` → `equipes(id)`
+
+#### Notes
+- `equipe_id` : équipe qui **détient** le pick
+- `equipe_source_id` : équipe d'origine du pick (si acquis par échange)
+
+---
+
+### 9. `types_repechage`
+
+#### Colonnes
+| Nom   | Type              | Null | Par défaut                                      |
+|-------|-------------------|------|-------------------------------------------------|
+| id    | integer           | Non  | nextval('types_repechage_id_seq'::regclass)     |
+| nom   | character varying | Non  | -                                               |
+
+#### Données de référence
 | id | nom                   |
 |----|-----------------------|
 | 1  | Ballotage de décembre |
@@ -312,44 +212,45 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie (
 
 ---
 
-### 12. `api_store`
-
-Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour l'UPSERT : une seule ligne par clé, jamais de duplication.
+### 10. `trophees`
 
 #### Colonnes
-| Nom           | Type        | Null | Par défaut                          |
-|---------------|-------------|------|-------------------------------------|
-| id            | integer     | Non  | nextval('api_store_id_seq'::regclass) |
-| key           | text        | Non  | -                                   |
-| json_response | jsonb       | Non  | -                                   |
-| last_update   | timestamptz | Non  | NOW()                               |
+| Nom   | Type              | Null | Par défaut                                      |
+|-------|-------------------|------|-------------------------------------------------|
+| id    | integer           | Non  | nextval('trophees_id_seq'::regclass)            |
+| nom   | character varying | Non  | -                                               |
 
-#### Index
-- `api_store_pkey` : UNIQUE sur `id`
-- `idx_api_store_key` : Index sur `key` pour les lectures rapides
-- Contrainte UNIQUE implicite sur `key` (utilisée par l'UPSERT `ON CONFLICT (key)`)
-
-#### Contraintes
-- `PRIMARY KEY (id)`
-- `UNIQUE (key)` — une seule entrée par clé
-
-#### Clés utilisées
-| Clé                        | Contenu                                                          | Mise à jour       |
-|----------------------------|------------------------------------------------------------------|-------------------|
-| `live_points`              | `{ topPlayers, teamLeaderboard, gamesCount, liveGamesCount }`    | Cron 3h00 nightly |
-| `live_points_leaderboard`  | `{ teamLeaderboard, gamesCount, liveGamesCount }`                | Cron 3h00 nightly |
-| `live_points_feed`         | `{ topPlayers, gamesCount, liveGamesCount }`                     | Cron 3h00 nightly |
-
-#### Notes
-- Pas de FK — table autonome pour le stockage de cache persistant
-- L'UPSERT met à jour `json_response` et `last_update` si la clé existe déjà
-- Alimentée par `POST /api/snapshot/live-points` (protégé par `requireApiKey`)
+#### Données de référence
+| id | nom      |
+|----|----------|
+| 1  | Général  |
+| 2  | Attaque  |
+| 3  | Défense  |
+| 4  | Gardien  |
+| 5  | Playoffs |
 
 ---
 
-### 13. `mis_au_ballotage`
+### 11. `trophee_gagnants`
 
-Trace les joueurs retirés par une équipe avant chaque événement de repêchage (draft annuel, ballotage de décembre, ballotage de mars). Pendant que `repechages` enregistre les arrivées, `mis_au_ballotage` enregistre les départs.
+#### Colonnes
+| Nom        | Type    | Null | Par défaut                                      |
+|------------|---------|------|-------------------------------------------------|
+| id         | integer | Non  | nextval('trophee_gagnants_id_seq'::regclass)    |
+| trophee_id | integer | Oui  | -                                               |
+| annee      | integer | Non  | -                                               |
+| equipe_id  | integer | Oui  | -                                               |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (trophee_id)` → `trophees(id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+
+---
+
+### 12. `mis_au_ballotage`
+
+Trace les joueurs retirés par une équipe avant chaque événement de repêchage.
 
 #### Colonnes
 | Nom               | Type    | Null | Par défaut                                           |
@@ -369,48 +270,190 @@ Trace les joueurs retirés par une équipe avant chaque événement de repêchag
 - `CHECK (joueur_id IS NOT NULL OR joueur_nom_libre IS NOT NULL)`
 
 #### Notes
-- `type_id` réutilise `types_repechage` : `1` = avant ballotage de décembre, `2` = avant draft annuel, `4` = avant ballotage de mars
-- `joueur_id` : lien vers `joueurs` si le joueur est enregistré dans le pool
-- `joueur_nom_libre` : nom textuel pour les joueurs non enregistrés
 - Pour un `(annee, type_id)` donné : `mis_au_ballotage` = qui est parti, `repechages` = qui est arrivé
 
-#### API
-- `GET /api/mis-au-ballotage` — tous les entrées
-- `GET /api/mis-au-ballotage/:type/:annee` — filtré par type et année
+---
+
+### 13. `api_store`
+
+Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour l'UPSERT — une seule ligne par clé.
+
+#### Colonnes
+| Nom           | Type        | Null | Par défaut                              |
+|---------------|-------------|------|-----------------------------------------|
+| id            | integer     | Non  | nextval('api_store_id_seq'::regclass)   |
+| key           | text        | Non  | -                                       |
+| json_response | jsonb       | Non  | -                                       |
+| last_update   | timestamptz | Non  | NOW()                                   |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `UNIQUE (key)`
+
+#### Clés utilisées
+| Clé               | Contenu                                                               | Mise à jour              |
+|-------------------|-----------------------------------------------------------------------|--------------------------|
+| `live_points`     | `{ topPlayers, teamLeaderboard, gamesCount, liveGamesCount }`         | Cron nightly (après minuit UTC) |
+| `classement_prev` | `{ teams: { [equipe_id]: total_points }, updatedAt }`                 | Cron `POST /api/points/update` |
+
+#### Notes
+- `classement_prev` : baseline des points cumulés avant la journée de matchs — utilisé pour calculer le diff journalier dans `live_points`
+
+---
+
+### 14. `blessures`
+
+Snapshot des blessures des joueurs du pool, alimenté depuis ESPN et matché aux joueurs via `nhl_player_id`.
+
+#### Colonnes
+| Nom             | Type        | Null | Par défaut                                    |
+|-----------------|-------------|------|-----------------------------------------------|
+| id              | integer     | Non  | nextval('blessures_id_seq'::regclass)         |
+| nhl_player_id   | integer     | Non  | -                                             |
+| statut          | varchar     | Non  | -                                             |
+| type_blessure   | text        | Oui  | -                                             |
+| commentaire     | text        | Oui  | -                                             |
+| date_retour     | date        | Oui  | -                                             |
+| last_update     | timestamptz | Non  | now()                                         |
+
+#### Notes
+- Alimentée par `POST /api/snapshot/injuries`
+- `statut` : ex. `'injured'`, `'day-to-day'`
+
+---
+
+### 15. `etat_joueurs`
+
+Snapshot de l'état de forme (hot/cold/normal) des joueurs du pool sur les 5 derniers matchs.
+
+#### Colonnes
+| Nom                    | Type        | Null | Par défaut      |
+|------------------------|-------------|------|-----------------|
+| id                     | integer     | Non  | nextval(...)    |
+| nhl_player_id          | integer     | Non  | -               |
+| etat                   | varchar     | Non  | -               |
+| points_5_matchs        | integer     | Oui  | -               |
+| victoires_5_matchs     | integer     | Oui  | -               |
+| blanchissages_5_matchs | integer     | Oui  | -               |
+| save_pctg_5_matchs     | numeric     | Oui  | -               |
+| derniers_matchs        | jsonb       | Non  | '[]'            |
+| last_update            | timestamptz | Non  | now()           |
+
+#### Notes
+- Alimentée par `POST /api/snapshot/etat`
+- `etat` : `'hot'`, `'cold'`, ou `'normal'`
+- `derniers_matchs` : tableau JSON des stats des 5 dernières parties
+
+---
+
+### 16. `series_playoffs`
+
+Bracket des séries éliminatoires du pool. Une ligne par affrontement (QF, SF, Finale).
+
+#### Colonnes
+| Nom          | Type    | Null | Par défaut                                         |
+|--------------|---------|------|----------------------------------------------------|
+| id           | integer | Non  | nextval('series_playoffs_id_seq'::regclass)        |
+| saison       | text    | Non  | -                                                  |
+| ronde        | integer | Non  | -                                                  |
+| division     | text    | Oui  | -                                                  |
+| position     | integer | Non  | -                                                  |
+| equipe_a_id  | integer | Oui  | -                                                  |
+| equipe_b_id  | integer | Oui  | -                                                  |
+| gagnant_id   | integer | Oui  | -                                                  |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_a_id)` → `equipes(id)`
+- `FOREIGN KEY (equipe_b_id)` → `equipes(id)`
+- `FOREIGN KEY (gagnant_id)` → `equipes(id)`
+
+#### Notes
+- `ronde` : `1` = QF, `2` = SF, `3` = Finale
+- `position` : 1–4 = QF, 5–6 = SF, 7 = Finale
+- `division` : `'nord'`, `'sud'`, ou `null` (Finale)
+- Initialisé par `POST /api/series/initialize`
+
+---
+
+### 17. `equipe_semaine_points`
+
+Points accumulés par équipe pendant chaque semaine des séries. Calculé comme diff `equipe_points - series_semaine_baseline`.
+
+#### Colonnes
+| Nom              | Type        | Null | Par défaut   |
+|------------------|-------------|------|--------------|
+| id               | integer     | Non  | nextval(...) |
+| equipe_id        | integer     | Oui  | -            |
+| saison           | text        | Non  | -            |
+| semaine          | integer     | Non  | -            |
+| debut_semaine    | date        | Non  | -            |
+| fin_semaine      | date        | Non  | -            |
+| attaque_points   | integer     | Non  | 0            |
+| defense_points   | integer     | Non  | 0            |
+| gardien_points   | integer     | Non  | 0            |
+| total_points     | integer     | Non  | 0            |
+| total_buts       | integer     | Non  | 0            |
+| total_matchs     | integer     | Non  | 0            |
+| last_update_at   | timestamptz | Oui  | now()        |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `UNIQUE (equipe_id, saison, semaine)`
+
+#### Notes
+- Mise à jour par `updateDailySeries()` appelé depuis `POST /api/snapshot/live-points` si une ronde est active
+- `semaine` : `1` = QF, `2` = SF, `3` = Finale
+
+---
+
+### 18. `series_semaine_baseline`
+
+Snapshot des points cumulés (`equipe_points`) au début de chaque semaine de playoffs. Sert de baseline pour calculer les points de la semaine.
+
+#### Colonnes
+| Nom              | Type        | Null | Par défaut   |
+|------------------|-------------|------|--------------|
+| id               | integer     | Non  | nextval(...) |
+| equipe_id        | integer     | Oui  | -            |
+| saison           | text        | Non  | -            |
+| semaine          | integer     | Non  | -            |
+| total_points     | integer     | Non  | 0            |
+| attaque_points   | integer     | Non  | 0            |
+| defense_points   | integer     | Non  | 0            |
+| gardien_points   | integer     | Non  | 0            |
+| total_buts       | integer     | Non  | 0            |
+| total_matchs     | integer     | Non  | 0            |
+| snapshot_at      | timestamptz | Oui  | now()        |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `UNIQUE (equipe_id, saison, semaine)`
+
+#### Notes
+- Créé automatiquement par `snapshotWeekBaseline()` lors de `POST /api/series/initialize` (semaine 1) et `POST /api/series/resolve-round` (semaines 2 et 3)
+- Points semaine = `equipe_semaine_points - series_semaine_baseline`
 
 ---
 
 ## Relations entre les tables
+
 - `echanges` → `equipes` (equipe_source_id, equipe_destination_id)
-- `echange_joueurs` → `echanges` (echange_id) ON DELETE CASCADE — Table de jonction pour les joueurs échangés
-- `echange_joueurs` → `equipes` (equipe_receptrice_id) — équipe qui reçoit le joueur
-- `echange_joueurs` → `joueurs` (joueur_id) ON DELETE SET NULL — joueur lié (optionnel)
-- `repechages` → `types_repechage` (type_id)
-- `repechages` → `equipes` (equipe_id)
-- `repechages` → `joueurs` (joueur_id)
-- `trophee_gagnants` → `trophees` (trophee_id)
-- `trophee_gagnants` → `equipes` (equipe_id)
-- `equipe_joueurs` → `equipes` (equipe_id) - Table de jonction pour les effectifs
-- `equipe_joueurs` → `joueurs` (joueur_id) - Table de jonction pour les effectifs
-- `equipe_points` → `equipes` (equipe_id) - Points cumulés par équipe par saison
-- `mis_au_ballotage` → `equipes` (equipe_id) — équipe qui retire le joueur
-- `mis_au_ballotage` → `joueurs` (joueur_id) ON DELETE SET NULL — joueur lié (optionnel)
-- `mis_au_ballotage` → `types_repechage` (type_id) — type d'événement précédé par ce retrait
+- `echange_joueurs` → `echanges` ON DELETE CASCADE
+- `echange_joueurs` → `equipes` (equipe_receptrice_id)
+- `echange_joueurs` → `joueurs` ON DELETE SET NULL
+- `equipe_joueurs` → `equipes` + `joueurs` (junction roster)
+- `equipe_points` → `equipes`
+- `repechages` → `types_repechage`, `equipes`, `joueurs`
+- `choix_repechage` → `equipes` (equipe_id + equipe_source_id)
+- `trophee_gagnants` → `trophees`, `equipes`
+- `mis_au_ballotage` → `equipes`, `joueurs`, `types_repechage`
+- `series_playoffs` → `equipes` (equipe_a_id, equipe_b_id, gagnant_id)
+- `equipe_semaine_points` → `equipes`
+- `series_semaine_baseline` → `equipes`
 
 ---
 
-## Index et séquences
-- Chaque table possède une séquence pour l’auto-incrémentation de l’id.
-- Les index primaires sont présents sur chaque id.
-
----
-
-## Notes utiles pour le développement
-- Toutes les relations de clés étrangères sont documentées ci-dessus.
-- Les tailles de tables et d’index sont indiquées pour surveiller la volumétrie.
-- Les types de colonnes sont précisés pour chaque table.
-- Les valeurs par défaut sont indiquées.
-- Les contraintes d’unicité et de clé primaire sont listées.
-
----
-*Dernière mise à jour : février 2026 — ajout table `echange_joueurs`, suppression colonne `echanges.details`*
+*Dernière mise à jour : mars 2026 — ajout tables playoffs (`series_playoffs`, `equipe_semaine_points`, `series_semaine_baseline`), `blessures`, `etat_joueurs`, `choix_repechage`; colonnes `joueurs.compte_points`, `equipe_points.total_buts/total_matchs`; clé `classement_prev` dans `api_store`*
