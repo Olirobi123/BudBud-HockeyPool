@@ -135,18 +135,18 @@ export class PlayersService {
       joueurs_destination: row.joueurs_destination ?? [],
     }));
 
-    // Chronological order of draft types within a year: annuel → décembre → mars
-    const TYPE_SLOT: Record<number, string> = {
-      2: '1', // Draft annuel
-      3: '2', // Draft d'expansion
-      1: '3', // Ballotage / repêchage de décembre
-      4: '4', // Ballotage / repêchage de mars
-      5: '0', // Draft de dissolution
+    // Approximate month-day for each draft type so sort_date (YYYY-MM-DD) compares
+    // correctly against real trade dates. Ballotage de mars uses next calendar year.
+    const draftSortDate = (annee: number, typeId: number): string => {
+      switch (typeId) {
+        case 5: return `${annee}-00-01`;  // Draft de dissolution (avant la saison)
+        case 2: return `${annee}-08-01`;  // Draft annuel (août)
+        case 3: return `${annee}-09-01`;  // Draft d'expansion (septembre)
+        case 1: return `${annee}-12-01`;  // Ballotage de décembre
+        case 4: return `${annee + 1}-03-01`; // Ballotage de mars (année suivante)
+        default: return `${annee}-99-01`;
+      }
     };
-
-    const draftSortDate = (annee: number, typeId: number): string => (
-      `${annee}-${TYPE_SLOT[typeId] ?? '9'}`
-    );
 
     const draftEvents: HistoireRepechageEvent[] = draftResult.rows.map((row) => ({
       type: 'repechage' as const,
