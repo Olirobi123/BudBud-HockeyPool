@@ -83,23 +83,21 @@ function MobileSkaterRow({ player, injuries, etat }: MobileSkaterRowProps) {
   const stats = player.nhlStats && isSkaterStats(player.nhlStats) ? player.nhlStats : null;
 
   return (
-    <div className={`flex items-start px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
+    <div className={`flex items-center px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
       {player.teamLogo
-        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2 mt-0.5" />
+        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2" />
         : <span className="w-7 shrink-0 mr-2" />}
-      <div className="flex-1 min-w-0 pt-px">
-        <div className="flex items-start gap-1 min-w-0">
-          <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug">
-            {player.prenom} {player.nom}
-          </Link>
-          <span className="inline-flex items-center shrink-0 mt-0.5">
-            <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
-          </span>
-        </div>
+      <div className="flex-1 min-w-0">
+        <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug truncate block">
+          {player.prenom} {player.nom}
+        </Link>
       </div>
-      <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats?.gamesPlayed ?? '-'}</span>
-      <span className="w-8 text-center text-xs font-bold text-primary tabular-nums shrink-0 pt-px">{stats?.points ?? '-'}</span>
-      <span className="w-9 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats ? stats.ppm.toFixed(2) : '-'}</span>
+      <span className="inline-flex items-center shrink-0">
+        <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
+      </span>
+      <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0">{stats?.gamesPlayed ?? '-'}</span>
+      <span className="w-8 text-center text-xs font-bold text-primary tabular-nums shrink-0">{stats?.points ?? '-'}</span>
+      <span className="w-9 text-center text-xs text-muted-foreground tabular-nums shrink-0">{stats ? stats.ppm.toFixed(2) : '-'}</span>
     </div>
   );
 }
@@ -111,25 +109,23 @@ function MobileGoalieRow({ player, injuries, etat }: MobileSkaterRowProps) {
     : 0;
 
   return (
-    <div className={`flex items-start px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
+    <div className={`flex items-center px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
       {player.teamLogo
-        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2 mt-0.5" />
+        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2" />
         : <span className="w-7 shrink-0 mr-2" />}
-      <div className="flex-1 min-w-0 pt-px">
-        <div className="flex items-start gap-1 min-w-0">
-          <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug">
-            {player.prenom} {player.nom}
-          </Link>
-          <span className="inline-flex items-center shrink-0 mt-0.5">
-            <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
-          </span>
-        </div>
+      <div className="flex-1 min-w-0">
+        <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug truncate block">
+          {player.prenom} {player.nom}
+        </Link>
       </div>
-      <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">{stats?.gamesPlayed ?? '-'}</span>
-      <span className="w-10 text-center text-xs text-muted-foreground tabular-nums shrink-0 pt-px">
+      <span className="inline-flex items-center shrink-0">
+        <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
+      </span>
+      <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0">{stats?.gamesPlayed ?? '-'}</span>
+      <span className="w-10 text-center text-xs text-muted-foreground tabular-nums shrink-0">
         {stats ? `${stats.wins}·${stats.shutouts}` : '-'}
       </span>
-      <span className="w-8 text-right text-sm font-bold text-primary tabular-nums shrink-0 pt-px">{poolPts}</span>
+      <span className="w-8 text-right text-sm font-bold text-primary tabular-nums shrink-0">{poolPts}</span>
     </div>
   );
 }
