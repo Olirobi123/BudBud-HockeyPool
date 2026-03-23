@@ -363,18 +363,10 @@ export class LivePointsService {
   private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[], ownershipMap: Map<number, OwnershipRow>, isSnapshotCall: boolean): Promise<LiveTeamPoints[]> {
     const teamMap = new Map<number, LiveTeamPoints>();
 
-    // Seed teams: during playoffs (snapshot) only the 8 bracket teams; otherwise all active
+    // Seed all active teams
     try {
-      let teamsRows: { id: number; nom: string }[];
-      if (isSnapshotCall) {
-        const { getCurrentSeason } = await import('./seasonHelper');
-        const season = getCurrentSeason();
-        const result = await pool.query(QUERIES.GET_PLAYOFF_TEAMS_WITH_NAMES, [season]);
-        teamsRows = result.rows as { id: number; nom: string }[];
-      } else {
-        const result = await pool.query(QUERIES.GET_ACTIVE_TEAMS);
-        teamsRows = result.rows as { id: number; nom: string }[];
-      }
+      const result = await pool.query(QUERIES.GET_ACTIVE_TEAMS);
+      const teamsRows = result.rows as { id: number; nom: string }[];
       for (const row of teamsRows) {
         teamMap.set(row.id, {
           equipeId: row.id,
