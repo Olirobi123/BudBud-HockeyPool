@@ -416,9 +416,7 @@ export class LivePointsService {
       team.totalAssists += player.assists;
 
       if (!isSnapshotCall) {
-        if (ownershipMap.get(player.nhlPlayerId)?.compte_points) {
-          team.totalPJ += 1;
-        }
+        team.totalPJ += 1;
         team.totalPoints += player.points;
       } else if (ownershipMap.get(player.nhlPlayerId)?.compte_points) {
         team.totalPJ += 1;
