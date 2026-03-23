@@ -75,6 +75,32 @@ Before implementing features, consult in this order:
 6. `/Docs/Cron_Jobs.md` - Cron schedule, manual playoff actions, and endpoint reference
 6. `/Docs/Git_Workflow.md` - Branching strategy and deployment process
 
+## Component Structure
+
+### Single Responsibility
+- **One component per file** — never group multiple components in a single file
+- Each component has exactly one reason to change
+
+### Subfolder organisation
+When a feature area grows beyond one file, create a named subfolder:
+```
+components/joueur/
+├── histoire/               ← sub-components for the Histoire tab
+│   ├── TradeEventItem.tsx
+│   ├── DraftEventItem.tsx
+│   ├── BallotageEventItem.tsx
+│   ├── HistoireEventItem.tsx   ← type dispatcher
+│   └── HistoireTimeline.tsx    ← layout/scaffold
+└── JoueurTabsHistoire.tsx  ← thin wrapper: data fetch + empty state only
+```
+- The parent file (e.g. `JoueurTabsHistoire.tsx`) is a **thin wrapper**: it fetches data, handles loading/empty states, and delegates rendering to sub-components
+- Sub-components live in the subfolder and are not aware of data fetching
+
+### Naming conventions
+- Subfolders use lowercase (e.g. `histoire/`, `timeline/`)
+- Component files use PascalCase matching their export (e.g. `DraftEventItem.tsx`)
+- Dispatcher/router components are named `[Feature]EventItem.tsx` or `[Feature]Item.tsx`
+
 ## Key Constraints
 
 - TypeScript strict mode - no `any` types
