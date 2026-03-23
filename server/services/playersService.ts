@@ -2,6 +2,7 @@ import { Pool } from 'pg';
 import { NHLClient, PlayerStatsResponse, PlayerSearchResult } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
 import { QUERIES } from '../models';
+import { formatDate } from '../utils';
 import {
   Joueur, Equipe,
   HistoireEchangeEvent, HistoireRepechageEvent, HistoireBallotageEvent,
@@ -135,12 +136,9 @@ export class PlayersService {
       joueurs_destination: row.joueurs_destination ?? [],
     }));
 
-    const draftSortDate = (annee: number, yearOffset: number, month: number, day: number): string => {
-      const year = annee + yearOffset;
-      const mm = String(month).padStart(2, '0');
-      const dd = String(day).padStart(2, '0');
-      return `${year}-${mm}-${dd}`;
-    };
+    const draftSortDate = (annee: number, yearOffset: number, month: number, day: number): string => (
+      formatDate(new Date(annee + yearOffset, month - 1, day))
+    );
 
     const draftEvents: HistoireRepechageEvent[] = draftResult.rows.map((row) => ({
       type: 'repechage' as const,
