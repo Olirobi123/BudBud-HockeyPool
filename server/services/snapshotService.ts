@@ -11,6 +11,8 @@ export class SnapshotService {
     const season = getCurrentSeason();
     const response = await livePointsService.getLivePoints(false, true);
 
+    if (response.gamesCount === 0) return;
+
     await pool.query(QUERIES.UPSERT_API_STORE, [FULL_KEY, response]);
 
     const ronde = seriesService.getRondeActive();

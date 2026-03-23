@@ -71,11 +71,13 @@ export class LivePointsService {
     const activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
     const liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
+    // No live games (FUT, FINAL/OFF, or no games today) — serve snapshot, nothing to compute
+    if (!isSnapshotCall && liveGames.length === 0) {
+      const snapshot = await this.fetchSnapshot();
+      if (snapshot) return this.cacheAndReturn(snapshot);
+    }
+
     if (activeGames.length === 0) {
-      if (!isSnapshotCall) {
-        const snapshot = await this.fetchSnapshot();
-        if (snapshot) return this.cacheAndReturn(snapshot);
-      }
       return {
         topPlayers: [],
         teamLeaderboard: [],
