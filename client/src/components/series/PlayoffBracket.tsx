@@ -18,9 +18,7 @@ interface RoundColumnProps {
 function RoundColumn({
   title, matchups, isActive, rondeNum, labelFn, isFinale = false,
 }: RoundColumnProps) {
-  const activeColor = isFinale
-    ? { line: 'bg-gradient-to-r from-amber-500/60 to-transparent', lineR: 'bg-gradient-to-l from-amber-500/60 to-transparent', text: 'text-amber-400' }
-    : { line: 'bg-gradient-to-r from-cyan-500/60 to-transparent', lineR: 'bg-gradient-to-l from-cyan-500/60 to-transparent', text: 'text-cyan-400' };
+  const activeColor = { line: 'bg-gradient-to-r from-amber-500/60 to-transparent', lineR: 'bg-gradient-to-l from-amber-500/60 to-transparent', text: 'text-amber-400' };
 
   return (
     <div className="flex flex-col gap-3">
