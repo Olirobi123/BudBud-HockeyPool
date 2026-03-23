@@ -25,6 +25,15 @@ export const QUERIES = {
   // Équipes
   GET_ALL_TEAMS: `SELECT * FROM ${TABLES.EQUIPES}`,
   GET_ACTIVE_TEAMS: `SELECT * FROM ${TABLES.EQUIPES} WHERE active = true`,
+  GET_PLAYOFF_TEAMS_WITH_NAMES: `
+    SELECT DISTINCT e.id, e.nom
+    FROM ${TABLES.EQUIPES} e
+    WHERE e.id IN (
+      SELECT equipe_a_id FROM ${TABLES.SERIES_PLAYOFFS} WHERE saison = $1 AND equipe_a_id IS NOT NULL
+      UNION
+      SELECT equipe_b_id FROM ${TABLES.SERIES_PLAYOFFS} WHERE saison = $1 AND equipe_b_id IS NOT NULL
+    )
+  `,
   GET_TEAM_BY_ID: `SELECT * FROM ${TABLES.EQUIPES} WHERE id = $1`,
 
   // Teams by division (alphabetically ordered)
