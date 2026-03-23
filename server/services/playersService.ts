@@ -135,22 +135,16 @@ export class PlayersService {
       joueurs_destination: row.joueurs_destination ?? [],
     }));
 
-    // Approximate month-day for each draft type so sort_date (YYYY-MM-DD) compares
-    // correctly against real trade dates. Ballotage de mars uses next calendar year.
-    const draftSortDate = (annee: number, typeId: number): string => {
-      switch (typeId) {
-        case 5: return `${annee - 1}-10-01`;  // Draft de dissolution (octobre, 1er)
-        case 3: return `${annee - 1}-10-02`;  // Draft d'expansion (octobre, 2e)
-        case 2: return `${annee - 1}-10-03`;  // Draft annuel (octobre, 3e)
-        case 1: return `${annee - 1}-12-01`;  // Ballotage de décembre
-        case 4: return `${annee}-03-01`;      // Ballotage de mars
-        default: return `${annee}-99-01`;
-      }
+    const draftSortDate = (annee: number, yearOffset: number, month: number, day: number): string => {
+      const year = annee + yearOffset;
+      const mm = String(month).padStart(2, '0');
+      const dd = String(day).padStart(2, '0');
+      return `${year}-${mm}-${dd}`;
     };
 
     const draftEvents: HistoireRepechageEvent[] = draftResult.rows.map((row) => ({
       type: 'repechage' as const,
-      sort_date: draftSortDate(row.annee, row.type_id),
+      sort_date: draftSortDate(row.annee, row.sort_year_offset, row.sort_month, row.sort_day),
       id: row.id,
       annee: row.annee,
       round: row.round ?? null,
@@ -163,7 +157,7 @@ export class PlayersService {
 
     const ballotageEvents: HistoireBallotageEvent[] = ballotageResult.rows.map((row) => ({
       type: 'ballotage' as const,
-      sort_date: draftSortDate(row.annee, row.type_id),
+      sort_date: draftSortDate(row.annee, row.sort_year_offset, row.sort_month, row.sort_day),
       id: row.id,
       annee: row.annee,
       equipe_id: row.equipe_id,
