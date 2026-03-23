@@ -433,7 +433,12 @@ export class LivePointsService {
     }
 
     return Array.from(teamMap.values())
-      .sort((a, b) => b.totalPoints - a.totalPoints || b.totalGoals - a.totalGoals);
+      .sort((a, b) => {
+        if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+        const ppmA = a.totalPJ > 0 ? a.totalPoints / a.totalPJ : 0;
+        const ppmB = b.totalPJ > 0 ? b.totalPoints / b.totalPJ : 0;
+        return ppmB - ppmA;
+      });
   }
 }
 
