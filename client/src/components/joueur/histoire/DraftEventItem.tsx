@@ -14,6 +14,7 @@ export default function DraftEventItem({ event, player }: Props) {
 
   return (
     <div className="relative">
+      {/* type stamp */}
       <div className="flex items-center gap-2 mb-2 ml-1">
         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-blue-500/10 border border-blue-500/20">
           <UserPlus className="w-3 h-3 text-blue-500" />
@@ -28,26 +29,31 @@ export default function DraftEventItem({ event, player }: Props) {
         </span>
       </div>
 
+      {/* card */}
       <div className="rounded-lg border border-blue-500/20 bg-card overflow-hidden">
         <div className="flex">
-          <div className="flex flex-col items-center justify-center px-5 py-4 bg-blue-500/5 border-r border-blue-500/20 min-w-[72px]">
+          {/* rank badge — left panel */}
+          <div className="flex flex-col items-center justify-center px-4 py-4 bg-blue-500/5 border-r border-blue-500/20 w-16 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-widest text-blue-500/70 mb-0.5">
               Rang
             </span>
             <span className="text-4xl font-black tabular-nums leading-none text-blue-400">
               {event.rang}
             </span>
-            {event.round !== null && (
-              <span className="text-[10px] text-blue-500/60 mt-1 tabular-nums whitespace-nowrap">
-                {`Ronde ${event.round}`}
-              </span>
-            )}
           </div>
 
-          <div className="flex flex-col justify-center px-4 py-4 gap-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Sélectionné par
-            </p>
+          {/* info — right panel */}
+          <div className="flex flex-col justify-center px-4 py-4 gap-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Sélectionné par
+              </p>
+              {event.round !== null && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 whitespace-nowrap">
+                  {`Ronde ${event.round}`}
+                </span>
+              )}
+            </div>
             <p className="text-sm font-bold text-foreground leading-tight">
               {event.equipe_nom}
             </p>
