@@ -364,7 +364,8 @@ export const QUERIES = {
 
   GET_PLAYER_DRAFT_HISTORY: `
     SELECT r.id, r.annee, r.round, r.rang, r.equipe_id,
-           e.nom AS equipe_nom, r.type_id, tr.nom AS type_nom
+           e.nom AS equipe_nom, r.type_id, tr.nom AS type_nom,
+           tr.sort_year_offset, tr.sort_month, tr.sort_day
     FROM repechages r
     JOIN ${TABLES.JOUEURS} j          ON r.joueur_id = j.id
     JOIN ${TABLES.EQUIPES} e          ON e.id = r.equipe_id
@@ -375,7 +376,8 @@ export const QUERIES = {
 
   GET_PLAYER_BALLOTAGE_HISTORY: `
     SELECT m.id, m.annee, m.equipe_id,
-           e.nom AS equipe_nom, m.type_id, tr.nom AS type_nom
+           e.nom AS equipe_nom, m.type_id, tr.nom AS type_nom,
+           tr.sort_year_offset, tr.sort_month, tr.sort_day
     FROM ${TABLES.MIS_AU_BALLOTAGE} m
     JOIN ${TABLES.JOUEURS} j          ON m.joueur_id = j.id
     JOIN ${TABLES.EQUIPES} e          ON e.id = m.equipe_id
