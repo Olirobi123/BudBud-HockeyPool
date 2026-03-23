@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { formatAnnee } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -64,7 +65,7 @@ export default function EchangeFilters({
           <SelectContent>
             <SelectItem value="all">Toutes les saisons</SelectItem>
             {years.map((year) => (
-              <SelectItem key={year} value={year}>Saison {year}</SelectItem>
+              <SelectItem key={year} value={year}>Saison {formatAnnee(Number(year))}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -114,7 +115,7 @@ export default function EchangeFilters({
           <SelectContent>
             <SelectItem value="all">Toutes les saisons</SelectItem>
             {years.map((year) => (
-              <SelectItem key={year} value={year}>Saison {year}</SelectItem>
+              <SelectItem key={year} value={year}>Saison {formatAnnee(Number(year))}</SelectItem>
             ))}
           </SelectContent>
         </Select>

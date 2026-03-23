@@ -6,7 +6,7 @@ import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/components/ui/card';
 import PlayerDetails from '@/types/IPlayerDetails';
-import { formatSeason } from '@/lib/utils';
+import { formatSeason, formatAnnee } from '@/lib/utils';
 import { usePlayerHistory } from '@/hooks/joueur/usePlayerHistory';
 
 
@@ -303,7 +303,7 @@ export default function JoueurTabsOverview({ player }: Props) {
                             {e.equipe_nom}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {e.annee}
+                            {formatAnnee(e.annee)}
                             {' · '}
                             {e.type_nom}
                           </p>

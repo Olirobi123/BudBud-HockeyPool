@@ -1,6 +1,7 @@
 import { UserMinus } from 'lucide-react';
 import { HistoireBallotageEvent } from '@/types/IHistoire';
 import PlayerDetails from '@/types/IPlayerDetails';
+import { formatAnnee } from '@/lib/utils';
 
 type Props = {
   event: HistoireBallotageEvent;
@@ -22,7 +23,7 @@ export default function BallotageEventItem({ event, player }: Props) {
           </span>
         </span>
         <span className="text-xs text-muted-foreground">
-          {event.annee}
+          {formatAnnee(event.annee)}
           {' · '}
           {event.type_nom}
         </span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { DraftType } from '@/types/IDraft';
+import { formatAnnee } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -74,7 +75,7 @@ export function DraftFilters({
               <SelectContent>
                 {safeAnnees.map((annee) => (
                   <SelectItem key={annee} value={String(annee)}>
-                    {annee}
+                    {formatAnnee(annee)}
                   </SelectItem>
                 ))}
               </SelectContent>
