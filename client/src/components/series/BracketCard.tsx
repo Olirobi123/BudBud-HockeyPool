@@ -115,8 +115,9 @@ export function BracketCard({
   const isTied = equipeA !== undefined && equipeB !== undefined
     && equipeA.total_points === equipeB.total_points && equipeA.total_points > 0;
 
-  const isPending = equipe_a_id === null || equipe_b_id === null;
   const hasWinner = gagnant_id !== null;
+  const isBye = hasWinner && (equipe_a_id === null || equipe_b_id === null);
+  const isPending = !isBye && (equipe_a_id === null || equipe_b_id === null);
 
   return (
     <div
@@ -156,17 +157,17 @@ export function BracketCard({
       <div className="divide-y divide-border/40">
         <TeamRow
           team={equipeA}
-          nom={equipe_a_nom}
+          nom={isBye && equipe_a_id === null ? 'Bye' : equipe_a_nom}
           isWinner={gagnant_id === equipe_a_id && hasWinner}
-          isLoser={hasWinner && gagnant_id !== equipe_a_id}
+          isLoser={!isBye && hasWinner && gagnant_id !== equipe_a_id}
           isTied={isTied}
           isFinale={isFinale}
         />
         <TeamRow
           team={equipeB}
-          nom={equipe_b_nom}
+          nom={isBye && equipe_b_id === null ? 'Bye' : equipe_b_nom}
           isWinner={gagnant_id === equipe_b_id && hasWinner}
-          isLoser={hasWinner && gagnant_id !== equipe_b_id}
+          isLoser={!isBye && hasWinner && gagnant_id !== equipe_b_id}
           isTied={isTied}
           isFinale={isFinale}
         />
