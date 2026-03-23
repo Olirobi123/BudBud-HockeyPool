@@ -29,6 +29,10 @@ export function formatSeasonShort(season?: number): string {
   return str;
 }
 
+export function formatAnnee(annee: number): string {
+  return `${annee - 1}-${String(annee).slice(2)}`;
+}
+
 export function formatYearRanges(years: number[]): string {
   if (years.length === 0) return '';
   if (years.length === 1) return String(years[0]);

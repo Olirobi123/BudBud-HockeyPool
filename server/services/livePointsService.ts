@@ -363,10 +363,19 @@ export class LivePointsService {
   private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[], ownershipMap: Map<number, OwnershipRow>, isSnapshotCall: boolean): Promise<LiveTeamPoints[]> {
     const teamMap = new Map<number, LiveTeamPoints>();
 
-    // Seed all active pool teams so teams with 0 points still appear
+    // Seed teams: during playoffs (snapshot) only the 8 bracket teams; otherwise all active
     try {
-      const result = await pool.query(QUERIES.GET_ACTIVE_TEAMS);
-      for (const row of result.rows as { id: number; nom: string }[]) {
+      let teamsRows: { id: number; nom: string }[];
+      if (isSnapshotCall) {
+        const { getCurrentSeason } = await import('./seasonHelper');
+        const season = getCurrentSeason();
+        const result = await pool.query(QUERIES.GET_PLAYOFF_TEAMS_WITH_NAMES, [season]);
+        teamsRows = result.rows as { id: number; nom: string }[];
+      } else {
+        const result = await pool.query(QUERIES.GET_ACTIVE_TEAMS);
+        teamsRows = result.rows as { id: number; nom: string }[];
+      }
+      for (const row of teamsRows) {
         teamMap.set(row.id, {
           equipeId: row.id,
           equipeNom: row.nom,
@@ -409,7 +418,6 @@ export class LivePointsService {
       if (!isSnapshotCall) {
         team.totalPJ += 1;
         team.totalPoints += player.points;
-
       } else if (ownershipMap.get(player.nhlPlayerId)?.compte_points) {
         team.totalPJ += 1;
         team.totalPoints += player.points;

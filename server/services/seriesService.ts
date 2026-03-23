@@ -127,9 +127,16 @@ export class SeriesService {
    * Called at the start of each playoff week.
    */
   async snapshotWeekBaseline(saison: string, semaine: number): Promise<void> {
-    const currentPoints = await pool.query(QUERIES.GET_CURRENT_EQUIPE_POINTS_ALL, [saison]);
+    const [currentPoints, playoffTeamsResult] = await Promise.all([
+      pool.query(QUERIES.GET_CURRENT_EQUIPE_POINTS_ALL, [saison]),
+      pool.query(QUERIES.GET_PLAYOFF_TEAMS_WITH_NAMES, [saison]),
+    ]);
 
-    for (const row of currentPoints.rows) {
+    const playoffTeamIds = new Set<number>(
+      playoffTeamsResult.rows.map((r: { id: number }) => r.id),
+    );
+
+    for (const row of currentPoints.rows.filter((r: { equipe_id: number }) => playoffTeamIds.has(r.equipe_id))) {
       await pool.query(QUERIES.UPSERT_SEMAINE_BASELINE, [
         row.equipe_id,
         saison,

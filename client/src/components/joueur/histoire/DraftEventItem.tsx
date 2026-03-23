@@ -1,6 +1,7 @@
 import { UserPlus } from 'lucide-react';
 import { HistoireRepechageEvent } from '@/types/IHistoire';
 import PlayerDetails from '@/types/IPlayerDetails';
+import { formatAnnee } from '@/lib/utils';
 
 type Props = {
   event: HistoireRepechageEvent;
@@ -23,7 +24,7 @@ export default function DraftEventItem({ event, player }: Props) {
           </span>
         </span>
         <span className="text-xs text-muted-foreground">
-          {event.annee}
+          {formatAnnee(event.annee)}
           {' · '}
           {event.type_nom}
         </span>
