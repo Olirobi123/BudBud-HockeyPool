@@ -58,7 +58,7 @@ export class LivePointsService {
       console.error('NHL scores API unavailable, falling back to snapshot:', error);
       if (!isSnapshotCall) {
         const snapshot = await this.fetchSnapshot();
-        if (snapshot) return this.cacheAndReturn(snapshot);
+        if (snapshot) return this.cacheAndReturn(snapshot.data);
       }
       return { topPlayers: [], teamLeaderboard: [], gamesCount: 0, liveGamesCount: 0 };
     }
@@ -70,11 +70,15 @@ export class LivePointsService {
     const filteredGames = games.filter((g) => g.gameDate === dateString);
     const activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
     const liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    // Check across ALL dates — a late game from yesterday may still be live after midnight Eastern
+    const anyGameLive = games.some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
-    // No live games (FUT, FINAL/OFF, or no games today) — serve snapshot, nothing to compute
-    if (!isSnapshotCall && liveGames.length === 0) {
+    // No active games today (FUT or game-free day) and no live game anywhere — serve snapshot
+    // (previous day's results) until the next games become active.
+    // Falls through to play-by-play when today's games are FINAL/OFF.
+    if (!isSnapshotCall && activeGames.length === 0 && !anyGameLive) {
       const snapshot = await this.fetchSnapshot();
-      if (snapshot) return this.cacheAndReturn(snapshot);
+      if (snapshot) return this.cacheAndReturn(snapshot.data);
     }
 
     if (activeGames.length === 0) {
@@ -334,11 +338,14 @@ export class LivePointsService {
     return response;
   }
 
-  private async fetchSnapshot(): Promise<LivePointsResponse | null> {
+  private async fetchSnapshot(): Promise<{ data: LivePointsResponse; updatedAt: Date } | null> {
     try {
       const result = await pool.query(QUERIES.GET_API_STORE, ['live_points']);
       if (result.rows.length === 0) return null;
-      return result.rows[0].json_response as LivePointsResponse;
+      return {
+        data: result.rows[0].json_response as LivePointsResponse,
+        updatedAt: result.rows[0].updated_at as Date,
+      };
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error fetching live_points snapshot from api_store:', error);
