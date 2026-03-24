@@ -68,14 +68,27 @@ export class LivePointsService {
     // after midnight UTC) use yesterday's UTC date which aligns with the Eastern game day.
     const dateString = isSnapshotCall ? this.getDateString(-1) : scoresResult.currentDate;
     const filteredGames = games.filter((g) => g.gameDate === dateString);
-    const activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
-    const liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    let activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+    let liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
     // Check across ALL dates — a late game from yesterday may still be live after midnight Eastern
     const anyGameLive = games.some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
-    // No active games today (FUT or game-free day) and no live game anywhere — serve snapshot
+    // Past-midnight fallback: if currentDate rolled to the next day but yesterday's games are
+    // FINAL/OFF (snapshot not yet saved), fall back to yesterday's games for computation.
+    if (!isSnapshotCall && activeGames.length === 0 && !anyGameLive) {
+      const prevDate = this.getPrevDate(dateString);
+      const prevActiveGames = games.filter(
+        (g) => g.gameDate === prevDate && ACTIVE_GAME_STATES.includes(g.gameState),
+      );
+      if (prevActiveGames.length > 0) {
+        activeGames = prevActiveGames;
+        liveGames = [];
+      }
+    }
+
+    // No active games (FUT or game-free day) and no live game anywhere — serve snapshot
     // (previous day's results) until the next games become active.
-    // Falls through to play-by-play when today's games are FINAL/OFF.
+    // Falls through to play-by-play when games are FINAL/OFF.
     if (!isSnapshotCall && activeGames.length === 0 && !anyGameLive) {
       const snapshot = await this.fetchSnapshot();
       if (snapshot) return this.cacheAndReturn(snapshot.data);
@@ -179,6 +192,12 @@ export class LivePointsService {
     if (offsetDays !== 0) {
       d.setUTCDate(d.getUTCDate() + offsetDays);
     }
+    return d.toISOString().slice(0, 10);
+  }
+
+  private getPrevDate(dateString: string): string {
+    const d = new Date(`${dateString}T12:00:00Z`);
+    d.setUTCDate(d.getUTCDate() - 1);
     return d.toISOString().slice(0, 10);
   }
 
