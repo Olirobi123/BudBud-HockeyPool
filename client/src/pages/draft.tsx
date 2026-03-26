@@ -35,7 +35,7 @@ export default function Draft(): JSX.Element {
     filteredPicksEquipe,
   } = useDraftFilters(draftPicks, types);
 
-  const { data: misAuBallotage = [] } = useMisAuBallotage(selectedType, selectedYear);
+  const { data: misAuBallotage = [], isLoading: isBallotageLoading } = useMisAuBallotage(selectedType, selectedYear);
 
   const filteredMisAuBallotage = selectedEquipe
     ? misAuBallotage.filter((e) => e.equipe_nom === selectedEquipe)
@@ -111,7 +111,7 @@ export default function Draft(): JSX.Element {
 
       <div className="flex flex-col gap-12">
         {/* Mis au ballotage — always on top */}
-        <MisAuBallotageTable entries={filteredMisAuBallotage} typeName={selectedTypeName} />
+        <MisAuBallotageTable entries={filteredMisAuBallotage} typeName={selectedTypeName} isLoading={isBallotageLoading} />
 
         {/* Draft Table */}
         <DraftTable

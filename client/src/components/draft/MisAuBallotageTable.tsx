@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { UserMinus, ChevronDown } from 'lucide-react';
 import { MisAuBallotage } from '@/types/IMisAuBallotage';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/components/ui/card';
@@ -9,13 +10,37 @@ import {
 interface MisAuBallotageTableProps {
   entries: MisAuBallotage[];
   typeName: string;
+  isLoading?: boolean;
+}
+
+function MisAuBallotageTableSkeleton() {
+  return (
+    <Card className="border-amber-400/30">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1 h-6 bg-amber-400 rounded-full" />
+              <div className="w-0.5 h-4 bg-amber-400/60 rounded-full" />
+            </div>
+            <div className="space-y-1.5">
+              <Skeleton className="h-5 w-36" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </div>
+          <Skeleton className="h-5 w-8 rounded-full" />
+        </CardTitle>
+      </CardHeader>
+    </Card>
+  );
 }
 
 export function MisAuBallotageTable(
-  { entries, typeName }: MisAuBallotageTableProps,
+  { entries, typeName, isLoading = false }: MisAuBallotageTableProps,
 ): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
 
+  if (isLoading) return <MisAuBallotageTableSkeleton />;
   if (entries.length === 0) return null;
 
   // Group by team
