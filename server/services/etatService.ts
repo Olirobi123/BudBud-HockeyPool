@@ -1,4 +1,4 @@
-import { NHLClient } from '@olirobi/nhl_api_client';
+import { NHLClient, getCurrentSeasonId } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
 import { QUERIES, TABLES } from '../models';
 import { EtatInfo, Last5GameSnapshot } from '../types';
@@ -42,10 +42,21 @@ export class EtatService {
 
     type InsertRow = [number, string, number | null, number | null, number | null, number | null, string];
 
+    const seasonId = getCurrentSeasonId();
+    const seasonStartYear = Math.floor(seasonId / 10000);
+    const CURRENT_SEASON_START = new Date(`${seasonStartYear}-10-01`);
+
     const classifyPlayer = async (player: { nhl_player_id: number; position: string }): Promise<InsertRow | null> => {
       const stats = await nhlClient.players.get(player.nhl_player_id).stats();
-      const last5 = stats.last5Games;
-      if (!last5 || last5.length === 0) return null;
+      const last5Raw = stats.last5Games;
+      if (!last5Raw || last5Raw.length === 0) return null;
+
+      const last5 = last5Raw.filter((g) => {
+        if (!g.gameDate) return false;
+        return new Date(g.gameDate) >= CURRENT_SEASON_START;
+      });
+
+      if (last5.length < 5) return null;
 
       const isGoalie = player.position === 'G';
       const snapshot: Last5GameSnapshot[] = last5.map((g) => ({
