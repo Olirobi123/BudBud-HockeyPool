@@ -45,6 +45,7 @@ export class LivePointsService {
     this.nhlClient = new NHLClient();
   }
 
+  /** Main entry point. Returns live pool points from play-by-play or the nightly snapshot. */
   async getLivePoints(useCache = true, isSnapshotCall = false): Promise<LivePointsResponse> {
     if (useCache && this.cachedResponse && Date.now() < this.cacheExpiry) {
       return this.cachedResponse;
@@ -70,15 +71,12 @@ export class LivePointsService {
     const filteredGames = games.filter((g) => g.gameDate === dateString);
     const activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
     const liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
-    // Check across ALL dates — a late game from yesterday may still be live after midnight Eastern
-    const anyGameLive = games.some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
-    // No active games (FUT, past-midnight, or game-free day) and no live game anywhere — serve snapshot
-    // (previous day's results) until the next games become active.
-    // Falls through to play-by-play when games are FINAL/OFF.
-    if (!isSnapshotCall && activeGames.length === 0 && !anyGameLive) {
+    if (!isSnapshotCall) {
       const snapshot = await this.fetchSnapshot();
-      if (snapshot) return this.cacheAndReturn(snapshot.data);
+      if (snapshot && this.shouldServeSnapshot(snapshot, games, scoresResult.currentDate)) {
+        return this.cacheAndReturn(snapshot.data);
+      }
     }
 
     if (activeGames.length === 0) {
@@ -90,75 +88,17 @@ export class LivePointsService {
       };
     }
 
-    // Fetch play-by-play for all active games concurrently
-    const playByPlayResults = await Promise.all(
-      activeGames.map((game) => this.fetchPlayByPlaySafe(game.id)),
-    );
+    const { playerMap, playedGoalies } = await this.buildPlayerAccumulators(activeGames);
+    const { skaters, goalies } = this.splitSkaterAndGoalies(playerMap, playedGoalies);
 
-    // Build player accumulator from all games
-    const playerMap = new Map<number, PlayerAccumulator>();
-    const playedGoalies = new Set<number>();
-
-    for (let i = 0; i < activeGames.length; i++) {
-      const pbp = playByPlayResults[i];
-      if (!pbp) continue;
-
-      const game = activeGames[i];
-      this.processGamePlays(pbp, game, playerMap, playedGoalies);
-    }
-
-    // Separate skaters and goalies (only goalies with at least 1 second of TOI)
-    const skaters = Array.from(playerMap.values()).filter(
-      (p) => p.position !== GOALIE_POSITION,
-    );
-    const goalies = Array.from(playerMap.values()).filter(
-      (p) => p.position === GOALIE_POSITION && playedGoalies.has(p.nhlPlayerId),
-    );
-
-    // Batch lookup pool ownership for all players
     const nhlPlayerIds = [
       ...skaters.map((p) => p.nhlPlayerId),
       ...goalies.map((p) => p.nhlPlayerId),
     ];
     const ownershipMap = await this.batchLookupOwnership(nhlPlayerIds);
 
-    const buildLivePlayer = (
-      p: PlayerAccumulator,
-      pts: number,
-    ): LivePlayerPoints => {
-      const ownership = ownershipMap.get(p.nhlPlayerId);
-      return {
-        nhlPlayerId: p.nhlPlayerId,
-        firstName: p.firstName,
-        lastName: p.lastName,
-        position: p.position,
-        nhlTeamAbbrev: p.nhlTeamAbbrev,
-        nhlTeamLogo: p.nhlTeamLogo,
-        headshot: p.headshot,
-        goals: p.goals,
-        assists: p.assists,
-        points: pts,
-        wins: p.wins,
-        shutouts: p.shutouts,
-        poolTeam: ownership !== undefined && ownership.equipe_id !== null
-          ? { id: ownership.equipe_id, nom: ownership.equipe_nom as string }
-          : undefined,
-      };
-    };
+    const allPlayers = this.buildSortedLivePlayers(skaters, goalies, ownershipMap);
 
-    const skaterPlayers: LivePlayerPoints[] = skaters
-      .map((p) => buildLivePlayer(p, p.goals + p.assists));
-
-    const goaliePlayers: LivePlayerPoints[] = goalies
-      .map((p) => buildLivePlayer(p, calculateGoaliePoints(p.wins, p.shutouts)));
-
-    // Combine and sort by points descending
-    const allPlayers: LivePlayerPoints[] = [
-      ...skaterPlayers,
-      ...goaliePlayers,
-    ].sort((a, b) => b.points - a.points || b.goals - a.goals);
-
-    // Top 10 for the feed — exclude goalies
     const topPlayers = allPlayers
       .filter((p) => p.position !== GOALIE_POSITION)
       .slice(0, TOP_PLAYERS_LIMIT);
@@ -174,6 +114,7 @@ export class LivePointsService {
     });
   }
 
+  /** Returns a UTC date string (YYYY-MM-DD) offset by the given number of days from today. */
   private getDateString(offsetDays = 0): string {
     const d = new Date();
     if (offsetDays !== 0) {
@@ -182,7 +123,45 @@ export class LivePointsService {
     return d.toISOString().slice(0, 10);
   }
 
-private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | null> {
+  /**
+   * Returns true when the snapshot should be served instead of play-by-play.
+   * Conditions (all must hold):
+   *  1. Snapshot was written today (ET) at or after 03:15 ET — the nightly cron runs at
+   *     03:15 AM ET so this confirms the snapshot contains last night's final results.
+   *  2. No games from the previous game day are active (LIVE, CRIT, FINAL, OFF).
+   *  3. No games from the NHL's current date are active (LIVE, CRIT, FINAL, OFF).
+   */
+  private shouldServeSnapshot(
+    snapshot: { data: LivePointsResponse; updatedAt: Date },
+    games: GameScore[],
+    currentDate: string,
+  ): boolean {
+    const now = new Date();
+    const toEtDateString = (d: Date) =>
+      d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+    const toEtMinutes = (d: Date) => {
+      const et = new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+      return et.getHours() * 60 + et.getMinutes();
+    };
+    const isSnapshotFresh =
+      toEtDateString(snapshot.updatedAt) === toEtDateString(now) &&
+      toEtMinutes(snapshot.updatedAt) >= 3 * 60 + 15;
+
+    if (!isSnapshotFresh) return false;
+
+    const prevDayActive = games
+      .filter((g) => g.gameDate !== currentDate)
+      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+
+    const currentDayActive = games
+      .filter((g) => g.gameDate === currentDate)
+      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+
+    return !prevDayActive && !currentDayActive;
+  }
+
+  /** Fetches play-by-play for a single game, returning null on error instead of throwing. */
+  private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | null> {
     try {
       return await this.nhlClient.games.playByPlay(gameId);
     } catch (error) {
@@ -192,6 +171,11 @@ private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | 
     }
   }
 
+  /**
+   * Processes all plays from a single game's play-by-play into the shared playerMap.
+   * Accumulates goals and assists for skaters, tracks goalie activity, and awards
+   * wins/shutouts to the winning goalie once the game reaches FINAL or OFF.
+   */
   private processGamePlays(
     pbp: PlayByPlayResponse,
     game: GameScore,
@@ -313,6 +297,83 @@ private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | 
     }
   }
 
+  /** Fetches play-by-play for all active games concurrently and builds the player accumulator map. */
+  private async buildPlayerAccumulators(
+    activeGames: GameScore[],
+  ): Promise<{ playerMap: Map<number, PlayerAccumulator>; playedGoalies: Set<number> }> {
+    const playByPlayResults = await Promise.all(
+      activeGames.map((game) => this.fetchPlayByPlaySafe(game.id)),
+    );
+
+    const playerMap = new Map<number, PlayerAccumulator>();
+    const playedGoalies = new Set<number>();
+
+    for (let i = 0; i < activeGames.length; i++) {
+      const pbp = playByPlayResults[i];
+      if (!pbp) continue;
+      this.processGamePlays(pbp, activeGames[i], playerMap, playedGoalies);
+    }
+
+    return { playerMap, playedGoalies };
+  }
+
+  /** Splits the player accumulator map into skaters and goalies who actually played. */
+  private splitSkaterAndGoalies(
+    playerMap: Map<number, PlayerAccumulator>,
+    playedGoalies: Set<number>,
+  ): { skaters: PlayerAccumulator[]; goalies: PlayerAccumulator[] } {
+    const allPlayers = Array.from(playerMap.values());
+    return {
+      skaters: allPlayers.filter((p) => p.position !== GOALIE_POSITION),
+      goalies: allPlayers.filter(
+        (p) => p.position === GOALIE_POSITION && playedGoalies.has(p.nhlPlayerId),
+      ),
+    };
+  }
+
+  /** Maps a single PlayerAccumulator to a LivePlayerPoints object, attaching pool ownership. */
+  private buildLivePlayer(
+    p: PlayerAccumulator,
+    pts: number,
+    ownershipMap: Map<number, OwnershipRow>,
+  ): LivePlayerPoints {
+    const ownership = ownershipMap.get(p.nhlPlayerId);
+    return {
+      nhlPlayerId: p.nhlPlayerId,
+      firstName: p.firstName,
+      lastName: p.lastName,
+      position: p.position,
+      nhlTeamAbbrev: p.nhlTeamAbbrev,
+      nhlTeamLogo: p.nhlTeamLogo,
+      headshot: p.headshot,
+      goals: p.goals,
+      assists: p.assists,
+      points: pts,
+      wins: p.wins,
+      shutouts: p.shutouts,
+      poolTeam: ownership !== undefined && ownership.equipe_id !== null
+        ? { id: ownership.equipe_id, nom: ownership.equipe_nom as string }
+        : undefined,
+    };
+  }
+
+  /** Combines skaters and goalies into a single list sorted by points then goals. */
+  private buildSortedLivePlayers(
+    skaters: PlayerAccumulator[],
+    goalies: PlayerAccumulator[],
+    ownershipMap: Map<number, OwnershipRow>,
+  ): LivePlayerPoints[] {
+    const skaterPlayers = skaters.map((p) =>
+      this.buildLivePlayer(p, p.goals + p.assists, ownershipMap),
+    );
+    const goaliePlayers = goalies.map((p) =>
+      this.buildLivePlayer(p, calculateGoaliePoints(p.wins, p.shutouts), ownershipMap),
+    );
+    return [...skaterPlayers, ...goaliePlayers]
+      .sort((a, b) => b.points - a.points || b.goals - a.goals);
+  }
+
+  /** Queries pool ownership for a batch of NHL player IDs, returning a map keyed by NHL ID. */
   private async batchLookupOwnership(
     nhlPlayerIds: number[],
   ): Promise<Map<number, OwnershipRow>> {
@@ -332,12 +393,14 @@ private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | 
     return map;
   }
 
+  /** Stores a response in the in-memory cache and returns it. */
   private cacheAndReturn(response: LivePointsResponse): LivePointsResponse {
     this.cachedResponse = response;
     this.cacheExpiry = Date.now() + CACHE_TTL_MS;
     return response;
   }
 
+  /** Reads the latest live_points snapshot from api_store, including its updated_at timestamp. */
   private async fetchSnapshot(): Promise<{ data: LivePointsResponse; updatedAt: Date } | null> {
     try {
       const result = await pool.query(QUERIES.GET_API_STORE, ['live_points']);
@@ -353,6 +416,10 @@ private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | 
     }
   }
 
+  /**
+   * Computes each pool team's points earned today by diffing the current equipe_points
+   * totals against the classement_prev snapshot. Guards against NHL point retractions.
+   */
   private async fetchDailyPointsDiff(): Promise<Map<number, number>> {
     const { getCurrentSeason } = await import('./seasonHelper');
     const season = getCurrentSeason();
@@ -369,7 +436,16 @@ private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | 
     );
   }
 
-  private async buildTeamLeaderboard(allPlayers: LivePlayerPoints[], ownershipMap: Map<number, OwnershipRow>, isSnapshotCall: boolean): Promise<LiveTeamPoints[]> {
+  /**
+   * Builds the pool team leaderboard from live player stats.
+   * For snapshot calls, total points come from the daily diff to reflect any NHL corrections.
+   * All active pool teams are seeded with 0 points so teams without scorers still appear.
+   */
+  private async buildTeamLeaderboard(
+    allPlayers: LivePlayerPoints[],
+    ownershipMap: Map<number, OwnershipRow>,
+    isSnapshotCall: boolean,
+  ): Promise<LiveTeamPoints[]> {
     const teamMap = new Map<number, LiveTeamPoints>();
 
     // Seed all active teams
@@ -434,11 +510,11 @@ private async fetchPlayByPlaySafe(gameId: number): Promise<PlayByPlayResponse | 
       team.players.push(player);
     }
 
-    //Set diff pts
+    // Override totals with the authoritative diff when available
     if (diffMap) {
-      Array.from(teamMap.values()).forEach((team) => {
-        team.totalPoints = diffMap!.get(team.equipeId) ?? 0;
-      });
+      for (const team of Array.from(teamMap.values())) {
+        team.totalPoints = diffMap.get(team.equipeId) ?? 0;
+      }
     }
 
     return Array.from(teamMap.values())
