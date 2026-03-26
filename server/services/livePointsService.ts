@@ -421,14 +421,14 @@ export class LivePointsService {
     return response;
   }
 
-  /** Reads the latest live_points snapshot from api_store, including its last_update timestamp. */
+  /** Reads the latest live_points snapshot from api_store, including its updated_at timestamp. */
   private async fetchSnapshot(): Promise<{ data: LivePointsResponse; updatedAt: Date } | null> {
     try {
       const result = await pool.query(QUERIES.GET_API_STORE, ['live_points']);
       if (result.rows.length === 0) return null;
       return {
         data: result.rows[0].json_response as LivePointsResponse,
-        updatedAt: result.rows[0].last_update as Date,
+        updatedAt: result.rows[0].updated_at as Date,
       };
     } catch (error) {
       // eslint-disable-next-line no-console
