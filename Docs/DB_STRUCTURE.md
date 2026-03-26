@@ -284,7 +284,7 @@ Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour 
 | id            | integer     | Non  | nextval('api_store_id_seq'::regclass)   |
 | key           | text        | Non  | -                                       |
 | json_response | jsonb       | Non  | -                                       |
-| last_update   | timestamptz | Non  | NOW()                                   |
+| updated_at    | timestamptz | Non  | NOW()                                   |
 
 #### Contraintes
 - `PRIMARY KEY (id)`

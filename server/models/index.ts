@@ -286,7 +286,7 @@ export const QUERIES = {
 
   // API Store: persistent JSON snapshots
   GET_API_STORE: `
-    SELECT json_response, last_update, updated_at
+    SELECT json_response,  updated_at
     FROM ${TABLES.API_STORE}
     WHERE key = $1
   `,
@@ -294,9 +294,7 @@ export const QUERIES = {
     INSERT INTO ${TABLES.API_STORE} (key, json_response, last_update)
     VALUES ($1, $2, NOW())
     ON CONFLICT (key) DO UPDATE SET
-      json_response = EXCLUDED.json_response,
-      last_update   = NOW(),
-      updated_at    = NOW()
+      json_response = EXCLUDED.json_response
   `,
 
   // Choix de repêchage futurs
