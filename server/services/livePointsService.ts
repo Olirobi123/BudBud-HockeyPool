@@ -126,8 +126,10 @@ export class LivePointsService {
   /**
    * Returns true when the snapshot should be served instead of play-by-play.
    * Conditions (all must hold):
-   *  1. Snapshot was written today (ET) at or after 03:15 ET — the nightly cron runs at
-   *     03:15 AM ET so this confirms the snapshot contains last night's final results.
+   *  1. Snapshot was written after the most recent cron boundary (19:00 ET).
+   *     The nightly cron runs at 19:15 ET, so:
+   *       - If now >= 19:00 ET today → snapshot must be from today at or after 19:00 ET.
+   *       - If now <  19:00 ET today → snapshot must be from yesterday at or after 19:00 ET.
    *  2. No games from the previous game day are active (LIVE, CRIT, FINAL, OFF).
    *  3. No games from the NHL's current date are active (LIVE, CRIT, FINAL, OFF).
    */
@@ -143,9 +145,28 @@ export class LivePointsService {
       const et = new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' }));
       return et.getHours() * 60 + et.getMinutes();
     };
-    const isSnapshotFresh =
-      toEtDateString(snapshot.updatedAt) === toEtDateString(now) &&
-      toEtMinutes(snapshot.updatedAt) >= 3 * 60 + 15;
+
+    const CRON_BOUNDARY_MINUTES = 19 * 60; // 19:00 ET
+    const nowMinutes = toEtMinutes(now);
+    const snapshotDate = toEtDateString(snapshot.updatedAt);
+    const snapshotMinutes = toEtMinutes(snapshot.updatedAt);
+    const todayDate = toEtDateString(now);
+
+    // Compute yesterday's ET date string
+    const yesterdayMs = now.getTime() - 24 * 60 * 60 * 1000;
+    const yesterdayDate = toEtDateString(new Date(yesterdayMs));
+
+    let isSnapshotFresh: boolean;
+    if (nowMinutes >= CRON_BOUNDARY_MINUTES) {
+      // After 19:00 ET today: snapshot must be from today at or after 19:00
+      isSnapshotFresh =
+        snapshotDate === todayDate && snapshotMinutes >= CRON_BOUNDARY_MINUTES;
+    } else {
+      // Before 19:00 ET today: snapshot from yesterday at >= 19:00 OR from today
+      isSnapshotFresh =
+        (snapshotDate === yesterdayDate && snapshotMinutes >= CRON_BOUNDARY_MINUTES) ||
+        snapshotDate === todayDate;
+    }
 
     if (!isSnapshotFresh) return false;
 
@@ -400,14 +421,14 @@ export class LivePointsService {
     return response;
   }
 
-  /** Reads the latest live_points snapshot from api_store, including its updated_at timestamp. */
+  /** Reads the latest live_points snapshot from api_store, including its last_update timestamp. */
   private async fetchSnapshot(): Promise<{ data: LivePointsResponse; updatedAt: Date } | null> {
     try {
       const result = await pool.query(QUERIES.GET_API_STORE, ['live_points']);
       if (result.rows.length === 0) return null;
       return {
         data: result.rows[0].json_response as LivePointsResponse,
-        updatedAt: result.rows[0].updated_at as Date,
+        updatedAt: result.rows[0].last_update as Date,
       };
     } catch (error) {
       // eslint-disable-next-line no-console
