@@ -9,10 +9,14 @@ export class PlayersController {
    */
   getAPIPlayerByNHLId = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const nhlIdNum = parseInt(id, 10);
 
     try {
-      const playerData = await playersService.getAPIPlayerByNHLId(id);
-      sendSuccess(res, playerData);
+      const [playerData, ownership] = await Promise.all([
+        playersService.getAPIPlayerByNHLId(id),
+        Number.isNaN(nhlIdNum) ? Promise.resolve(null) : playersService.getOwnershipByNhlId(nhlIdNum),
+      ]);
+      sendSuccess(res, { ...playerData, ownership });
     } catch (error) {
       sendServerError(res, error instanceof Error ? error.message : 'Erreur lors de la récupération des données du joueur');
     }

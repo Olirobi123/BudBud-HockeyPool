@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { usePlayerOwnership } from '@/hooks/joueur/usePlayerOwnership';
 import { useInjuries } from '@/hooks/useInjuries';
 import { useEtat } from '@/hooks/useEtat';
 import { InjuryBadge } from '@/components/equipes/InjuryBadge';
@@ -12,8 +11,7 @@ type Props = {
   player: PlayerDetails;
 };
 export default function JoueurHeader({ player }: Props) {
-  const nhlId = player.playerId?.toString() ?? '';
-  const { data: ownership, isLoading: ownershipLoading } = usePlayerOwnership(nhlId);
+  const { ownership } = player;
   const { data: injuries } = useInjuries();
   const { data: etats } = useEtat();
   const injury = player.playerId !== undefined ? injuries?.[player.playerId] : undefined;
@@ -46,16 +44,16 @@ export default function JoueurHeader({ player }: Props) {
             <Badge variant="outline" className="text-white border-white">
               {player.position}
             </Badge>
-            {!ownershipLoading && ownership != null && (
+            {ownership != null && (
               <Link to={`/equipes/${ownership.id}`}>
                 <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer">
                   {ownership.nom}
                 </Badge>
               </Link>
             )}
-            {!ownershipLoading && ownership == null &&
+            {ownership == null && (
               <Badge className="bg-secondary text-primary-foreground hover:bg-slate-500 cursor-pointer">Agent libre</Badge>
-            }
+            )}
             {injury && <InjuryBadge injury={injury} />}
             {!injury && etatInfo && etatInfo.etat !== 'normal' && (
               <EtatBadge etat={etatInfo} position={player.position ?? 'C'} />
