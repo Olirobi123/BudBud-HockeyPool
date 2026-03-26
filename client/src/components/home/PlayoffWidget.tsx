@@ -16,12 +16,28 @@ const ROUND_LABELS: Record<1 | 2 | 3, string> = {
 
 function PlayoffWidgetSkeleton() {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {Array.from({ length: 2 }).map((_, i) => (
         // eslint-disable-next-line react/no-array-index-key
-        <div key={i} className="rounded-xl border border-border/40 p-3 space-y-2">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
+        <div key={i} className="rounded-xl border border-border/40 overflow-hidden">
+          {/* Header label row */}
+          <div className="px-3 py-1.5 border-b border-border/40 bg-muted/20">
+            <Skeleton className="h-3 w-24" />
+          </div>
+          {/* Team row A */}
+          <div className="flex items-center gap-2.5 px-3 py-2.5">
+            <Skeleton className="h-4 w-4 shrink-0 rounded-full" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-4 w-8 shrink-0" />
+          </div>
+          {/* Divider */}
+          <div className="border-t border-border/40" />
+          {/* Team row B */}
+          <div className="flex items-center gap-2.5 px-3 py-2.5">
+            <Skeleton className="h-4 w-4 shrink-0 rounded-full" />
+            <Skeleton className="h-4 flex-1" />
+            <Skeleton className="h-4 w-8 shrink-0" />
+          </div>
         </div>
       ))}
     </div>
