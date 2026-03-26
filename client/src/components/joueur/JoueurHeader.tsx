@@ -36,7 +36,7 @@ export default function JoueurHeader({ player }: Props) {
             {player.lastName?.default ?? ''}
           </h1>
           <div className="flex items-center flex-wrap gap-1.5 sm:gap-3">
-            <img src={player.teamLogo} alt={player.fullTeamName?.default ?? ''} className="h-6 sm:h-8" />
+            <img src={player.teamLogo} alt={player.fullTeamName?.default ?? ''} className="h-6 w-8 sm:h-8 sm:w-10 object-contain" />
             <Badge variant="outline" className="text-white border-white">
               #
               {player.sweaterNumber}
