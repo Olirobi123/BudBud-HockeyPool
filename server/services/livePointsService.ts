@@ -170,15 +170,18 @@ export class LivePointsService {
 
     if (!isSnapshotFresh) return false;
 
-    const prevDayActive = games
+    // Only in-progress games should block the snapshot — completed games (FINAL, OFF) should not.
+    const IN_PROGRESS_STATES = ['LIVE', 'CRIT'];
+
+    const prevDayInProgress = games
       .filter((g) => g.gameDate !== currentDate)
-      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+      .some((g) => IN_PROGRESS_STATES.includes(g.gameState));
 
-    const currentDayActive = games
+    const currentDayInProgress = games
       .filter((g) => g.gameDate === currentDate)
-      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+      .some((g) => IN_PROGRESS_STATES.includes(g.gameState));
 
-    return !prevDayActive && !currentDayActive;
+    return !prevDayInProgress && !currentDayInProgress;
   }
 
   /** Fetches play-by-play for a single game, returning null on error instead of throwing. */
