@@ -93,7 +93,7 @@ export default function Home(): JSX.Element {
         </div>
 
         {/* Séries éliminatoires — order 5 mobile, row 3 col 1-3 desktop (conditional) */}
-        <div className="lg:col-span-3 order-5 lg:order-none">
+        <div className="lg:col-span-2 order-5 lg:order-none">
           <PlayoffWidget />
         </div>
       </div>

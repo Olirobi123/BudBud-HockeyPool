@@ -33,7 +33,7 @@ function yearLabel(year: number): string {
 
 function SeriesSkeleton() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
       {Array.from({ length: 3 }).map((_, col) => (
         // eslint-disable-next-line react/no-array-index-key
         <div key={col} className="flex flex-col gap-4">
