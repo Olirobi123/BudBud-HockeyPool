@@ -44,6 +44,15 @@ export class SnapshotController {
     await pointsService.snapshotPreviousClassement(season);
     sendSuccess(res, { saved: true });
   });
+
+  /**
+   * POST /api/snapshot/live-points-only
+   * Save live-points snapshot WITHOUT updating playoffs series (safe manual recovery endpoint)
+   */
+  saveLivePointsOnly = asyncHandler(async (_req: Request, res: Response) => {
+    await snapshotService.saveLivePointsSnapshotOnly();
+    sendSuccess(res, { saved: true });
+  });
 }
 
 export const snapshotController = new SnapshotController();

@@ -16,4 +16,7 @@ router.post('/etat', requireApiKey, snapshotController.saveEtat);
 // Re-snapshot classement_prev baseline manuellement (récupération)
 router.post('/classement-prev', requireApiKey, snapshotController.saveClassementPrev);
 
+// Snapshot live-points sans mettre à jour les séries playoffs (récupération manuelle)
+router.post('/live-points-only', requireApiKey, snapshotController.saveLivePointsOnly);
+
 export default router;
