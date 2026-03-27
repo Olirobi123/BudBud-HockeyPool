@@ -291,7 +291,7 @@ export const QUERIES = {
     WHERE key = $1
   `,
   UPSERT_API_STORE: `
-    INSERT INTO ${TABLES.API_STORE} (key, json_response, last_update)
+    INSERT INTO ${TABLES.API_STORE} (key, json_response, updated_at)
     VALUES ($1, $2, NOW())
     ON CONFLICT (key) DO UPDATE SET
       json_response = EXCLUDED.json_response,
