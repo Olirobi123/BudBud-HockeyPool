@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { snapshotService } from '../services/snapshotService';
 import { injuriesService } from '../services/injuriesService';
 import { etatService } from '../services/etatService';
+import { pointsService } from '../services/pointsService';
+import { getCurrentSeason } from '../services/seasonHelper';
 import { sendSuccess } from '../utils/response';
 import { asyncHandler } from '../middleware/errorHandler';
 
@@ -30,6 +32,16 @@ export class SnapshotController {
    */
   saveEtat = asyncHandler(async (_req: Request, res: Response) => {
     await etatService.saveEtatSnapshot();
+    sendSuccess(res, { saved: true });
+  });
+
+  /**
+   * POST /api/snapshot/classement-prev
+   * Re-snapshot current equipe_points as classement_prev baseline (manual recovery endpoint)
+   */
+  saveClassementPrev = asyncHandler(async (_req: Request, res: Response) => {
+    const season = getCurrentSeason();
+    await pointsService.snapshotPreviousClassement(season);
     sendSuccess(res, { saved: true });
   });
 }

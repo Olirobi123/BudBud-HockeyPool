@@ -13,4 +13,7 @@ router.post('/injuries', requireApiKey, snapshotController.saveInjuries);
 // Sauvegarder un snapshot de l'état hot/cold/normal des joueurs (cron nocturne)
 router.post('/etat', requireApiKey, snapshotController.saveEtat);
 
+// Re-snapshot classement_prev baseline manuellement (récupération)
+router.post('/classement-prev', requireApiKey, snapshotController.saveClassementPrev);
+
 export default router;
