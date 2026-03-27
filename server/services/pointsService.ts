@@ -50,7 +50,7 @@ export class PointsService {
    * Snapshot current equipe_points totals into api_store key `classement_prev`
    * before running the NHL API update, so snapshotService can compute daily diffs.
    */
-  private async snapshotPreviousClassement(season: string): Promise<void> {
+  async snapshotPreviousClassement(season: string): Promise<void> {
     try {
       const result = await pool.query(QUERIES.GET_CURRENT_EQUIPE_POINTS_ALL, [season]);
       const teams: Record<string, number> = {};

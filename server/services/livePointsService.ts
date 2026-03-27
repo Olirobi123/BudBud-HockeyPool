@@ -126,10 +126,10 @@ export class LivePointsService {
   /**
    * Returns true when the snapshot should be served instead of play-by-play.
    * Conditions (all must hold):
-   *  1. Snapshot was written after the most recent cron boundary (19:00 ET).
-   *     The nightly cron runs at 19:15 ET, so:
-   *       - If now >= 19:00 ET today → snapshot must be from today at or after 19:00 ET.
-   *       - If now <  19:00 ET today → snapshot must be from yesterday at or after 19:00 ET.
+   *  1. Snapshot was written after the most recent cron boundary (03:00 ET / 07:00 UTC).
+   *     The nightly cron runs at 03:15 ET (07:15 UTC), so:
+   *       - If now >= 03:00 ET today → snapshot must be from today at or after 03:00 ET.
+   *       - If now <  03:00 ET today → snapshot must be from yesterday at or after 03:00 ET.
    *  2. No games from the previous game day are active (LIVE, CRIT, FINAL, OFF).
    *  3. No games from the NHL's current date are active (LIVE, CRIT, FINAL, OFF).
    */
@@ -146,7 +146,7 @@ export class LivePointsService {
       return et.getHours() * 60 + et.getMinutes();
     };
 
-    const CRON_BOUNDARY_MINUTES = 19 * 60; // 19:00 ET
+    const CRON_BOUNDARY_MINUTES = 3 * 60; // 03:00 ET (07:00 UTC)
     const nowMinutes = toEtMinutes(now);
     const snapshotDate = toEtDateString(snapshot.updatedAt);
     const snapshotMinutes = toEtMinutes(snapshot.updatedAt);
