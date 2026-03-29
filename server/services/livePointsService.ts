@@ -69,8 +69,10 @@ export class LivePointsService {
     // after midnight UTC) use yesterday's UTC date which aligns with the Eastern game day.
     const dateString = isSnapshotCall ? this.getDateString(-1) : scoresResult.currentDate;
     const filteredGames = games.filter((g) => g.gameDate === dateString);
-    const activeGames = filteredGames.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
-    const liveGames = filteredGames.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    // Include all active games across all dates — games that started on the previous day
+    // but ran past midnight ET must be processed for play-by-play, not dropped.
+    const activeGames = games.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+    const liveGames = games.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
     if (!isSnapshotCall) {
       const snapshot = await this.fetchSnapshot();
@@ -170,18 +172,20 @@ export class LivePointsService {
 
     if (!isSnapshotFresh) return false;
 
-    // Only in-progress games should block the snapshot — completed games (FINAL, OFF) should not.
-    const IN_PROGRESS_STATES = ['LIVE', 'CRIT'];
-
-    const prevDayInProgress = games
+    // Previous-day games (gameDate !== currentDate) block the snapshot for ALL active states
+    // (LIVE, CRIT, FINAL, OFF): even completed games from yesterday postdate the snapshot
+    // (cron ran at 03:15 ET, games started at ~19:00 ET the same day) so the snapshot is stale.
+    // Current-day games only block for in-progress states — FINAL/OFF on the current date are
+    // fine once the cron has captured them.
+    const prevDayActive = games
       .filter((g) => g.gameDate !== currentDate)
-      .some((g) => IN_PROGRESS_STATES.includes(g.gameState));
+      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
 
     const currentDayInProgress = games
       .filter((g) => g.gameDate === currentDate)
-      .some((g) => IN_PROGRESS_STATES.includes(g.gameState));
+      .some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
 
-    return !prevDayInProgress && !currentDayInProgress;
+    return !prevDayActive && !currentDayInProgress;
   }
 
   /** Fetches play-by-play for a single game, returning null on error instead of throwing. */
