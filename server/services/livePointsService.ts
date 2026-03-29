@@ -172,20 +172,29 @@ export class LivePointsService {
 
     if (!isSnapshotFresh) return false;
 
-    // Previous-day games (gameDate !== currentDate) block the snapshot for ALL active states
-    // (LIVE, CRIT, FINAL, OFF): even completed games from yesterday postdate the snapshot
-    // (cron ran at 03:15 ET, games started at ~19:00 ET the same day) so the snapshot is stale.
-    // Current-day games only block for in-progress states — FINAL/OFF on the current date are
-    // fine once the cron has captured them.
-    const prevDayActive = games
-      .filter((g) => g.gameDate !== currentDate)
-      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+    // Whether completed (FINAL/OFF) prev-day games block the snapshot depends on timing:
+    //
+    // Before 03:00 ET (cron hasn't run yet):
+    //   The freshest snapshot was written at 03:15 ET *yesterday*, before last night's games
+    //   started (~19:00 ET). Any prev-day active state — even FINAL/OFF — means those game
+    //   results are NOT in the snapshot, so block it.
+    //
+    // After 03:00 ET (cron has run):
+    //   The snapshot was just written at 03:15 ET *today* and captured all completed games.
+    //   Only in-progress games (LIVE, CRIT) should block it now.
+    const IN_PROGRESS = ['LIVE', 'CRIT'];
 
-    const currentDayInProgress = games
-      .filter((g) => g.gameDate === currentDate)
-      .some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    if (nowMinutes < CRON_BOUNDARY_MINUTES) {
+      const prevDayActive = games
+        .filter((g) => g.gameDate !== currentDate)
+        .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+      if (prevDayActive) return false;
+    } else {
+      const anyInProgress = games.some((g) => IN_PROGRESS.includes(g.gameState));
+      if (anyInProgress) return false;
+    }
 
-    return !prevDayActive && !currentDayInProgress;
+    return true;
   }
 
   /** Fetches play-by-play for a single game, returning null on error instead of throwing. */
