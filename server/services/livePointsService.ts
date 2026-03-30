@@ -172,26 +172,27 @@ export class LivePointsService {
 
     if (!isSnapshotFresh) return false;
 
-    // Whether completed (FINAL/OFF) prev-day games block the snapshot depends on timing:
-    //
-    // Before 03:00 ET (cron hasn't run yet):
-    //   The freshest snapshot was written at 03:15 ET *yesterday*, before last night's games
-    //   started (~19:00 ET). Any prev-day active state — even FINAL/OFF — means those game
-    //   results are NOT in the snapshot, so block it.
-    //
-    // After 03:00 ET (cron has run):
-    //   The snapshot was just written at 03:15 ET *today* and captured all completed games.
-    //   Only in-progress games (LIVE, CRIT) should block it now.
-    const IN_PROGRESS = ['LIVE', 'CRIT'];
+    // The 03:15 ET cron always runs *before* tonight's games (~19:00 ET).
+    // Any current-date game that has become active (LIVE, CRIT, FINAL, OFF) therefore
+    // postdates the snapshot — serve play-by-play instead.
+    const currentDayActive = games
+      .filter((g) => g.gameDate === currentDate)
+      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
+    if (currentDayActive) return false;
 
+    // Prev-day games still in progress (overtime past midnight) also block.
+    const prevDayInProgress = games
+      .filter((g) => g.gameDate !== currentDate)
+      .some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    if (prevDayInProgress) return false;
+
+    // Before 03:00 ET the cron hasn't run yet: the snapshot was written yesterday at 03:15 ET,
+    // before last night's games started. Prev-day FINAL/OFF results are not in it yet.
     if (nowMinutes < CRON_BOUNDARY_MINUTES) {
-      const prevDayActive = games
+      const prevDayCompleted = games
         .filter((g) => g.gameDate !== currentDate)
-        .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
-      if (prevDayActive) return false;
-    } else {
-      const anyInProgress = games.some((g) => IN_PROGRESS.includes(g.gameState));
-      if (anyInProgress) return false;
+        .some((g) => g.gameState === 'FINAL' || g.gameState === 'OFF');
+      if (prevDayCompleted) return false;
     }
 
     return true;
