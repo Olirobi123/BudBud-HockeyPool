@@ -19,18 +19,26 @@ export class SeriesService {
   getRondeActive(): 1 | 2 | 3 | null {
     const now = new Date();
     const today = now.toISOString().slice(0, 10);
+    return this.getRondeForDate(today);
+  }
+
+  /**
+   * Returns the active round for a specific date string (YYYY-MM-DD).
+   * Used by the snapshot cron to determine which semaine to credit based on the
+   * game date being captured (yesterday UTC), not today's date.
+   */
+  getRondeForDate(date: string): 1 | 2 | 3 | null {
     for (const [semaineStr, range] of Object.entries(PLAYOFF_WEEKS)) {
-      if (today >= range.debut && today <= range.fin) {
+      if (date >= range.debut && date <= range.fin) {
         return parseInt(semaineStr) as 1 | 2 | 3;
       }
     }
-    // Also active if we're past the start of playoffs but not yet in a week window
     const playoffStart = '2026-03-23';
     const playoffEnd = '2026-04-12';
-    if (today >= playoffStart && today <= playoffEnd) {
-      if (today < PLAYOFF_WEEKS[1].debut) return 1;
-      if (today < PLAYOFF_WEEKS[2].debut) return 1;
-      if (today < PLAYOFF_WEEKS[3].debut) return 2;
+    if (date >= playoffStart && date <= playoffEnd) {
+      if (date < PLAYOFF_WEEKS[1].debut) return 1;
+      if (date < PLAYOFF_WEEKS[2].debut) return 1;
+      if (date < PLAYOFF_WEEKS[3].debut) return 2;
       return 3;
     }
     return null;
