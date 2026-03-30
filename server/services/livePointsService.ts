@@ -76,7 +76,7 @@ export class LivePointsService {
 
     if (!isSnapshotCall) {
       const snapshot = await this.fetchSnapshot();
-      if (snapshot && this.shouldServeSnapshot(snapshot, games, scoresResult.currentDate)) {
+      if (snapshot && this.shouldServeSnapshot(snapshot, games)) {
         return this.cacheAndReturn(snapshot.data);
       }
     }
@@ -127,18 +127,17 @@ export class LivePointsService {
 
   /**
    * Returns true when the snapshot should be served instead of play-by-play.
+   * Game filtering uses the server's ET today date, NOT the NHL API's currentDate which
+   * can lag (stays as the last game day until new games appear the following evening).
    * Conditions (all must hold):
-   *  1. Snapshot was written after the most recent cron boundary (03:00 ET / 07:00 UTC).
-   *     The nightly cron runs at 03:15 ET (07:15 UTC), so:
-   *       - If now >= 03:00 ET today → snapshot must be from today at or after 03:00 ET.
-   *       - If now <  03:00 ET today → snapshot must be from yesterday at or after 03:00 ET.
-   *  2. No games from the previous game day are active (LIVE, CRIT, FINAL, OFF).
-   *  3. No games from the NHL's current date are active (LIVE, CRIT, FINAL, OFF).
+   *  1. Snapshot is fresh: written after the most recent 03:00 ET cron boundary.
+   *  2. No today-ET games are active (LIVE, CRIT, FINAL, OFF) — they all postdate the snapshot.
+   *  3. No prev-day games are in progress (LIVE, CRIT) — overtime past midnight.
+   *  4. Before 03:00 ET: no prev-day FINAL/OFF games either (cron hasn't captured them yet).
    */
   private shouldServeSnapshot(
     snapshot: { data: LivePointsResponse; updatedAt: Date },
     games: GameScore[],
-    currentDate: string,
   ): boolean {
     const now = new Date();
     const toEtDateString = (d: Date) =>
@@ -172,17 +171,21 @@ export class LivePointsService {
 
     if (!isSnapshotFresh) return false;
 
-    // The 03:15 ET cron always runs *before* tonight's games (~19:00 ET).
-    // Any current-date game that has become active (LIVE, CRIT, FINAL, OFF) therefore
-    // postdates the snapshot — serve play-by-play instead.
+    // Use the server's ET today date — NOT the NHL's currentDate which lags on game-day
+    // transitions (it stays as the last game day until new games appear, e.g. still
+    // "2026-03-29" at 9 AM on March 30). Using the NHL date here would cause FINAL games
+    // from last night to appear as "current-day" and incorrectly block the fresh snapshot.
+
+    // Any today-ET game in an active state (LIVE, CRIT, FINAL, OFF) postdates the snapshot:
+    // the cron always runs at 03:15 ET before tonight's games (~19:00 ET).
     const currentDayActive = games
-      .filter((g) => g.gameDate === currentDate)
+      .filter((g) => g.gameDate === todayDate)
       .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
     if (currentDayActive) return false;
 
     // Prev-day games still in progress (overtime past midnight) also block.
     const prevDayInProgress = games
-      .filter((g) => g.gameDate !== currentDate)
+      .filter((g) => g.gameDate !== todayDate)
       .some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
     if (prevDayInProgress) return false;
 
@@ -190,7 +193,7 @@ export class LivePointsService {
     // before last night's games started. Prev-day FINAL/OFF results are not in it yet.
     if (nowMinutes < CRON_BOUNDARY_MINUTES) {
       const prevDayCompleted = games
-        .filter((g) => g.gameDate !== currentDate)
+        .filter((g) => g.gameDate !== todayDate)
         .some((g) => g.gameState === 'FINAL' || g.gameState === 'OFF');
       if (prevDayCompleted) return false;
     }

@@ -29,15 +29,17 @@ Le snapshot est servi uniquement si **toutes** ces conditions sont vraies :
    - Si maintenant ≥ 03:00 ET : le snapshot doit dater d'aujourd'hui à ≥ 03:00 ET.
    - Si maintenant < 03:00 ET : le snapshot doit dater d'hier à ≥ 03:00 ET (ou d'aujourd'hui).
 
-2. **Aucun match `currentDate` actif** — tout match du jour courant en LIVE, CRIT, FINAL ou OFF bloque le snapshot. Le cron tourne à 03:15 ET, toujours avant les matchs du soir (~19:00 ET) ; donc même un FINAL avant minuit représente des résultats absents du snapshot.
+2. **Aucun match du jour ET actif** — tout match dont `gameDate` correspond à la date ET *du serveur* (pas la `currentDate` de l'API NHL) en LIVE, CRIT, FINAL ou OFF bloque le snapshot. Le cron tourne à 03:15 ET, toujours avant les matchs du soir (~19:00 ET) ; donc même un FINAL avant minuit représente des résultats absents du snapshot.
 
-3. **Aucun match de la veille en cours** — les matchs en LIVE ou CRIT dont le `gameDate` ≠ `currentDate` (prolongation passée minuit) bloquent aussi.
+3. **Aucun match de la veille en cours** — les matchs en LIVE ou CRIT dont le `gameDate` ≠ date ET serveur (prolongation passée minuit) bloquent aussi.
 
 4. **Avant 03:00 ET : aucun match de la veille complété** — le cron n'a pas encore tourné ; le snapshot date du matin d'*hier*, avant les matchs d'hier soir. Les FINAL/OFF de la veille représentent des résultats non capturés.
 
+> **Pourquoi la date ET serveur, pas `currentDate` NHL ?** L'API NHL garde `currentDate` sur le dernier jour de matchs jusqu'à ce que de nouveaux matchs apparaissent (ex. toujours `"2026-03-29"` à 9h le 30 mars). Utiliser `currentDate` classerait les matchs FINAL de la veille comme « jour courant » et bloquerait incorrectement le snapshot frais.
+
 ### Pourquoi les FINAL avant minuit bloquent
 
-Le cron tourne à **03:15 ET chaque matin**. Il capture les matchs de la *veille* (date Eastern). Toute la journée suivante (de 03:15 ET jusqu'à ~19:00 ET), ce snapshot est valide — aucun nouveau match n'a encore eu lieu. Dès que les premiers matchs du soir passent en LIVE, CRIT ou même FINAL (matchs courts terminés avant minuit), leurs résultats postdatent le snapshot → play-by-play.
+Le cron tourne à **03:15 ET chaque matin**. Il capture les matchs de la *veille* (date Eastern). Toute la journée suivante (de 03:15 ET jusqu'à ~19:00 ET), ce snapshot est valide — aucun nouveau match n'a encore eu lieu. Dès que les premiers matchs du soir passent en LIVE, CRIT ou même FINAL (matchs courts terminés avant minuit), leur `gameDate` = aujourd'hui ET → postdatent le snapshot → play-by-play.
 
 ### Gestion des matchs passés minuit
 
