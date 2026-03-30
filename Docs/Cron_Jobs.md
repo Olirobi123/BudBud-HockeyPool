@@ -23,36 +23,36 @@ Le endpoint `GET /api/live-points` choisit automatiquement entre les données en
 
 ### Règle de sélection (`shouldServeSnapshot`)
 
-La frontière critique est **03:00 ET** (heure du cron).
+Le snapshot est servi uniquement si **toutes** ces conditions sont vraies :
 
-| Fenêtre | Condition pour servir le snapshot |
-|---------|----------------------------------|
-| **Avant 03:00 ET** | `isSnapshotFresh` ET aucun match de la veille en état actif (LIVE, CRIT, FINAL, OFF) ET aucun match du jour en cours (LIVE, CRIT) |
-| **Après 03:00 ET** | `isSnapshotFresh` ET aucun match en cours (LIVE, CRIT) — les FINAL/OFF sont ok car le cron les a capturés |
+1. **`isSnapshotFresh`** — le snapshot a été écrit après la dernière exécution du cron (03:00 ET).
+   - Si maintenant ≥ 03:00 ET : le snapshot doit dater d'aujourd'hui à ≥ 03:00 ET.
+   - Si maintenant < 03:00 ET : le snapshot doit dater d'hier à ≥ 03:00 ET (ou d'aujourd'hui).
 
-**`isSnapshotFresh`** : le snapshot a été écrit après la dernière exécution du cron (03:00 ET).
-- Si maintenant ≥ 03:00 ET : le snapshot doit dater d'aujourd'hui à ≥ 03:00 ET.
-- Si maintenant < 03:00 ET : le snapshot doit dater d'hier à ≥ 03:00 ET (ou d'aujourd'hui).
+2. **Aucun match `currentDate` actif** — tout match du jour courant en LIVE, CRIT, FINAL ou OFF bloque le snapshot. Le cron tourne à 03:15 ET, toujours avant les matchs du soir (~19:00 ET) ; donc même un FINAL avant minuit représente des résultats absents du snapshot.
 
-### Pourquoi les FINAL/OFF bloquent avant 03:00 ET
+3. **Aucun match de la veille en cours** — les matchs en LIVE ou CRIT dont le `gameDate` ≠ `currentDate` (prolongation passée minuit) bloquent aussi.
 
-Le cron tourne à **03:15 ET**, après la fin des matchs du soir (~01:00 ET). Le snapshot de la veille a donc été pris à 03:15 ET *hier matin*, soit **avant** les matchs du soir. Un match en état FINAL ou OFF représente des résultats que ce snapshot ne contient pas encore — il faut donc lire le play-by-play.
+4. **Avant 03:00 ET : aucun match de la veille complété** — le cron n'a pas encore tourné ; le snapshot date du matin d'*hier*, avant les matchs d'hier soir. Les FINAL/OFF de la veille représentent des résultats non capturés.
 
-Après 03:15 ET, le nouveau snapshot a capturé tous les matchs complétés : seuls les matchs encore en cours (LIVE, CRIT) le bloquent.
+### Pourquoi les FINAL avant minuit bloquent
+
+Le cron tourne à **03:15 ET chaque matin**. Il capture les matchs de la *veille* (date Eastern). Toute la journée suivante (de 03:15 ET jusqu'à ~19:00 ET), ce snapshot est valide — aucun nouveau match n'a encore eu lieu. Dès que les premiers matchs du soir passent en LIVE, CRIT ou même FINAL (matchs courts terminés avant minuit), leurs résultats postdatent le snapshot → play-by-play.
 
 ### Gestion des matchs passés minuit
 
-Les matchs qui commencent le soir du jour J (gameDate = J) et se terminent après minuit ET sont inclus dans `activeGames` indépendamment de la date courante retournée par l'API NHL. Cela évite qu'un match de prolongation passé minuit disparaisse du calcul live.
+Les matchs qui commencent le soir du jour J (`gameDate = J`) et se terminent après minuit ET sont inclus dans `activeGames` indépendamment de la date courante retournée par l'API NHL. Cela évite qu'un match de prolongation passé minuit disparaisse du calcul live.
 
 ### Timeline complète (jour type)
 
 | Heure ET | Affiché | Raison |
 |----------|---------|--------|
-| 19:00 – minuit | **Play-by-play live** | Matchs en LIVE/CRIT → snapshot bloqué |
+| 03:20 – 19:00 | **Snapshot** | `isSnapshotFresh = true`, aucun match actif → snapshot servi |
+| ~19:00 | Matchs → LIVE/CRIT | Snapshot bloqué → bascule sur play-by-play |
+| 19:00 – fin des matchs | **Play-by-play live** | Matchs `currentDate` en LIVE/CRIT → snapshot bloqué |
+| Matchs → FINAL (avant ou après minuit) | **Play-by-play live** | Matchs `currentDate` en FINAL/OFF → snapshot bloqué (résultats absents du snapshot) |
 | Minuit – 03:00 | **Play-by-play live** | Matchs de la veille en FINAL/OFF → snapshot bloqué (avant cron) |
-| **03:15** | — | Cron écrit le snapshot avec les résultats définitifs |
-| 03:20 – 19:00 | **Snapshot** | `isSnapshotFresh = true`, aucun match en cours → snapshot servi |
-| 19:00+ | **Play-by-play live** | Nouveaux matchs en LIVE/CRIT → snapshot bloqué à nouveau |
+| **03:15** | — | Cron écrit le nouveau snapshot avec tous les résultats définitifs |
 
 ---
 
