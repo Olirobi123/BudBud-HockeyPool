@@ -15,7 +15,13 @@ export class SnapshotService {
 
     await pool.query(QUERIES.UPSERT_API_STORE, [FULL_KEY, response]);
 
-    const ronde = seriesService.getRondeActive();
+    // Use yesterday's UTC date — the same game day livePointsService captures — so games
+    // played on the last day of a round (e.g. March 29) are credited to that round even
+    // though the cron runs after midnight UTC the following day (March 30).
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() - 1);
+    const gameDate = d.toISOString().slice(0, 10);
+    const ronde = seriesService.getRondeForDate(gameDate);
     if (ronde !== null) {
       await seriesService.updateDailySeries(season, ronde, response.teamLeaderboard);
     }
