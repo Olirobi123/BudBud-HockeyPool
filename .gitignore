@@ -11,4 +11,5 @@ nul
 *.xlsx
 *.skill
 *.json
+!client/public/manifest.json
 settings.local.json
