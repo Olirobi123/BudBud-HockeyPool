@@ -3,12 +3,7 @@ import { EchangeCard } from '@/components/echanges/EchangeCard';
 import { HistoireEchangeEvent } from '@/types/IHistoire';
 import Echange from '@/types/IEchange';
 import PlayerDetails from '@/types/IPlayerDetails';
-
-function formatEventDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  if (Number.isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString('fr-CA', { day: 'numeric', month: 'short', year: 'numeric' });
-}
+import { formatDate } from '@/lib/utils';
 
 type Props = {
   event: HistoireEchangeEvent;
@@ -42,7 +37,7 @@ export default function TradeEventItem({ event, player }: Props) {
           </span>
         </span>
         <span className="text-xs text-muted-foreground font-mono">
-          {formatEventDate(event.date)}
+          {formatDate(event.date)}
         </span>
       </div>
       <EchangeCard echange={mapped} highlightPlayer={playerFullName} />
