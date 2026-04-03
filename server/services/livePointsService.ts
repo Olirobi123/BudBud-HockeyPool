@@ -4,8 +4,10 @@ import { QUERIES } from '../models';
 import { LivePlayerPoints, LiveTeamPoints, LivePointsResponse } from '../types';
 import { scoresService } from './scoresService';
 import { calculateGoaliePoints, GOALIE_POSITION, DEFENSE_POSITION } from '../utils/poolRules';
+import { shouldServeSnapshot } from '../utils/snapshotLogic';
 
-const ACTIVE_GAME_STATES = ['LIVE', 'CRIT', 'FINAL', 'OFF'];
+const ACTIVE_GAME_STATES = new Set(['LIVE', 'CRIT', 'FINAL', 'OFF']);
+const LIVE_GAME_STATES = new Set(['LIVE', 'CRIT']);
 const TOP_PLAYERS_LIMIT = 10;
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
@@ -32,6 +34,17 @@ interface OwnershipRow {
   compte_points: boolean;
   equipe_id: number | null;
   equipe_nom: string | null;
+}
+
+/** Returns ET date string (YYYY-MM-DD) for the given Date. */
+function toEtDateString(d: Date): string {
+  return d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+}
+
+/** Returns total minutes since midnight in ET for the given Date. */
+function toEtMinutes(d: Date): number {
+  const et = new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  return et.getHours() * 60 + et.getMinutes();
 }
 
 export class LivePointsService {
@@ -71,12 +84,12 @@ export class LivePointsService {
     const filteredGames = games.filter((g) => g.gameDate === dateString);
     // Include all active games across all dates — games that started on the previous day
     // but ran past midnight ET must be processed for play-by-play, not dropped.
-    const activeGames = games.filter((g) => ACTIVE_GAME_STATES.includes(g.gameState));
-    const liveGames = games.filter((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
+    const activeGames = games.filter((g) => ACTIVE_GAME_STATES.has(g.gameState));
+    const liveGames = games.filter((g) => LIVE_GAME_STATES.has(g.gameState));
 
     if (!isSnapshotCall) {
       const snapshot = await this.fetchSnapshot();
-      if (snapshot && this.shouldServeSnapshot(snapshot, games)) {
+      if (snapshot && shouldServeSnapshot(snapshot, games)) {
         return this.cacheAndReturn(snapshot.data);
       }
     }
@@ -123,82 +136,6 @@ export class LivePointsService {
       d.setUTCDate(d.getUTCDate() + offsetDays);
     }
     return d.toISOString().slice(0, 10);
-  }
-
-  /**
-   * Returns true when the snapshot should be served instead of play-by-play.
-   * Game filtering uses the server's ET today date, NOT the NHL API's currentDate which
-   * can lag (stays as the last game day until new games appear the following evening).
-   * Conditions (all must hold):
-   *  1. Snapshot is fresh: written after the most recent 03:00 ET cron boundary.
-   *  2. No today-ET games are active (LIVE, CRIT, FINAL, OFF) — they all postdate the snapshot.
-   *  3. No prev-day games are in progress (LIVE, CRIT) — overtime past midnight.
-   *  4. Before 03:00 ET: no prev-day FINAL/OFF games either (cron hasn't captured them yet).
-   */
-  private shouldServeSnapshot(
-    snapshot: { data: LivePointsResponse; updatedAt: Date },
-    games: GameScore[],
-  ): boolean {
-    const now = new Date();
-    const toEtDateString = (d: Date) =>
-      d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-    const toEtMinutes = (d: Date) => {
-      const et = new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-      return et.getHours() * 60 + et.getMinutes();
-    };
-
-    const CRON_BOUNDARY_MINUTES = 3 * 60; // 03:00 ET (07:00 UTC)
-    const nowMinutes = toEtMinutes(now);
-    const snapshotDate = toEtDateString(snapshot.updatedAt);
-    const snapshotMinutes = toEtMinutes(snapshot.updatedAt);
-    const todayDate = toEtDateString(now);
-
-    // Compute yesterday's ET date string
-    const yesterdayMs = now.getTime() - 24 * 60 * 60 * 1000;
-    const yesterdayDate = toEtDateString(new Date(yesterdayMs));
-
-    let isSnapshotFresh: boolean;
-    if (nowMinutes >= CRON_BOUNDARY_MINUTES) {
-      // After 19:00 ET today: snapshot must be from today at or after 19:00
-      isSnapshotFresh =
-        snapshotDate === todayDate && snapshotMinutes >= CRON_BOUNDARY_MINUTES;
-    } else {
-      // Before 19:00 ET today: snapshot from yesterday at >= 19:00 OR from today
-      isSnapshotFresh =
-        (snapshotDate === yesterdayDate && snapshotMinutes >= CRON_BOUNDARY_MINUTES) ||
-        snapshotDate === todayDate;
-    }
-
-    if (!isSnapshotFresh) return false;
-
-    // Use the server's ET today date — NOT the NHL's currentDate which lags on game-day
-    // transitions (it stays as the last game day until new games appear, e.g. still
-    // "2026-03-29" at 9 AM on March 30). Using the NHL date here would cause FINAL games
-    // from last night to appear as "current-day" and incorrectly block the fresh snapshot.
-
-    // Any today-ET game in an active state (LIVE, CRIT, FINAL, OFF) postdates the snapshot:
-    // the cron always runs at 03:15 ET before tonight's games (~19:00 ET).
-    const currentDayActive = games
-      .filter((g) => g.gameDate === todayDate)
-      .some((g) => ACTIVE_GAME_STATES.includes(g.gameState));
-    if (currentDayActive) return false;
-
-    // Prev-day games still in progress (overtime past midnight) also block.
-    const prevDayInProgress = games
-      .filter((g) => g.gameDate !== todayDate)
-      .some((g) => g.gameState === 'LIVE' || g.gameState === 'CRIT');
-    if (prevDayInProgress) return false;
-
-    // Before 03:00 ET the cron hasn't run yet: the snapshot was written yesterday at 03:15 ET,
-    // before last night's games started. Prev-day FINAL/OFF results are not in it yet.
-    if (nowMinutes < CRON_BOUNDARY_MINUTES) {
-      const prevDayCompleted = games
-        .filter((g) => g.gameDate !== todayDate)
-        .some((g) => g.gameState === 'FINAL' || g.gameState === 'OFF');
-      if (prevDayCompleted) return false;
-    }
-
-    return true;
   }
 
   /** Fetches play-by-play for a single game, returning null on error instead of throwing. */
@@ -315,8 +252,8 @@ export class LivePointsService {
     }
 
     // Award wins and shutouts for completed games
-    const COMPLETED_STATES = ['FINAL', 'OFF'];
-    if (COMPLETED_STATES.includes(game.gameState)) {
+    const COMPLETED_GAME_STATES = new Set(['FINAL', 'OFF']);
+    if (COMPLETED_GAME_STATES.has(game.gameState)) {
       const awayScore = game.awayTeam.score ?? 0;
       const homeScore = game.homeTeam.score ?? 0;
 
@@ -379,6 +316,10 @@ export class LivePointsService {
     ownershipMap: Map<number, OwnershipRow>,
   ): LivePlayerPoints {
     const ownership = ownershipMap.get(p.nhlPlayerId);
+    const poolTeam = ownership && ownership.equipe_id != null
+      ? { id: ownership.equipe_id, nom: ownership.equipe_nom as string }
+      : undefined;
+
     return {
       nhlPlayerId: p.nhlPlayerId,
       firstName: p.firstName,
@@ -392,9 +333,7 @@ export class LivePointsService {
       points: pts,
       wins: p.wins,
       shutouts: p.shutouts,
-      poolTeam: ownership !== undefined && ownership.equipe_id !== null
-        ? { id: ownership.equipe_id, nom: ownership.equipe_nom as string }
-        : undefined,
+      poolTeam,
     };
   }
 
@@ -538,7 +477,6 @@ export class LivePointsService {
         team.totalPoints += player.points;
       } else if (ownershipMap.get(player.nhlPlayerId)?.compte_points) {
         team.totalPJ += 1;
-        team.totalPoints += player.points;
       }
 
       if (player.position === GOALIE_POSITION) {
