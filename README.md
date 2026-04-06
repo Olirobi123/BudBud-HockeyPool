@@ -9,8 +9,12 @@
 - **Gestion des équipes** : Fiche d'équipe avec effectif complet, statistiques et trophées.
 - **Effectifs avec statistiques** : Top 12 attaquants, top 6 défenseurs et gardiens, enrichis via l'API NHL.
 - **Échanges** : Suivi des transferts de joueurs entre équipes du pool.
-- **Repêchage** : Gestion des différents types de repêchages (annuel, expansion, ballotage…).
+- **Repêchage** : Gestion des différents types de repêchages (annuel, expansion, ballotage…) et choix futurs.
+- **Mises au ballotage** : Historique des joueurs retirés avant chaque événement de repêchage.
 - **Recherche de joueurs** : Recherche rapide via l'API NHL avec badge de propriété dans le pool.
+- **Fiche joueur** : Historique complet (échanges, repêchages, ballotages), état de forme et blessures.
+- **Séries éliminatoires** : Bracket des playoffs du pool avec classement par semaine.
+- **Blessures et état de forme** : Suivi des blessures (ESPN) et indicateurs hot/cold/normal sur les 5 derniers matchs.
 - **Trophées** : Palmarès des équipes (Général, Attaque, Défense, Gardien, Playoffs).
 - **Interface responsive** : Design mobile-first avec mode sombre.
 
@@ -18,7 +22,7 @@
 
 - **Frontend** : React 18 + TypeScript, Vite, Tailwind CSS, TanStack Query, shadcn/ui (Radix)
 - **Backend** : Node.js + Express + TypeScript (architecture MVC)
-- **Base de données** : PostgreSQL (8 tables)
+- **Base de données** : PostgreSQL (18 tables)
 - **API externe** : `@olirobi/nhl_api_client`
 
 ## API
@@ -37,11 +41,16 @@
 | `GET /api/echanges` | Liste des échanges |
 | `GET /api/repechage` | Choix de repêchage |
 | `GET /api/trophees` | Trophées et palmarès |
+| `POST /api/snapshot/*` | Snapshots nocturnes (cron, protégé par API key) |
+| `GET /api/mis-au-ballotage` | Historique des mises au ballotage |
+| `GET /api/injuries` | Blessures des joueurs du pool |
+| `GET /api/etat` | État de forme des joueurs (hot/cold/normal) |
+| `GET /api/series` | Séries éliminatoires du pool |
 | `GET /api/health` | Santé du serveur |
 
 ## Base de données (PostgreSQL)
 
-Tables : `equipes`, `joueurs`, `equipe_joueurs` (jonction), `repechages`, `types_repechage`, `echanges`, `trophees`, `trophee_gagnants`
+Tables : `equipes`, `joueurs`, `equipe_joueurs`, `equipe_points`, `repechages`, `types_repechage`, `choix_repechage`, `echanges`, `echange_joueurs`, `trophees`, `trophee_gagnants`, `mis_au_ballotage`, `api_store`, `blessures`, `etat_joueurs`, `series_playoffs`, `equipe_semaine_points`, `series_semaine_baseline`
 
 Voir `Docs/DB_STRUCTURE.md` pour le schéma complet.
 
@@ -70,8 +79,12 @@ npm run lint      # Lint strict (0 avertissements)
 - **Team Management**: Team pages with full rosters, stats, and trophy history.
 - **Rosters with Statistics**: Top 12 forwards, top 6 defensemen, and goalies enriched via the NHL API.
 - **Trades**: Track player transfers between pool teams.
-- **Drafts**: Manage draft types (annual, expansion, waivers, etc.).
+- **Drafts**: Manage draft types (annual, expansion, waivers, etc.) and future draft picks.
+- **Waiver Wire History**: Track players dropped before each draft event.
 - **Player Search**: Fast NHL player search with pool ownership badge.
+- **Player Profile**: Full history (trades, drafts, waivers), form status and injuries.
+- **Playoff Bracket**: Pool playoff series with weekly standings.
+- **Injuries & Player Form**: Injury tracking (ESPN) and hot/cold/normal indicators over last 5 games.
 - **Trophies**: Team award history (Overall, Attack, Defense, Goalie, Playoffs).
 - **Responsive UI**: Mobile-first design with dark mode support.
 
@@ -79,7 +92,7 @@ npm run lint      # Lint strict (0 avertissements)
 
 - **Frontend**: React 18 + TypeScript, Vite, Tailwind CSS, TanStack Query, shadcn/ui (Radix)
 - **Backend**: Node.js + Express + TypeScript (MVC architecture)
-- **Database**: PostgreSQL (8 tables)
+- **Database**: PostgreSQL (18 tables)
 - **External API**: `@olirobi/nhl_api_client`
 
 ## API
@@ -98,11 +111,16 @@ npm run lint      # Lint strict (0 avertissements)
 | `GET /api/echanges` | List trades |
 | `GET /api/repechage` | Draft picks |
 | `GET /api/trophees` | Trophies and awards |
+| `POST /api/snapshot/*` | Nightly snapshots (cron, API key protected) |
+| `GET /api/mis-au-ballotage` | Waiver wire history |
+| `GET /api/injuries` | Pool player injuries |
+| `GET /api/etat` | Player form (hot/cold/normal) |
+| `GET /api/series` | Pool playoff bracket |
 | `GET /api/health` | Server health check |
 
 ## Database (PostgreSQL)
 
-Tables: `equipes`, `joueurs`, `equipe_joueurs` (junction), `repechages`, `types_repechage`, `echanges`, `trophees`, `trophee_gagnants`
+Tables: `equipes`, `joueurs`, `equipe_joueurs`, `equipe_points`, `repechages`, `types_repechage`, `choix_repechage`, `echanges`, `echange_joueurs`, `trophees`, `trophee_gagnants`, `mis_au_ballotage`, `api_store`, `blessures`, `etat_joueurs`, `series_playoffs`, `equipe_semaine_points`, `series_semaine_baseline`
 
 See `Docs/DB_STRUCTURE.md` for the full schema.
 
