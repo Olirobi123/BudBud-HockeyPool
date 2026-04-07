@@ -219,6 +219,9 @@ export class LivePointsService {
 
       if (play.typeDescKey !== 'goal') continue;
 
+      // Shootout goals don't count for pool points
+      if (play.periodDescriptor?.periodType === 'SO') continue;
+
       if (details.scoringPlayerId != null) {
         const p = playerMap.get(details.scoringPlayerId);
         if (p) p.goals++;

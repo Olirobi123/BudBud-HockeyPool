@@ -46,10 +46,9 @@ Table de jonction reliant les échanges aux joueurs reçus par chaque équipe. R
 
 #### Contraintes
 - `PRIMARY KEY (id)`
-- `FOREIGN KEY (echange_id)` → `echanges(id) ON DELETE CASCADE`
+- `FOREIGN KEY (echange_id)` → `echanges(id)`
 - `FOREIGN KEY (equipe_receptrice_id)` → `equipes(id)`
-- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
-- `CHECK (joueur_id IS NOT NULL OR joueur_nom_libre IS NOT NULL)`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id)`
 
 #### Notes
 - `joueur_nom_libre` : pour les joueurs non enregistrés dans le pool (picks de repêchage, etc.)
@@ -89,8 +88,8 @@ Table de jonction reliant les équipes aux joueurs (remplace `equipes.nhl_player
 
 #### Contraintes
 - `PRIMARY KEY (id)`
-- `FOREIGN KEY (equipe_id)` → `equipes(id) ON DELETE CASCADE`
-- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE CASCADE`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id)`
 - `UNIQUE (joueur_id)` — un joueur ne peut être que sur une seule équipe
 
 ---
@@ -107,7 +106,7 @@ Table de jonction reliant les équipes aux joueurs (remplace `equipes.nhl_player
 | position       | character varying | Non  | -                                               |
 | created_at     | timestamp         | Oui  | NOW()                                           |
 | updated_at     | timestamp         | Oui  | NOW()                                           |
-| compte_points  | boolean           | Oui  | true                                            |
+| compte_points  | boolean           | Non  | false                                           |
 
 #### Contraintes
 - `PRIMARY KEY (id)`
@@ -115,7 +114,7 @@ Table de jonction reliant les équipes aux joueurs (remplace `equipes.nhl_player
 
 #### Notes
 - `position` : valeurs possibles `'C'`, `'LW'`, `'RW'`, `'D'`, `'G'`
-- `compte_points` : si `false`, le joueur ne compte pas pour le PJ/PTS du leaderboard live (ex. : joueur échangé en cours de saison)
+- `compte_points` : si `false`, le joueur ne compte pas pour le PJ/PTS du leaderboard live — mis à jour dynamiquement par `UPDATE_COMPTE_POINTS`
 
 ---
 
@@ -166,7 +165,7 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie.
 - `PRIMARY KEY (id)`
 - `FOREIGN KEY (type_id)` → `types_repechage(id)`
 - `FOREIGN KEY (equipe_id)` → `equipes(id)`
-- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id)`
 
 ---
 
@@ -200,15 +199,19 @@ Stocke les choix de repêchage futurs détenus par chaque équipe (picks échang
 | Nom   | Type              | Null | Par défaut                                      |
 |-------|-------------------|------|-------------------------------------------------|
 | id    | integer           | Non  | nextval('types_repechage_id_seq'::regclass)     |
-| nom   | character varying | Non  | -                                               |
+| nom              | character varying | Non  | -                                               |
+| sort_year_offset | integer           | Non  | 0                                               |
+| sort_month       | integer           | Non  | 1                                               |
+| sort_day         | integer           | Non  | 1                                               |
 
 #### Données de référence
-| id | nom                   |
-|----|-----------------------|
-| 1  | Ballotage de décembre |
-| 2  | Draft annuel          |
-| 3  | Draft d'expansion     |
-| 4  | Ballotage de mars     |
+| id | nom                   | sort_year_offset | sort_month | sort_day |
+|----|-----------------------|------------------|------------|----------|
+| 1  | Ballotage de décembre | -1               | 12         | 1        |
+| 2  | Draft annuel          | -1               | 10         | 3        |
+| 3  | Draft d'expansion     | -1               | 6          | 20       |
+| 4  | Ballotage de mars     | 0                | 3          | 1        |
+| 5  | Draft de dispersion   | -1               | 6          | 1        |
 
 ---
 
@@ -265,9 +268,8 @@ Trace les joueurs retirés par une équipe avant chaque événement de repêchag
 #### Contraintes
 - `PRIMARY KEY (id)`
 - `FOREIGN KEY (equipe_id)` → `equipes(id)`
-- `FOREIGN KEY (joueur_id)` → `joueurs(id) ON DELETE SET NULL`
+- `FOREIGN KEY (joueur_id)` → `joueurs(id)`
 - `FOREIGN KEY (type_id)` → `types_repechage(id)`
-- `CHECK (joueur_id IS NOT NULL OR joueur_nom_libre IS NOT NULL)`
 
 #### Notes
 - Pour un `(annee, type_id)` donné : `mis_au_ballotage` = qui est parti, `repechages` = qui est arrivé
@@ -316,6 +318,11 @@ Snapshot des blessures des joueurs du pool, alimenté depuis ESPN et matché aux
 | date_retour     | date        | Oui  | -                                             |
 | last_update     | timestamptz | Non  | now()                                         |
 
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (nhl_player_id)` → `joueurs(nhl_player_id)`
+- `UNIQUE (nhl_player_id)`
+
 #### Notes
 - Alimentée par `POST /api/snapshot/injuries`
 - `statut` : ex. `'injured'`, `'day-to-day'`
@@ -338,6 +345,11 @@ Snapshot de l'état de forme (hot/cold/normal) des joueurs du pool sur les 5 der
 | save_pctg_5_matchs     | numeric     | Oui  | -               |
 | derniers_matchs        | jsonb       | Non  | '[]'            |
 | last_update            | timestamptz | Non  | now()           |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `UNIQUE (nhl_player_id)`
+- `CHECK (etat IN ('hot', 'cold', 'normal'))`
 
 #### Notes
 - Alimentée par `POST /api/snapshot/etat`
@@ -367,6 +379,7 @@ Bracket des séries éliminatoires du pool. Une ligne par affrontement (QF, SF, 
 - `FOREIGN KEY (equipe_a_id)` → `equipes(id)`
 - `FOREIGN KEY (equipe_b_id)` → `equipes(id)`
 - `FOREIGN KEY (gagnant_id)` → `equipes(id)`
+- `UNIQUE (saison, ronde, position)`
 
 #### Notes
 - `ronde` : `1` = QF, `2` = SF, `3` = Finale
@@ -399,7 +412,7 @@ Points accumulés par équipe pendant chaque semaine des séries. Calculé comme
 
 #### Contraintes
 - `PRIMARY KEY (id)`
-- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id) ON DELETE CASCADE`
 - `UNIQUE (equipe_id, saison, semaine)`
 
 #### Notes
@@ -429,7 +442,7 @@ Snapshot des points cumulés (`equipe_points`) au début de chaque semaine de pl
 
 #### Contraintes
 - `PRIMARY KEY (id)`
-- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id) ON DELETE CASCADE`
 - `UNIQUE (equipe_id, saison, semaine)`
 
 #### Notes
@@ -456,4 +469,4 @@ Snapshot des points cumulés (`equipe_points`) au début de chaque semaine de pl
 
 ---
 
-*Dernière mise à jour : mars 2026 — ajout tables playoffs (`series_playoffs`, `equipe_semaine_points`, `series_semaine_baseline`), `blessures`, `etat_joueurs`, `choix_repechage`; colonnes `joueurs.compte_points`, `equipe_points.total_buts/total_matchs`; clé `classement_prev` dans `api_store`*
+*Dernière mise à jour : avril 2026 — correction contraintes FK (suppression ON DELETE CASCADE/SET NULL erronés sur `echange_joueurs`, `equipe_joueurs`, `repechages`, `mis_au_ballotage`), ajout contraintes manquantes (`blessures` FK+UNIQUE, `etat_joueurs` CHECK+UNIQUE, `series_playoffs` UNIQUE), correction `joueurs.compte_points` default false/NOT NULL, ajout colonnes `types_repechage.sort_*`, ajout type id=5 « Draft de dispersion »*
