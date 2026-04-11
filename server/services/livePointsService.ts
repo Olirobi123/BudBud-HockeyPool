@@ -337,7 +337,7 @@ export class LivePointsService {
     for (const { stats, team } of sides) {
       if (!stats) continue;
       const logo = team.logo ?? '';
-      const headshotBase = `https://assets.nhle.com/mugs/nhl/${boxscore.season ?? ''}`;
+      const headshotBase = `https://assets.nhle.com/mugs/nhl/${boxscore.season ?? ''}/${team.abbrev}`;
 
       for (const p of [...(stats.forwards ?? []), ...(stats.defense ?? [])]) {
         if (!playerMap.has(p.playerId)) {
