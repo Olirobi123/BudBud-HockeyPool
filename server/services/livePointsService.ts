@@ -292,7 +292,12 @@ export class LivePointsService {
     for (let i = 0; i < activeGames.length; i++) {
       const pbp = playByPlayResults[i];
       if (!pbp) continue;
-      this.processGamePlays(pbp, activeGames[i], playerMap, playedGoalies);
+      try {
+        this.processGamePlays(pbp, activeGames[i], playerMap, playedGoalies);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`Error processing play-by-play for game ${activeGames[i].id}:`, error);
+      }
     }
 
     return { playerMap, playedGoalies };
