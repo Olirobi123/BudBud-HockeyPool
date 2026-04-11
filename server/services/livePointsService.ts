@@ -1,4 +1,4 @@
-import { NHLClient, PlayByPlayResponse, GameScore } from '@olirobi/nhl_api_client';
+import { NHLClient, PlayByPlayResponse, BoxscoreResponse, GameScore } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
 import { QUERIES } from '../models';
 import { LivePlayerPoints, LiveTeamPoints, LivePointsResponse } from '../types';
@@ -7,9 +7,31 @@ import { calculateGoaliePoints, GOALIE_POSITION, DEFENSE_POSITION } from '../uti
 import { shouldServeSnapshot } from '../utils/snapshotLogic';
 
 const ACTIVE_GAME_STATES = new Set(['LIVE', 'CRIT', 'FINAL', 'OFF']);
+const COMPLETED_GAME_STATES = new Set(['FINAL', 'OFF']);
 const LIVE_GAME_STATES = new Set(['LIVE', 'CRIT']);
 const TOP_PLAYERS_LIMIT = 10;
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+interface BoxscorePlayerStats {
+  playerId: number;
+  name: { default: string };
+  position: string;
+  goals: number;
+  assists: number;
+  toi: string;
+  goalsAgainst?: number;
+}
+interface BoxscoreTeamStats {
+  forwards: BoxscorePlayerStats[];
+  defense: BoxscorePlayerStats[];
+  goalies: BoxscorePlayerStats[];
+}
+interface BoxscoreWithPlayerStats extends BoxscoreResponse {
+  playerByGameStats?: {
+    awayTeam?: BoxscoreTeamStats;
+    homeTeam?: BoxscoreTeamStats;
+  };
+}
 
 interface PlayerAccumulator {
   nhlPlayerId: number;
@@ -103,7 +125,7 @@ export class LivePointsService {
       };
     }
 
-    const { playerMap, playedGoalies } = await this.buildPlayerAccumulators(activeGames);
+    const { playerMap, playedGoalies } = await this.buildPlayerAccumulators(activeGames, isSnapshotCall);
     const { skaters, goalies } = this.splitSkaterAndGoalies(playerMap, playedGoalies);
 
     const nhlPlayerIds = [
@@ -147,6 +169,23 @@ export class LivePointsService {
       console.error(`Error fetching play-by-play for game ${gameId}:`, error);
       return null;
     }
+  }
+
+  /** Fetches boxscore for a single game, returning null on error instead of throwing. */
+  private async fetchBoxscoreSafe(gameId: number): Promise<BoxscoreWithPlayerStats | null> {
+    try {
+      return (await this.nhlClient.games.boxscore(gameId)) as BoxscoreWithPlayerStats;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching boxscore for game ${gameId}:`, error);
+      return null;
+    }
+  }
+
+  /** Converts a "MM:SS" TOI string to total seconds. */
+  private toiToSeconds(toi: string): number {
+    const [m, s] = toi.split(':').map(Number);
+    return (m ?? 0) * 60 + (s ?? 0);
   }
 
   /**
@@ -255,7 +294,6 @@ export class LivePointsService {
     }
 
     // Award wins and shutouts for completed games
-    const COMPLETED_GAME_STATES = new Set(['FINAL', 'OFF']);
     if (COMPLETED_GAME_STATES.has(game.gameState)) {
       const awayScore = game.awayTeam.score ?? 0;
       const homeScore = game.homeTeam.score ?? 0;
@@ -278,25 +316,147 @@ export class LivePointsService {
     }
   }
 
-  /** Fetches play-by-play for all active games concurrently and builds the player accumulator map. */
+  /**
+   * Processes a single game's boxscore into the shared playerMap.
+   * Uses pre-aggregated goals/assists from playerByGameStats. For completed games,
+   * awards the win to the winning team's goalie with the most TOI (highest-toi heuristic).
+   */
+  private processBoxscoreGame(
+    boxscore: BoxscoreWithPlayerStats,
+    game: GameScore,
+    playerMap: Map<number, PlayerAccumulator>,
+    playedGoalies: Set<number>,
+  ): void {
+    const sides = [
+      { stats: boxscore.playerByGameStats?.awayTeam, team: game.awayTeam },
+      { stats: boxscore.playerByGameStats?.homeTeam, team: game.homeTeam },
+    ] as const;
+
+    const goalieToiByTeam = new Map<number, Map<number, number>>();
+
+    for (const { stats, team } of sides) {
+      if (!stats) continue;
+      const logo = team.logo ?? '';
+      const headshotBase = `https://assets.nhle.com/mugs/nhl/${boxscore.season ?? ''}/${team.abbrev}`;
+
+      for (const p of [...(stats.forwards ?? []), ...(stats.defense ?? [])]) {
+        if (!playerMap.has(p.playerId)) {
+          playerMap.set(p.playerId, {
+            nhlPlayerId: p.playerId,
+            firstName: p.name.default.split(' ')[0] ?? '',
+            lastName: p.name.default.split(' ').slice(1).join(' '),
+            position: p.position,
+            nhlTeamAbbrev: team.abbrev,
+            nhlTeamLogo: logo,
+            headshot: `${headshotBase}/${p.playerId}.png`,
+            goals: 0,
+            assists: 0,
+            wins: 0,
+            shutouts: 0,
+            goalsAgainst: 0,
+          });
+        }
+        const acc = playerMap.get(p.playerId)!;
+        acc.goals += p.goals;
+        acc.assists += p.assists;
+      }
+
+      for (const g of stats.goalies ?? []) {
+        const seconds = this.toiToSeconds(g.toi);
+        if (seconds === 0) continue;
+        playedGoalies.add(g.playerId);
+        if (!playerMap.has(g.playerId)) {
+          playerMap.set(g.playerId, {
+            nhlPlayerId: g.playerId,
+            firstName: g.name.default.split(' ')[0] ?? '',
+            lastName: g.name.default.split(' ').slice(1).join(' '),
+            position: 'G',
+            nhlTeamAbbrev: team.abbrev,
+            nhlTeamLogo: logo,
+            headshot: `${headshotBase}/${g.playerId}.png`,
+            goals: 0,
+            assists: 0,
+            wins: 0,
+            shutouts: 0,
+            goalsAgainst: g.goalsAgainst ?? 0,
+          });
+        }
+        const toiMap = goalieToiByTeam.get(team.id) ?? new Map<number, number>();
+        toiMap.set(g.playerId, seconds);
+        goalieToiByTeam.set(team.id, toiMap);
+      }
+    }
+
+    if (!COMPLETED_GAME_STATES.has(game.gameState)) return;
+    const awayScore = game.awayTeam.score ?? 0;
+    const homeScore = game.homeTeam.score ?? 0;
+    if (awayScore === homeScore) return;
+    const winningTeamId = awayScore > homeScore ? game.awayTeam.id : game.homeTeam.id;
+    const toiMap = goalieToiByTeam.get(winningTeamId);
+    if (!toiMap) return;
+    const [winningGoalieId] = Array.from(toiMap.entries()).sort((a, b) => b[1] - a[1])[0] ?? [];
+    if (winningGoalieId == null) return;
+    const goalie = playerMap.get(winningGoalieId);
+    if (!goalie) return;
+    goalie.wins++;
+    if (goalie.goalsAgainst === 0) goalie.shutouts++;
+  }
+
+  /**
+   * Processes a single game using play-by-play, falling back to boxscore if PBP is
+   * unavailable or throws during processing.
+   */
+  private async processGameWithFallback(
+    game: GameScore,
+    playerMap: Map<number, PlayerAccumulator>,
+    playedGoalies: Set<number>,
+  ): Promise<void> {
+    const pbp = await this.fetchPlayByPlaySafe(game.id);
+    if (pbp) {
+      try {
+        this.processGamePlays(pbp, game, playerMap, playedGoalies);
+        return;
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(`PBP processing failed for game ${game.id}, falling back to boxscore:`, error);
+      }
+    }
+    const bs = await this.fetchBoxscoreSafe(game.id);
+    if (!bs) return;
+    try {
+      this.processBoxscoreGame(bs, game, playerMap, playedGoalies);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Boxscore fallback also failed for game ${game.id}:`, error);
+    }
+  }
+
+  /** Builds the player accumulator map for all active games. Uses boxscore for live calls
+   *  (fast, reliable) and play-by-play for snapshot calls (accurate goalie win attribution),
+   *  with per-game boxscore fallback when play-by-play fails. */
   private async buildPlayerAccumulators(
     activeGames: GameScore[],
+    usePlayByPlay: boolean,
   ): Promise<{ playerMap: Map<number, PlayerAccumulator>; playedGoalies: Set<number> }> {
-    const playByPlayResults = await Promise.all(
-      activeGames.map((game) => this.fetchPlayByPlaySafe(game.id)),
-    );
-
     const playerMap = new Map<number, PlayerAccumulator>();
     const playedGoalies = new Set<number>();
 
-    for (let i = 0; i < activeGames.length; i++) {
-      const pbp = playByPlayResults[i];
-      if (!pbp) continue;
-      try {
-        this.processGamePlays(pbp, activeGames[i], playerMap, playedGoalies);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(`Error processing play-by-play for game ${activeGames[i].id}:`, error);
+    if (usePlayByPlay) {
+      for (const game of activeGames) {
+        // eslint-disable-next-line no-await-in-loop
+        await this.processGameWithFallback(game, playerMap, playedGoalies);
+      }
+    } else {
+      const bsResults = await Promise.all(activeGames.map((g) => this.fetchBoxscoreSafe(g.id)));
+      for (let i = 0; i < activeGames.length; i++) {
+        const bs = bsResults[i];
+        if (!bs) continue;
+        try {
+          this.processBoxscoreGame(bs, activeGames[i], playerMap, playedGoalies);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`Boxscore processing failed for game ${activeGames[i].id}:`, error);
+        }
       }
     }
 
