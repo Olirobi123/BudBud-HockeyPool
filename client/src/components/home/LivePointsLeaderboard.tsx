@@ -218,6 +218,9 @@ function TeamRow({
           <span className="hidden sm:block w-9 text-center tabular-nums text-sm font-bold text-primary shrink-0">
             {team.totalPoints}
           </span>
+          <span className="hidden sm:block w-10 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+            {team.totalPJ > 0 ? (team.totalPoints / team.totalPJ).toFixed(2) : '—'}
+          </span>
           <ChevronDown
             className={cn(
               'w-4 h-4 text-muted-foreground transition-transform duration-200 shrink-0',
@@ -236,6 +239,13 @@ function TeamRow({
           <span>
             {'Pts '}
             <span className="text-sm font-bold text-primary">{team.totalPoints}</span>
+          </span>
+          <span className="w-px h-3 bg-border/60" />
+          <span>
+            {'PPM '}
+            <span className="text-foreground">
+              {team.totalPJ > 0 ? (team.totalPoints / team.totalPJ).toFixed(2) : '—'}
+            </span>
           </span>
         </div>
       </button>
@@ -262,6 +272,7 @@ function LeaderboardList({ teams, expandedTeamId, onToggle }: {
         <span className="flex-1">Équipe</span>
         <span className="w-8 text-center shrink-0">PJ</span>
         <span className="w-9 text-center shrink-0">Pts</span>
+        <span className="w-10 text-center shrink-0">PPM</span>
         <span className="w-4 shrink-0" />
       </div>
 

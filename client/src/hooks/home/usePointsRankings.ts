@@ -10,6 +10,10 @@ interface RankingsResponse {
   attaque_points: number;
   defense_points: number;
   gardien_points: number;
+  total_matchs: number;
+  attaque_matchs: number;
+  defense_matchs: number;
+  gardien_matchs: number;
 }
 
 const fetchPointsRankings = async (): Promise<TeamPointsRanking[]> => {
@@ -28,6 +32,10 @@ const fetchPointsRankings = async (): Promise<TeamPointsRanking[]> => {
     attaque_points: r.attaque_points,
     defense_points: r.defense_points,
     gardien_points: r.gardien_points,
+    total_matchs: r.total_matchs,
+    attaque_matchs: r.attaque_matchs,
+    defense_matchs: r.defense_matchs,
+    gardien_matchs: r.gardien_matchs,
   }));
 };
 

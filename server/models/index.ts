@@ -221,8 +221,8 @@ export const QUERIES = {
 
   // Equipe Points (classement)
   UPSERT_EQUIPE_POINTS: `
-    INSERT INTO ${TABLES.EQUIPE_POINTS} (equipe_id, season, attaque_points, defense_points, gardien_points, total_points, total_buts, total_matchs, last_update_at)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+    INSERT INTO ${TABLES.EQUIPE_POINTS} (equipe_id, season, attaque_points, defense_points, gardien_points, total_points, total_buts, total_matchs, attaque_matchs, defense_matchs, gardien_matchs, last_update_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
     ON CONFLICT (equipe_id, season) DO UPDATE SET
       attaque_points = EXCLUDED.attaque_points,
       defense_points = EXCLUDED.defense_points,
@@ -230,6 +230,9 @@ export const QUERIES = {
       total_points = EXCLUDED.total_points,
       total_buts = EXCLUDED.total_buts,
       total_matchs = EXCLUDED.total_matchs,
+      attaque_matchs = EXCLUDED.attaque_matchs,
+      defense_matchs = EXCLUDED.defense_matchs,
+      gardien_matchs = EXCLUDED.gardien_matchs,
       last_update_at = NOW()
   `,
   GET_RANKINGS_BY_SEASON: `
