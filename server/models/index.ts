@@ -240,14 +240,16 @@ export const QUERIES = {
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE ep.season = $1
-    ORDER BY ep.total_points DESC
+    ORDER BY ep.total_points DESC,
+             CASE WHEN ep.total_matchs > 0 THEN ep.total_points::float / ep.total_matchs ELSE 0 END DESC
   `,
   GET_RANKINGS_BY_DIVISION: `
     SELECT ep.*, e.nom as equipe_nom, e.division, e.dg_name
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE e.division = $1 AND ep.season = $2
-    ORDER BY ep.total_points DESC
+    ORDER BY ep.total_points DESC,
+             CASE WHEN ep.total_matchs > 0 THEN ep.total_points::float / ep.total_matchs ELSE 0 END DESC
   `,
   GET_EQUIPE_POINTS_BY_TEAM: `
     SELECT ep.*, e.nom as equipe_nom, e.division, e.dg_name
