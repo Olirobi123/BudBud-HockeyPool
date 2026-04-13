@@ -152,11 +152,13 @@ export class PointsService {
           playerId: player.nhl_player_id,
           wins: currentSeasonEntries.reduce((sum, s) => sum + (s.wins ?? 0), 0),
           shutouts: currentSeasonEntries.reduce((sum, s) => sum + (s.shutouts ?? 0), 0),
+          gamesPlayed: currentSeasonEntries.reduce((sum, s) => sum + (s.gamesPlayed ?? 0), 0),
         } as GoalieSummary);
       } else {
         skaterMap.set(player.nhl_player_id, {
           playerId: player.nhl_player_id,
           points: currentSeasonEntries.reduce((sum, s) => sum + (s.points ?? 0), 0),
+          gamesPlayed: currentSeasonEntries.reduce((sum, s) => sum + (s.gamesPlayed ?? 0), 0),
         } as SkaterSummary);
       }
     }
@@ -226,10 +228,10 @@ export class PointsService {
           forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.goals ?? 0), 0) +
           defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.goals ?? 0), 0);
 
-        const total_matchs =
-          forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0) +
-          defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0) +
-          goalieEntries.slice(0, MAX_ACTIVE_GOALIES).reduce((sum, g) => sum + (goalieMap.get(g.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
+        const attaque_matchs = forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
+        const defense_matchs = defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
+        const gardien_matchs = goalieEntries.slice(0, MAX_ACTIVE_GOALIES).reduce((sum, g) => sum + (goalieMap.get(g.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
+        const total_matchs = attaque_matchs + defense_matchs + gardien_matchs;
 
         if (isTroisRivieres) {
           // eslint-disable-next-line no-console
@@ -265,6 +267,9 @@ export class PointsService {
           total_points,
           total_buts,
           total_matchs,
+          attaque_matchs,
+          defense_matchs,
+          gardien_matchs,
         ]);
 
         teamsUpdated++;

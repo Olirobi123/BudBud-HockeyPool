@@ -20,6 +20,7 @@ interface CategoryConfig {
   mobileLabel: string;
   colLabel: string;
   pointsKey: keyof TeamPointsRanking;
+  matchsKey: keyof TeamPointsRanking;
   activeClass: string;
   valueClass: string;
 }
@@ -31,6 +32,7 @@ const CATEGORIES: CategoryConfig[] = [
     mobileLabel: 'Gén',
     colLabel: 'Pts',
     pointsKey: 'total_points',
+    matchsKey: 'total_matchs',
     activeClass: 'bg-blue-600/90 text-white shadow-sm',
     valueClass: 'text-blue-400',
   },
@@ -40,6 +42,7 @@ const CATEGORIES: CategoryConfig[] = [
     mobileLabel: 'Att',
     colLabel: 'Att',
     pointsKey: 'attaque_points',
+    matchsKey: 'attaque_matchs',
     activeClass: 'bg-blue-600/90 text-white shadow-sm',
     valueClass: 'text-blue-400',
   },
@@ -49,6 +52,7 @@ const CATEGORIES: CategoryConfig[] = [
     mobileLabel: 'Déf',
     colLabel: 'Déf',
     pointsKey: 'defense_points',
+    matchsKey: 'defense_matchs',
     activeClass: 'bg-blue-600/90 text-white shadow-sm',
     valueClass: 'text-blue-400',
   },
@@ -58,6 +62,7 @@ const CATEGORIES: CategoryConfig[] = [
     mobileLabel: 'Gar',
     colLabel: 'Gar',
     pointsKey: 'gardien_points',
+    matchsKey: 'gardien_matchs',
     activeClass: 'bg-blue-600/90 text-white shadow-sm',
     valueClass: 'text-blue-400',
   },
@@ -183,6 +188,7 @@ interface TeamRowProps {
 function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
   const activeCfg = CATEGORIES.find((c) => c.key === activeCategory)!;
   const activePoints = team[activeCfg.pointsKey] as number;
+  const activeMatchs = team[activeCfg.matchsKey] as number;
   const diff = leader - activePoints;
 
   return (
@@ -196,26 +202,15 @@ function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
         <span className="flex-1 text-sm font-semibold text-foreground min-w-0 truncate">
           {team.nom}
         </span>
-        {activeCategory === 'general' ? (
-          <>
-            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-              {team.attaque_points}
-            </span>
-            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-              {team.defense_points}
-            </span>
-            <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
-              {team.gardien_points}
-            </span>
-            <span className={cn('w-9 text-center tabular-nums text-sm font-bold shrink-0', activeCfg.valueClass)}>
-              {team.total_points}
-            </span>
-          </>
-        ) : (
-          <span className={cn('w-9 text-center tabular-nums text-sm font-bold shrink-0', activeCfg.valueClass)}>
-            {activePoints}
-          </span>
-        )}
+        <span className="w-9 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+          {activeMatchs}
+        </span>
+        <span className={cn('w-9 text-center tabular-nums text-sm font-bold shrink-0', activeCfg.valueClass)}>
+          {activePoints}
+        </span>
+        <span className="w-10 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+          {activeMatchs > 0 ? (activePoints / activeMatchs).toFixed(2) : '—'}
+        </span>
         <DiffCell diff={diff} />
       </div>
 
@@ -233,34 +228,22 @@ function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
           )}
         </div>
         <div className="flex items-center gap-3 mt-1 pl-8 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground tabular-nums">
-          {activeCategory === 'general' ? (
-            <>
-              <span>
-                {'Att '}
-                <span className="text-foreground">{team.attaque_points}</span>
-              </span>
-              <span className="w-px h-3 bg-border/60" />
-              <span>
-                {'Déf '}
-                <span className="text-foreground">{team.defense_points}</span>
-              </span>
-              <span className="w-px h-3 bg-border/60" />
-              <span>
-                {'Gar '}
-                <span className="text-foreground">{team.gardien_points}</span>
-              </span>
-              <span className="w-px h-3 bg-border/60" />
-              <span>
-                {'Pts '}
-                <span className={cn('font-bold', activeCfg.valueClass)}>{team.total_points}</span>
-              </span>
-            </>
-          ) : (
-            <span>
-              {`${activeCfg.colLabel} `}
-              <span className={cn('font-bold', activeCfg.valueClass)}>{activePoints}</span>
+          <span>
+            {'PJ '}
+            <span className="text-foreground">{activeMatchs}</span>
+          </span>
+          <span className="w-px h-3 bg-border/60" />
+          <span>
+            {`${activeCfg.colLabel} `}
+            <span className={cn('font-bold', activeCfg.valueClass)}>{activePoints}</span>
+          </span>
+          <span className="w-px h-3 bg-border/60" />
+          <span>
+            {'PPM '}
+            <span className="text-foreground">
+              {activeMatchs > 0 ? (activePoints / activeMatchs).toFixed(2) : '—'}
             </span>
-          )}
+          </span>
         </div>
       </div>
     </Link>
@@ -286,18 +269,11 @@ function RankingsList({ teams, activeCategory }: RankingsListProps) {
       <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
         <span className="w-6 shrink-0" />
         <span className="flex-1">Équipe</span>
-        {activeCategory === 'general' ? (
-          <>
-            <span className="w-9 text-center shrink-0">Att</span>
-            <span className="w-9 text-center shrink-0">Déf</span>
-            <span className="w-9 text-center shrink-0">Gar</span>
-            <span className={cn('w-9 text-center shrink-0', activeCfg.valueClass)}>Pts</span>
-          </>
-        ) : (
-          <span className={cn('w-9 text-center shrink-0', activeCfg.valueClass)}>
-            {activeCfg.colLabel}
-          </span>
-        )}
+        <span className="w-9 text-center shrink-0">PJ</span>
+        <span className={cn('w-9 text-center shrink-0', activeCfg.valueClass)}>
+          {activeCfg.colLabel}
+        </span>
+        <span className="w-10 text-center shrink-0">PPM</span>
         <span className="w-10 text-center shrink-0">Diff</span>
       </div>
 

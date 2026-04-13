@@ -30,4 +30,8 @@ export interface TeamPointsRanking {
   attaque_points: number;
   defense_points: number;
   gardien_points: number;
+  total_matchs: number;
+  attaque_matchs: number;
+  defense_matchs: number;
+  gardien_matchs: number;
 }

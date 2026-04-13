@@ -103,7 +103,7 @@ interface GameCardProps {
 }
 
 function GameCard({ game }: GameCardProps): JSX.Element {
-  const { awayTeam, homeTeam, gameState } = game;
+  const { awayTeam, homeTeam, gameState, gameCenterLink } = game;
   const status = getGameStatus(gameState);
   const stateText = formatGameState(game);
   const isCritical = gameState === 'CRIT';
@@ -111,20 +111,28 @@ function GameCard({ game }: GameCardProps): JSX.Element {
   const awayWins = status === 'final' && (awayTeam.score ?? 0) > (homeTeam.score ?? 0);
   const homeWins = status === 'final' && (homeTeam.score ?? 0) > (awayTeam.score ?? 0);
 
+  const cardClass = cn(
+    'flex-shrink-0 rounded-lg border flex flex-col px-2 py-1.5 min-w-[96px] w-[96px]',
+    'transition-all duration-200 group',
+    gameCenterLink ? 'cursor-pointer' : 'cursor-default',
+    // Live games
+    status === 'live' && 'bg-white/[0.04] border-red-500/30 game-card-live hover:border-red-500/50',
+    // Critical (OT) — extra emphasis
+    isCritical && 'bg-red-500/[0.06] border-red-400/40',
+    // Final games
+    status === 'final' && 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04]',
+    // Upcoming
+    status === 'upcoming' && 'bg-white/[0.015] border-white/[0.04] hover:border-white/[0.08]',
+  );
+
+  const nhlUrl = gameCenterLink ? `https://www.nhl.com${gameCenterLink}` : undefined;
+
   return (
-    <div
-      className={cn(
-        'flex-shrink-0 rounded-lg border flex flex-col px-2 py-1.5 min-w-[96px] w-[96px]',
-        'transition-all duration-200 cursor-default group',
-        // Live games
-        status === 'live' && 'bg-white/[0.04] border-red-500/30 game-card-live hover:border-red-500/50',
-        // Critical (OT) — extra emphasis
-        isCritical && 'bg-red-500/[0.06] border-red-400/40',
-        // Final games
-        status === 'final' && 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04]',
-        // Upcoming
-        status === 'upcoming' && 'bg-white/[0.015] border-white/[0.04] hover:border-white/[0.08]',
-      )}
+    <a
+      href={nhlUrl}
+      target={nhlUrl ? '_blank' : undefined}
+      rel={nhlUrl ? 'noopener noreferrer' : undefined}
+      className={cardClass}
     >
       {/* Game State Header */}
       <div className="flex items-center justify-center gap-1.5 mb-2">
@@ -159,7 +167,7 @@ function GameCard({ game }: GameCardProps): JSX.Element {
         <TeamRow team={awayTeam} isWinner={awayWins} status={status} />
         <TeamRow team={homeTeam} isWinner={homeWins} status={status} />
       </div>
-    </div>
+    </a>
   );
 }
 
