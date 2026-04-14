@@ -93,8 +93,8 @@ export class PointsService {
 
     const [rosters, allSkaters, allGoalies] = await Promise.all([
       Promise.all(teams.map((t) => teamsService.getTeamRoster(t.id))),
-      fetchAllPages((start) => nhlClient.stats.skaters({ seasonId, limit: PAGE_SIZE, start })),
-      fetchAllPages((start) => nhlClient.stats.goalies({ seasonId, limit: PAGE_SIZE, start })),
+      fetchAllPages((start) => nhlClient.stats.skaters({ seasonId, limit: PAGE_SIZE, start, sort: 'playerId', direction: 'ASC' })),
+      fetchAllPages((start) => nhlClient.stats.goalies({ seasonId, limit: PAGE_SIZE, start, sort: 'playerId', direction: 'ASC' })),
     ]);
 
     const skaterMap = new Map<number, SkaterSummary>(allSkaters.map((s) => [s.playerId, s]));
@@ -257,6 +257,9 @@ export class PointsService {
           // eslint-disable-next-line no-console
           console.log(`[DEBUG TR] TOTALS: attaque=${attaque_points} defense=${defense_points} gardiens=${gardien_points} total=${total_points}`);
         }
+
+        // eslint-disable-next-line no-console
+        console.log(`[POINTS] ${team.nom}: pts=${total_points} (att=${attaque_points} def=${defense_points} gar=${gardien_points}) | PJ=${total_matchs} (att=${attaque_matchs} def=${defense_matchs} gar=${gardien_matchs}) | buts=${total_buts}`);
 
         await pool.query(QUERIES.UPSERT_EQUIPE_POINTS, [
           team.id,
