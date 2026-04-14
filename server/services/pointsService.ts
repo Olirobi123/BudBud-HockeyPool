@@ -175,11 +175,9 @@ export class PointsService {
     goalieMap: Map<number, GoalieSummary>,
     season: string,
   ): Promise<number> {
-    const skaterPts = (nhlId: number) => skaterMap.get(nhlId)?.points ?? 0;
-    const goaliePoolPts = (nhlId: number) => {
-      const g = goalieMap.get(nhlId);
-      return g ? calculateGoaliePoints(g.wins, g.shutouts) : 0;
-    };
+    // pts desc, PPM desc (tiebreaker), nhl_player_id asc (deterministic final tiebreaker)
+    const byPts = (a: { pts: number; ppm: number; player: Joueur }, b: { pts: number; ppm: number; player: Joueur }) =>
+      b.pts - a.pts || b.ppm - a.ppm || a.player.nhl_player_id - b.player.nhl_player_id;
 
     let teamsUpdated = 0;
     const activeNhlIds: number[] = [];
@@ -187,79 +185,55 @@ export class PointsService {
     for (let i = 0; i < teams.length; i++) {
       const team = teams[i];
       const roster = rosters[i];
-      const isTroisRivieres = team.nom.toLowerCase().includes('trois') || team.nom.toLowerCase().includes('riviere') || team.nom.toLowerCase().includes('rivière');
       try {
-        // Top 12 forwards by NHL points
-        const forwardEntries = roster
+        const forwards = roster
           .filter((p) => FORWARD_POSITIONS.includes(p.position))
-          .map((p) => ({ player: p, pts: skaterPts(p.nhl_player_id) }))
-          .sort((a, b) => b.pts - a.pts);
-        const attaque_points = forwardEntries
-          .slice(0, MAX_ACTIVE_FORWARDS)
-          .reduce((sum, e) => sum + e.pts, 0);
+          .map((p) => {
+            const s = skaterMap.get(p.nhl_player_id);
+            const pts = s?.points ?? 0;
+            const gp = s?.gamesPlayed ?? 0;
+            return { player: p, pts, ppm: gp > 0 ? pts / gp : 0, gp, goals: s?.goals ?? 0 };
+          })
+          .sort(byPts)
+          .slice(0, MAX_ACTIVE_FORWARDS);
 
-        // Top 6 defensemen by NHL points
-        const defenseEntries = roster
+        const defense = roster
           .filter((p) => p.position === DEFENSE_POSITION)
-          .map((p) => ({ player: p, pts: skaterPts(p.nhl_player_id) }))
-          .sort((a, b) => b.pts - a.pts);
-        const defense_points = defenseEntries
-          .slice(0, MAX_ACTIVE_DEFENSEMEN)
-          .reduce((sum, e) => sum + e.pts, 0);
+          .map((p) => {
+            const s = skaterMap.get(p.nhl_player_id);
+            const pts = s?.points ?? 0;
+            const gp = s?.gamesPlayed ?? 0;
+            return { player: p, pts, ppm: gp > 0 ? pts / gp : 0, gp, goals: s?.goals ?? 0 };
+          })
+          .sort(byPts)
+          .slice(0, MAX_ACTIVE_DEFENSEMEN);
 
-        // Top 2 goalies by pool points (2 per win + 3 per shutout)
-        const goalieEntries = roster
+        const goalies = roster
           .filter((p) => p.position === GOALIE_POSITION)
-          .map((p) => ({ player: p, pts: goaliePoolPts(p.nhl_player_id), raw: goalieMap.get(p.nhl_player_id) }))
-          .sort((a, b) => b.pts - a.pts);
-        const gardien_points = goalieEntries
-          .slice(0, MAX_ACTIVE_GOALIES)
-          .reduce((sum, g) => sum + g.pts, 0);
+          .map((p) => {
+            const g = goalieMap.get(p.nhl_player_id);
+            const pts = g ? calculateGoaliePoints(g.wins, g.shutouts) : 0;
+            const gp = g?.gamesPlayed ?? 0;
+            return { player: p, pts, ppm: gp > 0 ? pts / gp : 0, gp };
+          })
+          .sort(byPts)
+          .slice(0, MAX_ACTIVE_GOALIES);
 
+        const attaque_points = forwards.reduce((sum, e) => sum + e.pts, 0);
+        const defense_points = defense.reduce((sum, e) => sum + e.pts, 0);
+        const gardien_points = goalies.reduce((sum, e) => sum + e.pts, 0);
         const total_points = attaque_points + defense_points + gardien_points;
 
-        // Collect active player NHL IDs for compte_points update
-        forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
-        defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
-        goalieEntries.slice(0, MAX_ACTIVE_GOALIES).forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
-
-        // Tiebreaker stats: goals and games played for active scoring players
-        const total_buts =
-          forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.goals ?? 0), 0) +
-          defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.goals ?? 0), 0);
-
-        const attaque_matchs = forwardEntries.slice(0, MAX_ACTIVE_FORWARDS).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
-        const defense_matchs = defenseEntries.slice(0, MAX_ACTIVE_DEFENSEMEN).reduce((sum, e) => sum + (skaterMap.get(e.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
-        const gardien_matchs = goalieEntries.slice(0, MAX_ACTIVE_GOALIES).reduce((sum, g) => sum + (goalieMap.get(g.player.nhl_player_id)?.gamesPlayed ?? 0), 0);
+        const attaque_matchs = forwards.reduce((sum, e) => sum + e.gp, 0);
+        const defense_matchs = defense.reduce((sum, e) => sum + e.gp, 0);
+        const gardien_matchs = goalies.reduce((sum, e) => sum + e.gp, 0);
         const total_matchs = attaque_matchs + defense_matchs + gardien_matchs;
 
-        if (isTroisRivieres) {
-          // eslint-disable-next-line no-console
-          console.log(`\n[DEBUG TR] ===== ${team.nom} (id=${team.id}) =====`);
-          // eslint-disable-next-line no-console
-          console.log(`[DEBUG TR] Forwards (all, sorted by pts):`);
-          forwardEntries.forEach((e, idx) => {
-            // eslint-disable-next-line no-console
-            console.log(`  ${idx < MAX_ACTIVE_FORWARDS ? 'ACTIVE' : 'bench '} [${e.player.position}] ${e.player.nom} (nhlId=${e.player.nhl_player_id}) pts=${e.pts} inMap=${skaterMap.has(e.player.nhl_player_id)}`);
-          });
-          // eslint-disable-next-line no-console
-          console.log(`[DEBUG TR] Defense (all, sorted by pts):`);
-          defenseEntries.forEach((e, idx) => {
-            // eslint-disable-next-line no-console
-            console.log(`  ${idx < MAX_ACTIVE_DEFENSEMEN ? 'ACTIVE' : 'bench '} [D] ${e.player.nom} (nhlId=${e.player.nhl_player_id}) pts=${e.pts} inMap=${skaterMap.has(e.player.nhl_player_id)}`);
-          });
-          // eslint-disable-next-line no-console
-          console.log(`[DEBUG TR] Goalies (all, sorted by pool pts):`);
-          goalieEntries.forEach((e, idx) => {
-            // eslint-disable-next-line no-console
-            console.log(`  ${idx < MAX_ACTIVE_GOALIES ? 'ACTIVE' : 'bench '} [G] ${e.player.nom} (nhlId=${e.player.nhl_player_id}) poolPts=${e.pts} wins=${e.raw?.wins ?? 'N/A'} shutouts=${e.raw?.shutouts ?? 'N/A'} inMap=${goalieMap.has(e.player.nhl_player_id)}`);
-          });
-          // eslint-disable-next-line no-console
-          console.log(`[DEBUG TR] TOTALS: attaque=${attaque_points} defense=${defense_points} gardiens=${gardien_points} total=${total_points}`);
-        }
+        const total_buts = forwards.reduce((sum, e) => sum + e.goals, 0) + defense.reduce((sum, e) => sum + e.goals, 0);
 
-        // eslint-disable-next-line no-console
-        console.log(`[POINTS] ${team.nom}: pts=${total_points} (att=${attaque_points} def=${defense_points} gar=${gardien_points}) | PJ=${total_matchs} (att=${attaque_matchs} def=${defense_matchs} gar=${gardien_matchs}) | buts=${total_buts}`);
+        forwards.forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
+        defense.forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
+        goalies.forEach((e) => activeNhlIds.push(e.player.nhl_player_id));
 
         await pool.query(QUERIES.UPSERT_EQUIPE_POINTS, [
           team.id,
