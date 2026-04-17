@@ -2,12 +2,12 @@ import {
   Trophy,
   Swords,
   Shield,
-  CircleDot,
   Flame,
   LucideIcon,
 } from 'lucide-react';
 import { TropheeType } from '@/types';
 import { cn } from '@/lib/utils';
+import { GoalieIcon } from '@/components/ui/GoalieIcon';
 
 interface TropheeIconProps {
   type: string;
@@ -15,11 +15,10 @@ interface TropheeIconProps {
   className?: string;
 }
 
-const iconMap: Record<TropheeType, LucideIcon> = {
+const lucideIconMap: Partial<Record<TropheeType, LucideIcon>> = {
   Général: Trophy,
   Attaque: Swords,
   Défense: Shield,
-  Gardien: CircleDot,
   Playoffs: Flame,
 };
 
@@ -37,15 +36,36 @@ const sizeMap = {
   lg: 'w-8 h-8 md:w-10 md:h-10',
 };
 
+const pixelSizeMap = {
+  sm: 16,
+  md: 20,
+  lg: 32,
+};
+
+const goaliePixelSizeMap = {
+  sm: 28,
+  md: 38,
+  lg: 56,
+};
+
 function isTropheeType(type: string): type is TropheeType {
-  return type in iconMap;
+  return type in colorMap;
 }
 
 export function TropheeIcon({ type, size = 'md', className }: TropheeIconProps) {
-  const Icon = isTropheeType(type) ? iconMap[type] : Trophy;
   const color = isTropheeType(type) ? colorMap[type] : 'text-gray-500';
   const sizeClass = sizeMap[size];
 
+  if (type === 'Gardien') {
+    return (
+      <GoalieIcon
+        size={goaliePixelSizeMap[size]}
+        className={cn(color, className)}
+      />
+    );
+  }
+
+  const Icon = isTropheeType(type) && lucideIconMap[type] ? lucideIconMap[type]! : Trophy;
   return (
     <Icon className={cn(sizeClass, color, className)} />
   );
