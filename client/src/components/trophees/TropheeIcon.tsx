@@ -48,6 +48,12 @@ const goaliePixelSizeMap = {
   lg: 56,
 };
 
+const goalieResponsiveClassMap = {
+  sm: 'w-[22px] h-[22px] md:w-[28px] md:h-[28px]',
+  md: 'w-[30px] h-[30px] md:w-[38px] md:h-[38px]',
+  lg: 'w-[44px] h-[44px] md:w-[56px] md:h-[56px]',
+};
+
 function isTropheeType(type: string): type is TropheeType {
   return type in colorMap;
 }
@@ -60,7 +66,7 @@ export function TropheeIcon({ type, size = 'md', className }: TropheeIconProps) 
     return (
       <GoalieIcon
         size={goaliePixelSizeMap[size]}
-        className={cn(color, className)}
+        className={cn(goalieResponsiveClassMap[size], color, className)}
       />
     );
   }
