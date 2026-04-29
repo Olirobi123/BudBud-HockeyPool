@@ -1,5 +1,5 @@
 import pool from '../config/database';
-import { EquipePoints, EquipePointsWithTeam, Joueur, Equipe } from '../types';
+import { EquipePoints, EquipePointsWithTeam, EquipePointsMensuel, Joueur, Equipe } from '../types';
 import { QUERIES } from '../models';
 import { teamsService } from './teamsService';
 import { getCurrentSeason, getCurrentSeasonNumber } from './seasonHelper';
@@ -279,6 +279,14 @@ export class PointsService {
   ): Promise<EquipePointsWithTeam[]> {
     const s = season ?? getCurrentSeason();
     const result = await pool.query(QUERIES.GET_RANKINGS_BY_DIVISION, [division, s]);
+    return result.rows;
+  }
+
+  /**
+   * Get monthly cumulative points per team for a given season
+   */
+  async getPointsMensuel(season: string): Promise<EquipePointsMensuel[]> {
+    const result = await pool.query(QUERIES.GET_POINTS_MENSUEL_BY_SEASON, [season]);
     return result.rows;
   }
 

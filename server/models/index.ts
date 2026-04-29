@@ -19,6 +19,7 @@ export const TABLES = {
   EQUIPE_SEMAINE_POINTS: 'equipe_semaine_points',
   SERIES_PLAYOFFS: 'series_playoffs',
   SERIES_SEMAINE_BASELINE: 'series_semaine_baseline',
+  EQUIPE_POINTS_MENSUEL: 'equipe_points_mensuel',
 } as const;
 
 export const QUERIES = {
@@ -256,6 +257,23 @@ export const QUERIES = {
     FROM ${TABLES.EQUIPE_POINTS} ep
     JOIN ${TABLES.EQUIPES} e ON ep.equipe_id = e.id
     WHERE ep.equipe_id = $1 AND ep.season = $2
+  `,
+
+  // Points mensuels (bilan saison)
+  GET_POINTS_MENSUEL_BY_SEASON: `
+    SELECT
+      epm.equipe_id,
+      e.nom AS equipe_nom,
+      epm.mois,
+      epm.total_points AS monthly_points,
+      SUM(epm.total_points) OVER (
+        PARTITION BY epm.equipe_id
+        ORDER BY epm.mois
+      ) AS cumul_points
+    FROM ${TABLES.EQUIPE_POINTS_MENSUEL} epm
+    JOIN ${TABLES.EQUIPES} e ON e.id = epm.equipe_id
+    WHERE epm.saison = $1
+    ORDER BY epm.equipe_id, epm.mois
   `,
 
   // Mis au ballotage (joueurs retirés avant draft/ballotage)

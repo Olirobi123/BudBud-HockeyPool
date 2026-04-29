@@ -13,6 +13,7 @@ const navLinks = [
   { href: '/echanges', label: 'Échanges' },
   { href: '/draft', label: 'Repêchage' },
   { href: '/series', label: 'Séries' },
+  { href: '/bilan', label: 'Bilan' },
   {
     href: 'https://www.marqueur.com/hockey/mbr/tools/pool/index.php?nyx=190707',
     label: 'Marqueur',
