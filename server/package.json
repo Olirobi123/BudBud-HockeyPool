@@ -15,6 +15,7 @@
     "@olirobi/nhl_api_client": "^1.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "esbuild": "^0.25.0",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
@@ -28,7 +29,6 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.25.0",
     "eslint": "^8.57.1",
     "tsx": "^4.19.1",
     "typescript": "5.6.3"
