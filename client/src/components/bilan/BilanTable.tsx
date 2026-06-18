@@ -18,8 +18,11 @@ export function BilanTable({ data }: Props): JSX.Element {
     return entry?.monthly_points ?? 0;
   };
 
-  // eslint-disable-next-line max-len
-  const getTotal = (equipe_id: number): number => data.filter((d) => d.equipe_id === equipe_id).reduce((s, d) => s + d.monthly_points, 0);
+  const getTotal = (equipe_id: number): number => {
+    const row = data.find((d) => d.equipe_id === equipe_id);
+    return row?.total_saison
+      ?? data.filter((d) => d.equipe_id === equipe_id).reduce((s, d) => s + d.monthly_points, 0);
+  };
 
   const colMax = (mois: number): number => Math.max(...teams.map((t) => getPoints(t.id, mois)));
 

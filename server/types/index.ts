@@ -376,6 +376,10 @@ export interface EquipePointsMensuel {
   mois: number;
   monthly_points: number;
   cumul_points: number;
+  total_saison: number | null;
+  attaque_saison: number | null;
+  defense_saison: number | null;
+  gardien_saison: number | null;
 }
 
 export interface EtatInfo {

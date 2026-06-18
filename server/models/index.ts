@@ -277,9 +277,14 @@ export const QUERIES = {
       SUM(epm.total_points) OVER (
         PARTITION BY epm.equipe_id
         ORDER BY epm.mois
-      ) AS cumul_points
+      ) AS cumul_points,
+      est.total_points    AS total_saison,
+      est.attaque_points  AS attaque_saison,
+      est.defense_points  AS defense_saison,
+      est.gardien_points  AS gardien_saison
     FROM ${TABLES.EQUIPE_POINTS_MENSUEL} epm
     JOIN ${TABLES.EQUIPES} e ON e.id = epm.equipe_id
+    LEFT JOIN equipe_saison_totaux est ON est.equipe_id = epm.equipe_id AND est.saison = epm.saison
     WHERE epm.saison = $1
     ORDER BY epm.equipe_id, epm.mois
   `,

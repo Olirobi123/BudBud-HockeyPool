@@ -8,6 +8,10 @@ export interface PointsMensuelEntry {
   mois: number;
   monthly_points: number;
   cumul_points: number;
+  total_saison: number | null;
+  attaque_saison: number | null;
+  defense_saison: number | null;
+  gardien_saison: number | null;
 }
 
 const fetchPointsMensuel = async (season: string): Promise<PointsMensuelEntry[]> => {
