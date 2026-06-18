@@ -41,6 +41,15 @@ export class PointsController {
   });
 
   /**
+   * GET /api/points/saisons
+   * Get distinct seasons available in equipe_points_mensuel
+   */
+  getSaisonsMensuel = asyncHandler(async (_req: Request, res: Response) => {
+    const saisons = await pointsService.getSaisonsMensuel();
+    sendSuccess(res, saisons);
+  });
+
+  /**
    * GET /api/points/mensuel?season=20222023
    * Get monthly cumulative points per team for a season
    */

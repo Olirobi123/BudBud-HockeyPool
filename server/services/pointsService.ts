@@ -283,6 +283,14 @@ export class PointsService {
   }
 
   /**
+   * Get distinct seasons available in equipe_points_mensuel
+   */
+  async getSaisonsMensuel(): Promise<string[]> {
+    const result = await pool.query(QUERIES.GET_SAISONS_MENSUEL);
+    return result.rows.map((r: { saison: string }) => r.saison);
+  }
+
+  /**
    * Get monthly cumulative points per team for a given season
    */
   async getPointsMensuel(season: string): Promise<EquipePointsMensuel[]> {
