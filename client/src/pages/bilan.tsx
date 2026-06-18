@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import Layout from '@/components/Layout';
 import { BilanTable } from '@/components/bilan/BilanTable';
+import { BilanCategoryToggle } from '@/components/bilan/BilanCategoryToggle';
+import type { BilanCategory } from '@/components/bilan/BilanCategoryToggle';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
@@ -11,11 +14,11 @@ import {
 import { usePointsMensuel } from '@/hooks/bilan/usePointsMensuel';
 import { useSaisons } from '@/hooks/bilan/useSaisons';
 import { usePageLoading } from '@/hooks/usePageLoading';
-import { useState } from 'react';
 
 export default function Bilan(): JSX.Element {
   const { data: saisons } = useSaisons();
   const [season, setSeason] = useState('');
+  const [category, setCategory] = useState<BilanCategory>('general');
   const activeSeason = season !== '' ? season : (saisons?.[0]?.value ?? '');
   const { data, isLoading } = usePointsMensuel(activeSeason);
 
@@ -35,23 +38,27 @@ export default function Bilan(): JSX.Element {
           <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
         </div>
 
-        {/* Season selector */}
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            Saison
-          </span>
-          <Select value={activeSeason} onValueChange={setSeason}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(saisons ?? []).map((s) => (
-                <SelectItem key={s.value} value={s.value}>
-                  {s.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Controls row */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              Saison
+            </span>
+            <Select value={activeSeason} onValueChange={setSeason}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(saisons ?? []).map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <BilanCategoryToggle active={category} onChange={setCategory} />
         </div>
 
         {/* Content */}
@@ -65,7 +72,7 @@ export default function Bilan(): JSX.Element {
           )}
 
           {!isLoading && data && data.length > 0 && (
-            <BilanTable data={data} />
+            <BilanTable data={data} category={category} />
           )}
         </div>
       </div>
