@@ -372,6 +372,7 @@ export interface PlayerHistoryResponse {
 export interface EquipePointsMensuel {
   equipe_id: number;
   equipe_nom: string;
+  equipe_nom_court: string;
   mois: number;
   monthly_points: number;
   cumul_points: number;

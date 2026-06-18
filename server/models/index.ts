@@ -259,11 +259,19 @@ export const QUERIES = {
     WHERE ep.equipe_id = $1 AND ep.season = $2
   `,
 
+  // Saisons disponibles dans equipe_points_mensuel
+  GET_SAISONS_MENSUEL: `
+    SELECT DISTINCT saison
+    FROM ${TABLES.EQUIPE_POINTS_MENSUEL}
+    ORDER BY saison DESC
+  `,
+
   // Points mensuels (bilan saison)
   GET_POINTS_MENSUEL_BY_SEASON: `
     SELECT
       epm.equipe_id,
       e.nom AS equipe_nom,
+      COALESCE(e.nom_court, e.nom) AS equipe_nom_court,
       epm.mois,
       epm.total_points AS monthly_points,
       SUM(epm.total_points) OVER (
