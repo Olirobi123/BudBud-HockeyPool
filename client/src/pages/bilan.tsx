@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '@/components/Layout';
-import { BilanTable } from '@/components/bilan/BilanTable';
+import BilanTable from '@/components/bilan/BilanTable';
 import { BilanCategoryToggle } from '@/components/bilan/BilanCategoryToggle';
 import type { BilanCategory } from '@/components/bilan/BilanCategoryToggle';
 import { Skeleton } from '@/components/ui/skeleton';

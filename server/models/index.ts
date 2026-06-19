@@ -266,7 +266,7 @@ export const QUERIES = {
     ORDER BY saison DESC
   `,
 
-  // Points mensuels (bilan saison)
+  // Points mensuels (bilan saison) — anchored on categorie='general', other categories joined
   GET_POINTS_MENSUEL_BY_SEASON: `
     SELECT
       epm.equipe_id,
@@ -274,6 +274,9 @@ export const QUERIES = {
       COALESCE(e.nom_court, e.nom) AS equipe_nom_court,
       epm.mois,
       epm.total_points AS monthly_points,
+      att.total_points AS attaque_monthly,
+      def.total_points AS defense_monthly,
+      gar.total_points AS gardien_monthly,
       SUM(epm.total_points) OVER (
         PARTITION BY epm.equipe_id
         ORDER BY epm.mois
@@ -284,8 +287,17 @@ export const QUERIES = {
       est.gardien_points  AS gardien_saison
     FROM ${TABLES.EQUIPE_POINTS_MENSUEL} epm
     JOIN ${TABLES.EQUIPES} e ON e.id = epm.equipe_id
+    LEFT JOIN ${TABLES.EQUIPE_POINTS_MENSUEL} att
+      ON att.equipe_id = epm.equipe_id AND att.saison = epm.saison
+      AND att.mois = epm.mois AND att.categorie = 'attaque'
+    LEFT JOIN ${TABLES.EQUIPE_POINTS_MENSUEL} def
+      ON def.equipe_id = epm.equipe_id AND def.saison = epm.saison
+      AND def.mois = epm.mois AND def.categorie = 'defense'
+    LEFT JOIN ${TABLES.EQUIPE_POINTS_MENSUEL} gar
+      ON gar.equipe_id = epm.equipe_id AND gar.saison = epm.saison
+      AND gar.mois = epm.mois AND gar.categorie = 'gardien'
     LEFT JOIN equipe_saison_totaux est ON est.equipe_id = epm.equipe_id AND est.saison = epm.saison
-    WHERE epm.saison = $1
+    WHERE epm.saison = $1 AND epm.categorie = 'general'
     ORDER BY epm.equipe_id, epm.mois
   `,
 

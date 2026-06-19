@@ -7,6 +7,9 @@ export interface PointsMensuelEntry {
   equipe_nom_court: string;
   mois: number;
   monthly_points: number;
+  attaque_monthly: number | null;
+  defense_monthly: number | null;
+  gardien_monthly: number | null;
   cumul_points: number;
   total_saison: number | null;
   attaque_saison: number | null;
