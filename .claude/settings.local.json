@@ -22,7 +22,24 @@
       "Bash(gh pr:*)",
       "Bash(git ls-tree:*)",
       "Bash(git rebase:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(node --eval \"console.log\\('test'\\)\")",
+      "Bash(npm run *)",
+      "Bash(npm exec *)",
+      "Bash(git log *)",
+      "Bash(git fetch *)",
+      "mcp__neon__list_projects",
+      "mcp__neon__describe_project",
+      "mcp__neon__get_connection_string",
+      "mcp__neon__get_database_tables",
+      "mcp__neon__run_sql",
+      "mcp__neon__describe_table_schema",
+      "Bash(echo \"exit:$?\")",
+      "Bash(echo \"eslint-exit:$?\")",
+      "Bash(timeout 300 npx --yes playwright@1.49.1 install --with-deps chromium)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "neon"
+  ]
 }

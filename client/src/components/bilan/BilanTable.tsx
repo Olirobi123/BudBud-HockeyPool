@@ -106,7 +106,7 @@ export default function BilanTable({ data, category }: Props): JSX.Element {
                       <td key={m} className="text-center py-3 px-3 tabular-nums relative">
                         <span
                           className="absolute inset-0"
-                          style={{ backgroundColor: '#2563eb', opacity: pts > 0 ? intensity * 0.65 : 0 }}
+                          style={{ backgroundColor: '#2563eb', opacity: pts > 0 ? intensity ** 2 * 0.65 : 0 }}
                         />
                         <span
                           className={`relative ${isTop ? 'font-bold text-white' : 'text-foreground'}`}
