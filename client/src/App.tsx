@@ -12,6 +12,7 @@ import Draft from '@/pages/draft';
 import Echanges from '@/pages/echanges';
 import Joueur from '@/pages/joueur';
 import Series from '@/pages/series';
+import Bilan from '@/pages/bilan';
 import NotFound from '@/pages/not-found';
 
 function LoadingOverlay() {
@@ -49,6 +50,9 @@ function App() {
 
             {/* Séries éliminatoires */}
             <Route path="/series" element={<Series />} />
+
+            {/* Bilan de saison */}
+            <Route path="/bilan" element={<Bilan />} />
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />

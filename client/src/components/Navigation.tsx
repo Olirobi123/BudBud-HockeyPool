@@ -6,13 +6,14 @@ import { NavigationLinks } from './navigation/NavigationLinks';
 import { NavigationMobileMenu } from './navigation/NavigationMobileMenu';
 import PlayerSearch from '@/components/PlayerSearch';
 import type { NHLPlayer } from '@/types';
-import { cn } from '@/lib/utils';
+import { cn, SCROLL_LOCK_FIXED_WIDTH } from '@/lib/utils';
 
 const navLinks = [
   { href: '/equipes', label: 'Équipes' },
   { href: '/echanges', label: 'Échanges' },
   { href: '/draft', label: 'Repêchage' },
   { href: '/series', label: 'Séries' },
+  { href: '/bilan', label: 'Bilan' },
   {
     href: 'https://www.marqueur.com/hockey/mbr/tools/pool/index.php?nyx=190707',
     label: 'Marqueur',
@@ -35,6 +36,8 @@ export default function Navigation() {
     <nav
       className={cn(
         'fixed top-0 left-0 right-0 z-50 duration-500 ease-out',
+        // Keeps the nav the same width when a Radix dropdown removes the scrollbar
+        SCROLL_LOCK_FIXED_WIDTH,
         isScrolled
           ? 'nav-glass-scrolled'
           : 'nav-glass',

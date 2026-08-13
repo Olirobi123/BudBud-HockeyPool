@@ -369,6 +369,22 @@ export interface PlayerHistoryResponse {
   events: HistoireEvent[];
 }
 
+export interface EquipePointsMensuel {
+  equipe_id: number;
+  equipe_nom: string;
+  equipe_nom_court: string;
+  mois: number;
+  monthly_points: number;
+  attaque_monthly: number | null;
+  defense_monthly: number | null;
+  gardien_monthly: number | null;
+  cumul_points: number;
+  total_saison: number | null;
+  attaque_saison: number | null;
+  defense_saison: number | null;
+  gardien_saison: number | null;
+}
+
 export interface EtatInfo {
   nhlPlayerId: number;
   etat: 'hot' | 'cold' | 'normal';

@@ -63,9 +63,14 @@ Table de jonction reliant les échanges aux joueurs reçus par chaque équipe. R
 |-----------|-------------------|------|-------------------------------------|
 | id        | integer           | Non  | nextval('equipes_id_seq'::regclass) |
 | nom       | character varying | Non  | -                                   |
+| nom_court | character varying | Oui  | -                                   |
 | active    | boolean           | Oui  | true                                |
 | division  | character varying | Oui  | -                                   |
 | dg_name   | text              | Oui  | -                                   |
+
+#### Notes
+- `active = false` : équipes historiques hors du pool actuel (ex : Limoilou, id=15)
+- `nom_court` : nom court affiché dans la page Bilan
 
 #### Contraintes
 - `PRIMARY KEY (id)`
