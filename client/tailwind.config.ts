@@ -65,6 +65,37 @@ export default {
         },
         positive: "hsl(var(--positive))",
         negative: "hsl(var(--negative))",
+
+        // --- Podium: rank 1/2/3 badges only ---
+        rank: {
+          gold: {
+            DEFAULT: "hsl(var(--rank-gold))",
+            fill: "hsl(var(--rank-gold-fill))",
+            ink: "hsl(var(--rank-gold-ink))",
+          },
+          silver: {
+            DEFAULT: "hsl(var(--rank-silver))",
+            fill: "hsl(var(--rank-silver-fill))",
+            ink: "hsl(var(--rank-silver-ink))",
+          },
+          bronze: {
+            DEFAULT: "hsl(var(--rank-bronze))",
+            fill: "hsl(var(--rank-bronze-fill))",
+            ink: "hsl(var(--rank-bronze-ink))",
+          },
+        },
+
+        // --- Divisions: Nord blue, Sud red ---
+        division: {
+          nord: {
+            DEFAULT: "hsl(var(--division-nord))",
+            ink: "hsl(var(--division-nord-ink))",
+          },
+          sud: {
+            DEFAULT: "hsl(var(--division-sud))",
+            ink: "hsl(var(--division-sud-ink))",
+          },
+        },
       },
       keyframes: {
         "live-pulse": {

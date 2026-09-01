@@ -5,6 +5,7 @@ import {
   Card, CardContent, CardHeader, CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RankBadge } from '@/components/ui/rank-badge';
 import { cn } from '@/lib/utils';
 import type { LiveTeamPoints, LivePlayerPoints } from '@/types/ILivePoints';
 
@@ -163,20 +164,6 @@ function LeaderboardEmpty() {
 /* ------------------------------------------------------------------ */
 /*  Rank badge                                                        */
 /* ------------------------------------------------------------------ */
-
-function RankBadge({ rank }: { rank: number }) {
-  const base = 'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold tabular-nums shrink-0';
-  if (rank === 1) {
-    return <span className={cn(base, 'bg-foreground text-background')}>{rank}</span>;
-  }
-  if (rank === 2) {
-    return <span className={cn(base, 'bg-muted text-foreground ring-1 ring-border')}>{rank}</span>;
-  }
-  if (rank === 3) {
-    return <span className={cn(base, 'bg-muted text-muted-foreground ring-1 ring-border')}>{rank}</span>;
-  }
-  return <span className={cn(base, 'text-muted-foreground')}>{rank}</span>;
-}
 
 /* ------------------------------------------------------------------ */
 /*  Team row — single-line table layout                               */

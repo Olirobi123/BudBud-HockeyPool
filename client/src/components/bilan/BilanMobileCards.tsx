@@ -1,3 +1,4 @@
+import { RankBadge } from '@/components/ui/rank-badge';
 import { MONTH_LABELS } from './bilanUtils';
 
 interface TeamRow {
@@ -12,14 +13,6 @@ interface Props {
   getCategoryTotal: (equipe_id: number) => number;
 }
 
-const RANK_BASE = 'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold tabular-nums shrink-0';
-
-function rankClass(rank: number): string {
-  if (rank === 1) return `${RANK_BASE} bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/30`;
-  if (rank === 2) return `${RANK_BASE} bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/20`;
-  if (rank === 3) return `${RANK_BASE} bg-orange-500/15 text-orange-400 ring-1 ring-orange-500/20`;
-  return `${RANK_BASE} text-muted-foreground`;
-}
 
 export default function BilanMobileCards({
   sortedTeams,
@@ -43,10 +36,10 @@ export default function BilanMobileCards({
           <div key={id} className="rounded-lg border border-border/60 bg-background p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className={rankClass(rowIdx + 1)}>{rowIdx + 1}</span>
+                <RankBadge rank={rowIdx + 1} />
                 <span className="font-semibold text-foreground text-sm">{nomLong}</span>
               </div>
-              <span className="text-base font-bold tabular-nums text-blue-400">
+              <span className="text-base font-bold tabular-nums text-foreground">
                 {total > 0 ? total : <span className="text-muted-foreground font-normal">—</span>}
               </span>
             </div>

@@ -24,9 +24,35 @@ where it carries information.
 | `--destructive` | red | error, injury | error states, injury badges |
 | `--positive` | green | gain, positive delta | points gained tonight, upward movement |
 | `--negative` | red | loss, negative delta | downward movement |
+| `--rank-gold/silver/bronze` | medal | finishing position 1 / 2 / 3 | the rank badge, nothing else |
+| `--division-nord` | blue | Division Nord | division band, standings rule, trade side A |
+| `--division-sud` | red | Division Sud | division band, standings rule, trade side B |
 
 NHL team logos and player headshots supply the remaining colour naturally, and
 they do it better than any brand palette would — that colour is real data.
+
+### Identity colour: the podium and the divisions
+
+Two palettes sit outside the state model, because they encode a *fixed
+property* rather than a changing state. They are the only ones, and they are
+deliberately fenced in:
+
+**The podium.** Gold, silver and bronze mark ranks 1, 2 and 3. Fourth place
+down is grey. It lives in exactly one component — `components/ui/rank-badge.tsx`
+— which every leaderboard, standings table and bilan table renders. Do not
+re-implement it, and do not extend medal colour onto a row background, a
+border, a heading or a points figure. The badge is the whole surface area.
+
+**The divisions.** Nord is blue, Sud is red. A team's division never changes,
+so the pair also serves as the neutral "two sides" palette on a trade card —
+side A blue, side B red. That is by position on the card, not by the teams'
+actual divisions: both teams in a trade are frequently in the same division,
+and two blue columns would defeat the purpose.
+
+Each division token ships in two weights. The bare token (`bg-division-nord`)
+is the marker weight — dots, rules, bands, gradient washes. The `-ink` variant
+(`text-division-nord-ink`) is darkened to clear 4.5:1 on white and is the only
+one allowed on text.
 
 ### The test
 
@@ -40,6 +66,12 @@ lands on them instantly. That only works because nothing else on the page is
 red. Every additional red element makes the live signal weaker. This is why
 "points behind the leader" is muted grey rather than red, and why overtime
 escalates the *same* red (a stronger border) instead of introducing amber.
+
+`--division-sud` is the one other red on the page. It is pitched darker and
+browner than `--live`, and it is barred from the two things that make live
+red carry — borders and animation. A Sud marker is a static 8px dot or a 3px
+rule; a live signal pulses. If you find yourself putting `--division-sud` on
+a card border, you are weakening the live state and should use a grey.
 
 ---
 
@@ -82,6 +114,28 @@ numbered Tailwind palette utility.
 | `--destructive` | `358 70% 45%` | `#C4222A` |
 | `--positive` | `142 60% 30%` | `#1F7A3D` |
 | `--negative` | `358 70% 45%` | `#C4222A` |
+
+### Podium
+
+Ranks 1–3 only, and only on the rank badge. `-fill` is the badge background,
+`-ink` the numeral, and the bare token the ring at 40% opacity.
+
+| Token | Value | Hex |
+|---|---|---|
+| `--rank-gold` / `-fill` / `-ink` | `43 89% 38%` / `45 94% 93%` / `38 88% 26%` | `#B7900F` / `#FDF4DC` / `#7C5308` |
+| `--rank-silver` / `-fill` / `-ink` | `215 16% 55%` / `214 25% 94%` / `215 22% 34%` | `#7A879B` / `#EDF0F5` / `#44546A` |
+| `--rank-bronze` / `-fill` / `-ink` | `24 60% 45%` / `26 62% 93%` / `22 62% 30%` | `#B86A2E` / `#FAEBE0` / `#7B3F1D` |
+
+### Divisions
+
+Bare token for markers and rules; `-ink` for text on white.
+
+| Token | Value | Hex |
+|---|---|---|
+| `--division-nord` | `217 91% 60%` | `#3B82F6` |
+| `--division-nord-ink` | `224 76% 48%` | `#1D4ED8` |
+| `--division-sud` | `6 78% 57%` | `#EA4B3B` |
+| `--division-sud-ink` | `6 72% 42%` | `#B82D1E` |
 
 ### Theme
 
@@ -175,8 +229,6 @@ These predate v2.0 and are scheduled for follow-up, not endorsed:
 - Roughly 300 hardcoded Tailwind palette utilities remain in feature components
   (tables, badges, tooltips, playoff bracket).
 - `bilan` heatmap cells use hardcoded `#2563eb` / `#60a5fa`.
-- Division banners use blue (Nord) and red (Sud); this arguably encodes a real
-  distinction and may survive review.
 - Four empty states have not yet been migrated onto `EmptyState`.
 
 New code does not get to add to this list.

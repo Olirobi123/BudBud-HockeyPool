@@ -2,34 +2,47 @@ import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { RankBadge } from '@/components/ui/rank-badge';
 import { TeamDGTooltip } from '@/components/ui/team-dg-tooltip';
+import { cn } from '@/lib/utils';
 import type { TeamStanding } from '@/types/IEquipes';
 
 const PLAYOFF_CUTOFF = 4;
 
+/*
+ * Nord is blue, Sud is red. Written out rather than interpolated so Tailwind's
+ * scanner sees whole class names.
+ */
+const DIVISION = {
+  nord: {
+    label: 'NORD',
+    rule: 'border-t-[3px] border-t-division-nord',
+    wash: 'bg-gradient-to-r from-division-nord/10 to-transparent',
+    spine: 'shadow-[inset_3px_0_0_hsl(var(--division-nord))]',
+  },
+  sud: {
+    label: 'SUD',
+    rule: 'border-t-[3px] border-t-division-sud',
+    wash: 'bg-gradient-to-r from-division-sud/10 to-transparent',
+    spine: 'shadow-[inset_3px_0_0_hsl(var(--division-sud))]',
+  },
+} as const;
+
 interface DivisionTableProps {
   division: 'nord' | 'sud';
   standings: TeamStanding[];
-  color: string;
 }
 
-export function DivisionTable({ division, standings, color }: DivisionTableProps) {
+export function DivisionTable({ division, standings }: DivisionTableProps) {
   const navigate = useNavigate();
-  const divisionLabel = division === 'nord' ? 'NORD' : 'SUD';
+  const theme = DIVISION[division];
 
   return (
-    <Card
-      className="overflow-hidden"
-      style={{ borderTop: `3px solid ${color}` }}
-    >
-      <CardHeader
-        className="border-b"
-        style={{ background: `linear-gradient(to right, ${color}15, transparent)` }}
-      >
+    <Card className={cn('overflow-hidden', theme.rule)}>
+      <CardHeader className={cn('border-b', theme.wash)}>
         <CardTitle className="text-xl font-bold uppercase tracking-wide">
-          Division {divisionLabel}
+          Division {theme.label}
         </CardTitle>
       </CardHeader>
 
@@ -52,20 +65,17 @@ export function DivisionTable({ division, standings, color }: DivisionTableProps
                 <Fragment key={team.id}>
                   <TeamDGTooltip dgName={team.dg_name} division={division}>
                     <TableRow
-                      className={`cursor-pointer hover:bg-muted/50 transition-colors group/row ${!isPlayoff ? 'opacity-50' : ''}`}
-                      style={isPlayoff ? { boxShadow: `inset 3px 0 0 ${color}` } : undefined}
+                      className={cn(
+                        'cursor-pointer hover:bg-muted/50 transition-colors group/row',
+                        !isPlayoff && 'opacity-50',
+                        isPlayoff && theme.spine,
+                      )}
                       onClick={() => navigate(`/equipes/${team.id}`)}
                     >
-                      <TableCell className="text-center">
-                        {team.rank === 1 ? (
-                          <Badge className="bg-yellow-500 text-yellow-950 font-bold">
-                            {team.rank}
-                          </Badge>
-                        ) : (
-                          <span className={`font-medium ${isPlayoff ? 'text-foreground' : 'text-muted-foreground'}`}>
-                            {team.rank}
-                          </span>
-                        )}
+                      <TableCell>
+                        <div className="flex justify-center">
+                          <RankBadge rank={team.rank} className={!isPlayoff ? 'opacity-70' : undefined} />
+                        </div>
                       </TableCell>
 
                       <TableCell className="font-semibold">

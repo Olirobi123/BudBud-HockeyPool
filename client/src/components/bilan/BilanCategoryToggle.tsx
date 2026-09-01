@@ -33,7 +33,7 @@ export function BilanCategoryToggle({ active, onChange }: Props): JSX.Element {
             className={cn(
               'px-1.5 sm:px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-colors cursor-pointer',
               isActive
-                ? 'bg-blue-600/90 text-white shadow-sm'
+                ? 'bg-primary text-primary-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/60',
             )}
           >

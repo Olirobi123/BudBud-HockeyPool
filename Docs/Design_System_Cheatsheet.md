@@ -25,6 +25,21 @@ Before adding colour ask *what state does this encode?* — if the answer is
 | Positive delta | `text-positive` |
 | Negative delta | `text-negative` |
 
+### Identity colour (the only two exceptions)
+
+| Need | How |
+|---|---|
+| Rank 1 / 2 / 3 | `<RankBadge rank={n} />` — never hand-roll medal colours |
+| Division Nord marker / rule | `bg-division-nord`, `border-t-division-nord`, `from-division-nord/10` |
+| Division Sud marker / rule | `bg-division-sud`, `border-t-division-sud`, `from-division-sud/10` |
+| Division name as text | `text-division-nord-ink` / `text-division-sud-ink` (the bare token fails contrast) |
+| The two sides of a trade | Nord blue left, Sud red right — by side, not by real division |
+
+Medal colour stops at the badge; division colour stops at markers, bands and
+rules. Neither goes on a heading, a row background or a points figure, and
+`--division-sud` never goes on a border or anything animated — that is
+`--live`'s job.
+
 ❌ **Never**: `bg-slate-*`, `text-gray-*`, `from-blue-*`, `text-cyan-*`,
 `bg-amber-*`, any numbered Tailwind palette utility, any raw hex, any
 `dark:` prefix (there is no dark mode).
