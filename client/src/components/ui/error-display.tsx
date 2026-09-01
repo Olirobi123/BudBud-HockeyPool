@@ -53,7 +53,7 @@ export function InlineError({
   className?: string;
 }) {
   return (
-    <div className={`text-red-500 text-sm flex items-center ${className}`}>
+    <div className={`text-destructive text-sm flex items-center ${className}`}>
       <AlertCircle className="h-3 w-3 mr-1" />
       {message}
     </div>

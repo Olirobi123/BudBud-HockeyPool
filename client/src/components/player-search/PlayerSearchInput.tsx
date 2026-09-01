@@ -26,7 +26,7 @@ export const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-muted-foreground focus:border-primary"
+      className="pl-9"
       onFocus={onFocus}
     />
     {isLoading && (

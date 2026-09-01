@@ -12,6 +12,16 @@ interface NavigationLinkProps {
   className?: string;
 }
 
+/**
+ * A link is active for its own path and anything nested beneath it, so
+ * `/equipes/12` still highlights "Équipes". Exact matching used to leave
+ * detail pages with no active link at all.
+ */
+export function isNavLinkActive(pathname: string, href: string, external = false): boolean {
+  if (external) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export const NavigationLink: React.FC<NavigationLinkProps> = ({
   href,
   label,
@@ -21,7 +31,7 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
   className = '',
 }) => {
   const baseStyles = cn(
-    'relative px-3 py-2 text-sm font-medium tracking-wide uppercase transition-all duration-200 cursor-pointer',
+    'relative px-3 py-2 text-sm font-medium tracking-wide uppercase transition-colors duration-200 cursor-pointer',
     'font-display',
     className,
   );
@@ -34,32 +44,28 @@ export const NavigationLink: React.FC<NavigationLinkProps> = ({
         rel="noopener noreferrer"
         className={cn(
           baseStyles,
-          'flex items-center gap-1.5 text-slate-400 hover:text-white',
+          'flex items-center gap-1.5 text-muted-foreground hover:text-foreground',
         )}
         onClick={onClick}
       >
         <span>{label}</span>
-        <ExternalLink className="w-3 h-3 opacity-50" />
+        <ExternalLink className="h-3 w-3 opacity-50" />
       </a>
     );
   }
 
   return (
-    <Link to={href} onClick={onClick}>
+    <Link to={href} onClick={onClick} aria-current={active ? 'page' : undefined}>
       <span
         className={cn(
           baseStyles,
-          active
-            ? 'text-white'
-            : 'text-slate-400 hover:text-white',
+          active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
         )}
       >
         {label}
-        {/* Active indicator — underline bar */}
         <span
           className={cn(
-            'absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full transition-all duration-300',
-            'bg-cyan-400',
+            'absolute bottom-0 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-foreground transition-all duration-300',
             active ? 'w-4/5 opacity-100' : 'w-0 opacity-0',
           )}
         />

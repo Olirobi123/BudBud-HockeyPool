@@ -33,8 +33,8 @@ const CATEGORIES: CategoryConfig[] = [
     colLabel: 'Pts',
     pointsKey: 'total_points',
     matchsKey: 'total_matchs',
-    activeClass: 'bg-blue-600/90 text-white shadow-sm',
-    valueClass: 'text-blue-400',
+    activeClass: 'bg-primary text-primary-foreground shadow-sm',
+    valueClass: 'text-foreground',
   },
   {
     key: 'attaque',
@@ -43,8 +43,8 @@ const CATEGORIES: CategoryConfig[] = [
     colLabel: 'Att',
     pointsKey: 'attaque_points',
     matchsKey: 'attaque_matchs',
-    activeClass: 'bg-blue-600/90 text-white shadow-sm',
-    valueClass: 'text-blue-400',
+    activeClass: 'bg-primary text-primary-foreground shadow-sm',
+    valueClass: 'text-foreground',
   },
   {
     key: 'defense',
@@ -53,8 +53,8 @@ const CATEGORIES: CategoryConfig[] = [
     colLabel: 'Déf',
     pointsKey: 'defense_points',
     matchsKey: 'defense_matchs',
-    activeClass: 'bg-blue-600/90 text-white shadow-sm',
-    valueClass: 'text-blue-400',
+    activeClass: 'bg-primary text-primary-foreground shadow-sm',
+    valueClass: 'text-foreground',
   },
   {
     key: 'gardiens',
@@ -63,8 +63,8 @@ const CATEGORIES: CategoryConfig[] = [
     colLabel: 'Gar',
     pointsKey: 'gardien_points',
     matchsKey: 'gardien_matchs',
-    activeClass: 'bg-blue-600/90 text-white shadow-sm',
-    valueClass: 'text-blue-400',
+    activeClass: 'bg-primary text-primary-foreground shadow-sm',
+    valueClass: 'text-foreground',
   },
 ];
 
@@ -149,13 +149,13 @@ function CategoryToggle({ active, onChange }: CategoryToggleProps) {
 function RankBadge({ rank }: { rank: number }) {
   const base = 'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold tabular-nums shrink-0';
   if (rank === 1) {
-    return <span className={cn(base, 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/30')}>{rank}</span>;
+    return <span className={cn(base, 'bg-foreground text-background')}>{rank}</span>;
   }
   if (rank === 2) {
-    return <span className={cn(base, 'bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/20')}>{rank}</span>;
+    return <span className={cn(base, 'bg-muted text-foreground ring-1 ring-border')}>{rank}</span>;
   }
   if (rank === 3) {
-    return <span className={cn(base, 'bg-orange-500/15 text-orange-400 ring-1 ring-orange-500/20')}>{rank}</span>;
+    return <span className={cn(base, 'bg-muted text-muted-foreground ring-1 ring-border')}>{rank}</span>;
   }
   return <span className={cn(base, 'text-muted-foreground')}>{rank}</span>;
 }
@@ -169,7 +169,7 @@ function DiffCell({ diff }: { diff: number }) {
     return <span className="w-10 text-center tabular-nums text-xs text-muted-foreground/40 shrink-0">—</span>;
   }
   return (
-    <span className="w-10 text-center tabular-nums text-xs text-red-400/80 shrink-0">
+    <span className="w-10 text-center tabular-nums text-xs text-muted-foreground shrink-0">
       {`−${diff}`}
     </span>
   );
@@ -222,7 +222,7 @@ function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
             {team.nom}
           </span>
           {diff > 0 && (
-            <span className="text-[10px] font-semibold tabular-nums text-red-400/80">
+            <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
               {`−${diff}`}
             </span>
           )}
@@ -318,7 +318,7 @@ export function PointsLeaderboard({ teams, isLoading }: PointsLeaderboardProps):
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-400" />
+            <Trophy className="w-5 h-5 text-muted-foreground" />
             <span>Classement général</span>
           </CardTitle>
           <CategoryToggle active={activeCategory} onChange={setActiveCategory} />
