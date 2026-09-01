@@ -7,13 +7,16 @@ interface QuebecMapProps {
   sudTeams: TeamStanding[];
   onRegionClick: (division: 'nord' | 'sud' | null) => void;
   activeFilter: 'nord' | 'sud' | null;
+  /** While the standings load the map is real but the counts are not yet known. */
+  isLoading?: boolean;
 }
 
 export function QuebecMap({
   nordTeams,
   sudTeams,
   onRegionClick,
-  activeFilter
+  activeFilter,
+  isLoading = false,
 }: QuebecMapProps) {
   // Division line at approximately 47th parallel (roughly Québec City latitude)
   // Positioned at about 55% down the real Quebec map (adjusted for new viewBox)
@@ -111,7 +114,7 @@ export function QuebecMap({
                   className="fill-white pointer-events-none select-none"
                   style={{ fontSize: '32px', fontWeight: 700 }}
                 >
-                  {nordTeams.length} équipes
+                  {isLoading ? '—' : `${nordTeams.length} équipes`}
                 </text>
               </g>
             </g>
@@ -193,7 +196,7 @@ export function QuebecMap({
                   className="fill-white pointer-events-none select-none"
                   style={{ fontSize: '32px', fontWeight: 700 }}
                 >
-                  {sudTeams.length} équipes
+                  {isLoading ? '—' : `${sudTeams.length} équipes`}
                 </text>
               </g>
             </g>

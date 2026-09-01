@@ -20,13 +20,15 @@ Les virgules séparent des transitions distinctes. Seule `opacity` reçoit la du
 
 ---
 
-## 2. Double loading — flash visuel entre states (P1)
+## 2. ~~Double loading — flash visuel entre states (P1)~~ ✅ RÉSOLU 2026-09-01
 
 **Fichiers:** `pages/equipes.tsx`, `pages/draft.tsx`, `pages/echanges.tsx`, `pages/joueur.tsx`
 
-Chaque page fait un early return `if (isLoading) return <Loading />` **avant** de monter `<Layout>`. Le `LoadingOverlay` global dans `App.tsx` (via `usePageLoading`) est aussi actif en parallèle. Résultat : l'utilisateur voit un spinner sans nav, puis un flash quand le Layout avec la nav apparaît.
+Chaque page faisait un early return `if (isLoading) return <Loading />` **avant** de monter `<Layout>`. Le `LoadingOverlay` global dans `App.tsx` (via `usePageLoading`) était aussi actif en parallèle. Résultat : l'utilisateur voyait un spinner sans nav, puis un flash quand le Layout avec la nav apparaissait.
 
-**Solution:** Soit retirer les early returns et laisser le `LoadingOverlay` global gérer, soit afficher le loading **à l'intérieur** du `<Layout>` pour garder la nav visible pendant le chargement.
+**Correctif retenu :** ni l'un ni l'autre — les deux couches bloquantes ont été supprimées. `LoadingProvider`, `usePageLoading` et le composant `Loading` n'existent plus. Chaque page monte son `<Layout>` immédiatement et remplit sa zone de contenu avec un skeleton, comme le faisait déjà `home`. La nav, le ticker et l'en-tête de page sont utilisables dès la première frame.
+
+Effet de bord découvert en retirant l'overlay : `bilan` affichait brièvement « Aucune donnée disponible » parce que `usePointsMensuel` est `enabled: !!season` et rapporte donc `isLoading: false` tant que la liste des saisons n'est pas revenue. Corrigé dans le même commit.
 
 ---
 
@@ -38,7 +40,7 @@ Les error states utilisent `onRetry={() => window.location.reload()}` — hard r
 
 ---
 
-## 4. `console.log` en production (P2)
+## 4. ~~`console.log` en production (P2)~~ ✅ RÉSOLU 2026-09-01
 
 **Fichier:** `pages/joueur.tsx:11`
 
@@ -46,7 +48,7 @@ Les error states utilisent `onRetry={() => window.location.reload()}` — hard r
 console.log(id)
 ```
 
-À retirer.
+Retiré.
 
 ---
 

@@ -13,16 +13,20 @@ import {
 } from '@/components/ui/select';
 import { usePointsMensuel } from '@/hooks/bilan/usePointsMensuel';
 import { useSaisons } from '@/hooks/bilan/useSaisons';
-import { usePageLoading } from '@/hooks/usePageLoading';
 
 export default function Bilan(): JSX.Element {
-  const { data: saisons } = useSaisons();
+  const { data: saisons, isLoading: isLoadingSaisons } = useSaisons();
   const [season, setSeason] = useState('');
   const [category, setCategory] = useState<BilanCategory>('general');
   const activeSeason = season !== '' ? season : (saisons?.[0]?.value ?? '');
-  const { data, isLoading } = usePointsMensuel(activeSeason);
+  const { data, isLoading: isLoadingPoints } = usePointsMensuel(activeSeason);
 
-  usePageLoading({ dependencies: [isLoading] });
+  /*
+   * usePointsMensuel is `enabled: !!season`, so it reports isLoading=false while
+   * the season list is still in flight. Without folding that in, the page shows
+   * "aucune donnée" for a beat before the real table arrives.
+   */
+  const isLoading = isLoadingSaisons || (activeSeason !== '' && isLoadingPoints);
 
   return (
     <Layout bgClassName="bg-background">

@@ -2,7 +2,6 @@ import { JSX } from 'react';
 import { AlertCircle } from 'lucide-react';
 import useNHLScores from '@/hooks/useNHLScores';
 import { useLivePoints } from '@/hooks/home/useLivePoints';
-import { usePageLoading } from '@/hooks/usePageLoading';
 import { TonightMeta } from './TonightMeta';
 import { ScoreboardRail } from './ScoreboardRail';
 import { TonightPoolPanel, hasScoredTonight } from './TonightPoolPanel';
@@ -31,8 +30,6 @@ export function TonightBoard(): JSX.Element {
     data: games, isLoading: scoresLoading, isError: scoresError, dataUpdatedAt,
   } = useNHLScores();
   const { data: livePoints, isLoading: pointsLoading } = useLivePoints();
-
-  usePageLoading({ dependencies: [scoresLoading] });
 
   const isLoading = scoresLoading || pointsLoading;
 
