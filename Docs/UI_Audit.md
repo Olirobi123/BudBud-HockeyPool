@@ -1,10 +1,10 @@
 # Audit UI/UX — Bonnes pratiques
 
-**Date:** 2026-04-06
+**Date:** 2026-04-06 · _mise à jour 2026-09-01_
 
 ---
 
-## 1. BUG CSS — Transition shorthand cassée (P0)
+## 1. ~~BUG CSS — Transition shorthand cassée (P0)~~ ✅ RÉSOLU 2026-09-01
 
 **Fichier:** `client/src/index.css:317`
 
@@ -54,13 +54,13 @@ console.log(id)
 
 Seulement ~15 attributs `aria-*` dans tout le frontend, majoritairement dans les composants shadcn/ui. Les composants custom en manquent :
 
-- **LiveScoresTicker** — pas de `role="region"` ni `aria-label`
+- ~~**LiveScoresTicker** — pas de `role="region"` ni `aria-label`~~ — partiellement adressé : chaque carte de match porte maintenant un `aria-label` décrivant les équipes et l'état
 - **Home sections** — les section headers n'ont pas de `aria-labelledby` sur leurs conteneurs
-- **GameCard** — pas de contexte pour screen readers (équipes, score, état du match)
+- ~~**GameCard** — pas de contexte pour screen readers~~ ✅ RÉSOLU 2026-09-01
 
 ---
 
-## 6. Section headers dupliqués (P3)
+## 6. ~~Section headers dupliqués (P3)~~ ✅ RÉSOLU 2026-09-01 — les eyebrow labels de `home.tsx` ont été retirés (chaque carte porte déjà son propre titre)
 
 **Fichier:** `pages/home.tsx`
 
@@ -70,13 +70,13 @@ Le pattern section header (dot coloré + `<h3>` uppercase tracking-wider) est co
 
 ## Ce qui est bien fait
 
-- **CSS variables cohérentes** — système de couleurs hockey-themed dans `:root`
+- **CSS variables cohérentes** — _remplacé en v2.0 par le système monochrome, voir `/Docs/Design_System.md`_
 - **`prefers-reduced-motion`** respecté — toutes les animations désactivées
 - **Layout component** flexible et réutilisé sur toutes les pages
 - **Mobile-first responsive** — breakpoints cohérents (`sm`, `md`, `lg`)
 - **team-details.tsx** — tabs mobile / grid desktop, excellent pattern
 - **Custom scrollbar** stylé et cohérent
-- **Navbar glass morphism** — transition propre, white flash évité
+- ~~**Navbar glass morphism**~~ — _retiré en v2.0 : le shell est désormais clair et sans hue_
 - **LiveScoresTicker** — `ResizeObserver` pour overflow, scroll arrows conditionnels
 - **Oswald** pour les titres (`font-display`) — choix distinctif et sportif
 
@@ -86,9 +86,9 @@ Le pattern section header (dot coloré + `<h3>` uppercase tracking-wider) est co
 
 | Priorité | Issue | Fichier(s) |
 |----------|-------|------------|
-| **P0** | CSS transition shorthand cassée | `index.css:317` |
+| ~~P0~~ ✅ | CSS transition shorthand cassée | `index.css` — résolu 2026-09-01 |
 | **P1** | Double loading cause des flashes | Toutes les pages |
 | **P1** | `window.location.reload()` au lieu de refetch | 4 pages |
 | **P2** | `console.log` en production | `joueur.tsx:11` |
 | **P2** | Accessibilité — `aria` manquants | Ticker, home sections |
-| **P3** | Section headers dupliqués | `home.tsx` |
+| ~~P3~~ ✅ | Section headers dupliqués | `home.tsx` — résolu 2026-09-01 |

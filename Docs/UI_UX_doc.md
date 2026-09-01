@@ -62,5 +62,5 @@
 ### Cross-References
 - **Design System (NEW):** `/Docs/Design_System.md` - Comprehensive design system reference
 - **Design System Cheatsheet (NEW):** `/Docs/Design_System_Cheatsheet.md` - Quick reference guide
-- **Implementation Plan:** `/Docs/Implementation.md` - Full implementation plan and task breakdown
-- **Project Structure:** `/Docs/project_structure.md` - Folder and component organization
+- **Component Structure:** see the "Component Structure" section of `/CLAUDE.md` — folder and component organization
+- **Component Audit:** `/Docs/Component_Audit.md` - single-responsibility review of oversized components

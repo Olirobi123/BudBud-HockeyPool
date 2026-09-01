@@ -1,683 +1,182 @@
-# 38BudBud Design System
+# Design System — 38BudBud
 
-> **Comprehensive Design System Documentation**
-> Created: 2026-01-11
-> Last Updated: 2026-01-11
-> Version: 1.0
+**v2.0 · Monochrome dashboard**
 
-## Table of Contents
-
-1. [Overview & Principles](#1-overview--principles)
-2. [Color System](#2-color-system)
-3. [Typography](#3-typography)
-4. [Spacing & Layout](#4-spacing--layout)
-5. [Component Library Reference](#5-component-library-reference)
-6. [Component Usage Patterns](#6-component-usage-patterns)
-7. [Responsive Design Guidelines](#7-responsive-design-guidelines)
-8. [Accessibility Standards](#8-accessibility-standards)
-9. [Animation & Transitions](#9-animation--transitions)
-10. [Best Practices](#10-best-practices)
-11. [Migration Guide](#11-migration-guide)
+> This document describes the system **as implemented**. v1.0 documented a dark
+> palette and a 50-primitive component library that never existed in the code;
+> both have been removed rather than carried forward. If you find a gap between
+> this file and `client/src/index.css`, the CSS is the source of truth — fix the
+> doc in the same commit.
 
 ---
 
-## 1. Overview & Principles
+## 1. The core rule
 
-### Project Context
-38BudBud is a full-stack web application for managing hockey pools. It's a bilingual (French/English) platform built with modern web technologies.
+**Chrome is monochrome. Colour is reserved for state, and every hue encodes exactly one meaning.**
 
-### Tech Stack
-- **Frontend:** React 18 + TypeScript
-- **Styling:** Tailwind CSS 3.x
-- **UI Components:** shadcn/ui (Radix-based primitives)
-- **Routing:** React-router-dom
-- **State Management:** TanStack Query for server state
-- **Backend:** Node.js + Express + PostgreSQL
+The application shell — navigation, footer, page and card surfaces, borders,
+headings, table text — is greyscale, with no exceptions. Colour appears only
+where it carries information.
 
-### Design Principles
+| Token | Hue | Means | Appears on |
+|---|---|---|---|
+| `--live` | red | in progress, right now | LIVE dot + pulse, period/clock label, live card border |
+| `--destructive` | red | error, injury | error states, injury badges |
+| `--positive` | green | gain, positive delta | points gained tonight, upward movement |
+| `--negative` | red | loss, negative delta | downward movement |
 
-1. **Consistency First**
-   - Use semantic design tokens everywhere
-   - Follow established patterns
-   - Maintain visual harmony across all pages
+NHL team logos and player headshots supply the remaining colour naturally, and
+they do it better than any brand palette would — that colour is real data.
 
-2. **Accessibility by Default**
-   - WCAG 2.1 AA compliance minimum
-   - Keyboard navigation support
-   - Semantic HTML and ARIA attributes
-   - Sufficient color contrast
+### The test
 
-3. **Mobile-First Responsive**
-   - Design for mobile, scale up for larger screens
-   - Use Tailwind responsive prefixes (`sm:`, `md:`, `lg:`)
-   - Test on all device sizes
+Before adding any colour, ask: **what state does this encode?**
+If the answer is *"it looks nice"* or *"it's the brand colour"*, use a grey.
 
-4. **Performance Optimized**
-   - Lightweight components
-   - Efficient rendering
-   - Optimized bundle size
+### Why red is rare
 
-5. **Maintainability**
-   - Clear component hierarchy
-   - Reusable patterns
-   - Well-documented code
-
-### Dark Mode Support
-The design system fully supports light and dark modes using CSS variables that automatically adapt based on the `.dark` class.
+On a night with three live games, exactly three cards carry red and the eye
+lands on them instantly. That only works because nothing else on the page is
+red. Every additional red element makes the live signal weaker. This is why
+"points behind the leader" is muted grey rather than red, and why overtime
+escalates the *same* red (a stronger border) instead of introducing amber.
 
 ---
 
-## 2. Color System
+## 2. Tokens
 
-### 2.1 Semantic Tokens (Primary System)
+All tokens live in `:root` in `client/src/index.css` as raw HSL triplets, and are
+exposed to Tailwind in `client/tailwind.config.ts`. Always use the semantic
+Tailwind class (`bg-card`, `text-muted-foreground`), never a raw hex or a
+numbered Tailwind palette utility.
 
-**ALWAYS USE SEMANTIC TOKENS FIRST.** These tokens automatically adapt to light/dark mode and ensure consistency.
+### Surfaces & ink
 
-#### Core Tokens
+| Token | Value | Hex | Usage |
+|---|---|---|---|
+| `--background` | `0 0% 100%` | `#FFFFFF` | page background |
+| `--foreground` | `0 0% 4%` | `#0A0A0A` | primary ink, headings, numbers |
+| `--card` | `0 0% 100%` | `#FFFFFF` | card surface |
+| `--card-foreground` | `0 0% 4%` | `#0A0A0A` | text on cards |
+| `--popover` / `--popover-foreground` | as card | — | popovers, sheets |
+| `--muted` | `0 0% 96%` | `#F5F5F5` | subdued fills, ticker strip |
+| `--muted-foreground` | `240 4% 46%` | `#52525B` | secondary text, labels |
+| `--border` | `240 6% 90%` | `#E4E4E7` | all rules and card borders |
+| `--input` | `240 6% 90%` | `#E4E4E7` | form field borders |
 
-| Token | Light Mode | Dark Mode | Usage | Tailwind Class |
-|-------|------------|-----------|--------|----------------|
-| **background** | `hsl(0 0% 100%)` #FFFFFF | `hsl(220 39% 11%)` #111827 | Page backgrounds | `bg-background` |
-| **foreground** | `hsl(220 26% 14%)` #1C2B33 | `hsl(210 20% 98%)` #F9FAFB | Primary text color | `text-foreground` |
-| **card** | `hsl(0 0% 100%)` #FFFFFF | `hsl(220 39% 11%)` #111827 | Card backgrounds | `bg-card` |
-| **card-foreground** | `hsl(220 26% 14%)` #1C2B33 | `hsl(210 20% 98%)` #F9FAFB | Text on cards | `text-card-foreground` |
-| **muted** | `hsl(210 40% 96%)` #F1F5F9 | `hsl(215 28% 17%)` #1F2937 | Subtle backgrounds | `bg-muted` |
-| **muted-foreground** | `hsl(215 16% 47%)` #64748B | `hsl(215 20% 65%)` #9CA3AF | Secondary text | `text-muted-foreground` |
-| **primary** | `hsl(217 91% 60%)` #3B82F6 | `hsl(231 48% 48%)` #4F46E5 | Primary actions, links, branding | `bg-primary` `text-primary` |
-| **primary-foreground** | `hsl(210 20% 98%)` #F8FAFC | `hsl(210 20% 98%)` #F8FAFC | Text on primary | `text-primary-foreground` |
-| **secondary** | `hsl(215 20% 65%)` #94A3B8 | `hsl(215 28% 17%)` #1F2937 | Secondary actions | `bg-secondary` |
-| **secondary-foreground** | `hsl(220 26% 14%)` #1C2B33 | `hsl(210 20% 98%)` #F9FAFB | Text on secondary | `text-secondary-foreground` |
-| **accent** | `hsl(6 78% 57%)` #EF4444 | `hsl(188 94% 42%)` #06B6D4 | Highlights, alerts, important items | `bg-accent` |
-| **accent-foreground** | `hsl(210 20% 98%)` #F8FAFC | `hsl(210 20% 98%)` #F9FAFB | Text on accent | `text-accent-foreground` |
-| **destructive** | `rgb(234 179 8)` yellow-500 | `hsl(0 84% 60%)` #EF4444 | Errors, warnings, delete actions | `bg-destructive` |
-| **destructive-foreground** | `hsl(210 20% 98%)` #F8FAFC | `hsl(210 20% 98%)` #F8FAFC | Text on destructive | `text-destructive-foreground` |
-| **border** | `hsl(214 32% 91%)` #E2E8F0 | `hsl(215 28% 17%)` #1F2937 | Borders | `border` `border-border` |
-| **input** | `hsl(214 32% 91%)` #E2E8F0 | `hsl(215 28% 17%)` #1F2937 | Input borders | `border-input` |
-| **ring** | `hsl(217 91% 60%)` #3B82F6 | `hsl(231 48% 48%)` #4F46E5 | Focus rings | `ring-ring` |
+### Interactive
 
-#### Special Tokens
+| Token | Value | Usage |
+|---|---|---|
+| `--primary` | `0 0% 9%` | primary buttons, active toggle — black, not blue |
+| `--primary-foreground` | `0 0% 98%` | text on primary |
+| `--secondary` / `--accent` | `0 0% 96%` | hover surface — a grey, deliberately hueless |
+| `--ring` | `0 0% 4%` | focus outline |
+| `--radius` | `0.375rem` | base radius; `lg`/`md`/`sm` derive from it |
 
-| Token | Light Mode | Dark Mode | Usage |
-|-------|------------|-----------|--------|
-| **popover** | `hsl(0 0% 100%)` #FFFFFF | `hsl(220 39% 11%)` #111827 | Popover backgrounds |
-| **popover-foreground** | `hsl(220 26% 14%)` #1C2B33 | `hsl(210 20% 98%)` #F9FAFB | Popover text |
+### State
 
-### 2.2 Hockey Theme Colors
+| Token | Value | Hex |
+|---|---|---|
+| `--live` | `358 77% 50%` | `#E11D26` |
+| `--destructive` | `358 70% 45%` | `#C4222A` |
+| `--positive` | `142 60% 30%` | `#1F7A3D` |
+| `--negative` | `358 70% 45%` | `#C4222A` |
 
-Custom colors specific to the hockey pool theme:
+### Theme
 
-| Variable | Value | Hex | Usage |
-|----------|-------|-----|--------|
-| `--hockey-blue` | `hsl(217 91% 60%)` | #3B82F6 | Primary branding color |
-| `--hockey-blue-dark` | `hsl(213 94% 68%)` | #2563EB | Darker shade for depth |
-| `--hockey-red` | `hsl(6 78% 57%)` | #EF4444 | Accent/alert color |
-| `--hockey-red-dark` | `hsl(0 84% 60%)` | #DC2626 | Darker red for emphasis |
-| `--ice-blue` | `hsl(199 89% 48%)` | #0EA5E9 | Secondary branding |
-| `--slate-dark` | `hsl(215 28% 17%)` | #1E293B | Dark mode backgrounds |
-
-### 2.3 Extended Palette (Use Sparingly)
-
-Tailwind's default color scale should only be used when semantic tokens don't fit the use case.
-
-**Gray Scale:** `gray-50`, `gray-100`, `gray-200`, ... `gray-900`
-**Blue Scale:** `blue-50`, `blue-100`, ... `blue-900`
-**Green Scale:** `green-50`, `green-100`, ... `green-900`
-**Red Scale:** `red-50`, `red-100`, ... `red-900`
-**Yellow Scale:** `yellow-50`, `yellow-100`, ... `yellow-900`
-
-**Rule:** If a semantic token exists for your use case, use it. Extended palette colors should be exceptions, not the rule.
-
-### 2.4 Common Color Issues Found
-
-*(To be populated during audit)*
+Light only. `darkMode: ["class"]` remains in the Tailwind config and the tokens
+are structured so a `.dark {}` block could be added later, but **there is no dark
+mode today** — no theme provider, no toggle, and no `.dark` selector. Do not add
+`dark:` utilities; they will not do anything.
 
 ---
 
 ## 3. Typography
 
-### 3.1 Font Family
+Loaded once, from `client/index.html`. Do not add `@import` rules to the CSS.
 
-**Primary Font:** Inter (loaded from Google Fonts)
+| Face | Tailwind | Usage |
+|---|---|---|
+| Inter | `font-sans` (default on `body`) | all body copy, tables, forms |
+| Oswald | `font-display` | headings, team abbreviations, scores, uppercase labels |
 
-```css
-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-             'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
-```
+**Numbers**: any figure that updates in place — scores, clocks, points, PPM —
+must carry `tabular-nums`, or the digits jitter on every refresh.
 
-The Inter font is applied globally to the body element and provides excellent readability at all sizes.
-
-### 3.2 Type Scale
-
-| Usage | Tailwind Classes | Size | Weight | Line Height | Example Context |
-|-------|-----------------|------|--------|-------------|-----------------|
-| **H1 (Page Title)** | `text-3xl md:text-4xl font-bold` | 30px / 36px | 700 (bold) | tight | "Repêchage 2024", "Historique des Échanges" |
-| **H2 (Section Title)** | `text-2xl font-bold` | 24px | 700 (bold) | tight | "Activité en Direct", "Dernier Échange" |
-| **H3 (Card Title)** | `text-xl font-semibold` | 20px | 600 (semibold) | normal | Card headers, subsection titles |
-| **H4 (Subsection)** | `text-lg font-semibold` | 18px | 600 (semibold) | normal | Small subsections |
-| **Body Large** | `text-base` | 16px | 400 (normal) | relaxed | Hero descriptions, important content |
-| **Body Default** | `text-sm` | 14px | 400 (normal) | normal | General body text, paragraphs |
-| **Body Small** | `text-xs` | 12px | 400 (normal) | normal | Captions, metadata, timestamps |
-| **Label** | `text-sm font-medium` | 14px | 500 (medium) | normal | Form labels, component labels |
-| **Button Text** | `text-sm font-medium` | 14px | 500 (medium) | normal | Button labels |
-
-### 3.3 Text Color Guidelines
-
-| Usage | Semantic Class | Alternative | When to Use |
-|-------|---------------|-------------|-------------|
-| **Primary Text** | `text-foreground` | `text-gray-900` | Main content, headings |
-| **Secondary Text** | `text-muted-foreground` | `text-gray-600` | Descriptions, supporting text |
-| **Tertiary Text** | `text-muted-foreground` | `text-gray-500` | Captions, timestamps, metadata |
-| **Inverted Text** | `text-primary-foreground` | `text-white` | Text on dark backgrounds |
-| **Link Text** | `text-primary` | - | Interactive links |
-| **Success Text** | `text-green-600` | - | Success messages, positive states |
-| **Error Text** | `text-destructive` | `text-red-600` | Error messages, validation errors |
-| **Warning Text** | `text-yellow-600` | - | Warning messages, cautionary text |
-
-**Preference:** Always use semantic classes first (`text-foreground`, `text-muted-foreground`) before falling back to color-specific classes.
-
-### 3.4 Typography Issues Found
-
-*(To be populated during audit)*
+**Uppercase labels**: `font-display text-xs font-semibold uppercase tracking-wider
+text-muted-foreground` is the standard section-label recipe.
 
 ---
 
-## 4. Spacing & Layout
+## 4. Components
 
-### 4.1 Tailwind Spacing Scale
+23 primitives in `client/src/components/ui/`:
 
-38BudBud uses Tailwind's default spacing scale where 1 unit = 4px:
+`GoalieIcon`, `alert`, `avatar`, `badge`, `breadcrumb`, `button`, `card`,
+`dialog`, `empty-state`, `error-display`, `form`, `input`, `label`, `loading`,
+`pagination`, `select`, `sheet`, `skeleton`, `stat-tooltip`, `table`, `tabs`,
+`team-dg-tooltip`, `textarea`, `toast`, `toaster`.
 
-`0`, `1` (4px), `2` (8px), `3` (12px), `4` (16px), `6` (24px), `8` (32px), `12` (48px), `16` (64px), `20` (80px), `24` (96px), `32` (128px), `40` (160px), `48` (192px), `64` (256px)
+That is the whole list. There is no accordion, checkbox, switch, slider,
+calendar, popover, tooltip, dropdown-menu, separator, scroll-area, progress,
+chart, carousel, command, or menubar — add the shadcn primitive properly if you
+need one rather than hand-rolling it.
 
-### 4.2 Page-Level Spacing
+**`EmptyState`** (`components/ui/empty-state.tsx`) is the shared empty
+treatment: a Lucide icon at 30% opacity above a muted message, with an optional
+hint line. Use it instead of adding a new variant.
 
-| Element | Spacing Value | Tailwind Class | Notes |
-|---------|--------------|----------------|-------|
-| **Page Top Padding** | 80px | `pt-20` | Accounts for fixed navigation height |
-| **Page Bottom Padding** | 48px | `pb-12` | Consistent footer spacing |
-| **Section Vertical Padding** | 64px | `py-16` | Large sections (hero, feature sections) |
-| **Container Max Width** | 1280px | `max-w-7xl` | Standard content container |
-| **Container Horizontal Padding** | 16px / 24px / 32px | `px-4 sm:px-6 lg:px-8` | Responsive horizontal padding |
+### Structure
 
-### 4.3 Component-Level Spacing
+Per `CLAUDE.md`: one component per file; feature folders under `components/`;
+when a feature grows past one file, create a named lowercase subfolder where the
+parent is a thin wrapper that fetches data and owns loading/empty/error states,
+and the children are pure and take props. `components/home/tonight/` is the
+reference example.
 
-| Component | Internal Padding | Notes |
-|-----------|------------------|-------|
-| **Card** | `p-6` | Standard card padding (24px) |
-| **Card Header** | `p-6` | Consistent with card |
-| **Card Content** | `p-6 pt-0` | Top padding removed if header exists |
-| **Button (default)** | `px-4 py-2` | Horizontal 16px, vertical 8px |
-| **Button (sm)** | `px-3 h-9` | Small button size |
-| **Button (lg)** | `px-8 h-11` | Large button size |
-| **Input** | `px-3 py-2` | Form input padding |
-| **Badge** | `px-2.5 py-0.5` | Small badge padding |
-
-| Element | External Margin | Notes |
-|---------|----------------|-------|
-| **Section Title (H2)** | `mb-6` | 24px bottom margin |
-| **Card Title (H3)** | `mb-2` | 8px bottom margin |
-| **Paragraph** | `mb-4` | 16px between paragraphs |
-| **Form Field** | `mb-4` | Space between form fields |
-
-### 4.4 Layout Spacing
-
-| Usage | Gap/Space | Tailwind Class |
-|-------|-----------|----------------|
-| **Card Grid** | 16px / 24px | `gap-4 md:gap-6` |
-| **Form Fields** | 16px | `gap-4` or `space-y-4` |
-| **Inline Elements** | 8px | `gap-2` or `space-x-2` |
-| **Button Groups** | 8px | `gap-2` |
-| **List Items** | 12px | `gap-3` or `space-y-3` |
-
-### 4.5 Spacing Issues Found
-
-*(To be populated during audit)*
+Pure logic belongs outside components. `components/scores/gameState.ts` holds
+every interpretation of NHL game state (`formatGameState`, `getGameStatus`,
+`getWinners`, `sortGamesByPriority`, `hasLiveGame`) so the ticker and the home
+scoreboard cannot drift apart.
 
 ---
 
-## 5. Component Library Reference
+## 5. Layout & spacing
 
-### 5.1 Overview
+- Container: `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`
+- Card padding: `p-6` (shadcn default); dense scoreboard cards use `p-3`
+- Grid gaps: `gap-6` for page-level grids, `gap-2` for dense card rails
+- Mobile-first: every layout must be checked at 375 / 768 / 1024 / 1440
 
-38BudBud uses 50+ UI primitives from shadcn/ui, built on Radix UI primitives with Tailwind styling.
-
-**Location:** `client/src/components/ui/`
-
-### 5.2 Core Components
-
-#### Layout Components
-- **Card** - Container for grouped content
-- **Separator** - Visual divider between sections
-- **Scroll Area** - Scrollable container with custom scrollbar
-
-#### Typography Components
-- **Label** - Form field labels
-- **Badge** - Status indicators, tags, counts
-
-#### Form Components
-- **Button** - Interactive actions
-- **Input** - Text input fields
-- **Textarea** - Multi-line text input
-- **Select** - Dropdown selection
-- **Checkbox** - Boolean selection
-- **Radio Group** - Single selection from multiple options
-- **Switch** - Toggle switch
-- **Slider** - Range selection
-- **Calendar** - Date picker
-
-#### Feedback Components
-- **Alert** - Informational messages
-- **Alert Dialog** - Modal confirmations
-- **Dialog** - Modal windows
-- **Drawer** - Side panel
-- **Sheet** - Slide-in panel
-- **Toast** - Temporary notifications
-- **Loading** - Loading indicators
-- **Error Display** - Error messages with retry
-
-#### Navigation Components
-- **Tabs** - Tabbed content
-- **Breadcrumb** - Page hierarchy navigation
-- **Navigation Menu** - Main navigation
-- **Menubar** - Application menu bar
-- **Dropdown Menu** - Context menus
-- **Context Menu** - Right-click menus
-- **Command** - Command palette
-
-#### Data Display Components
-- **Table** - Tabular data display
-- **Avatar** - User profile images
-- **Chart** - Data visualizations
-- **Carousel** - Image/content carousel
-- **Progress** - Progress indicators
-- **Skeleton** - Loading placeholders
-
-#### Overlay Components
-- **Popover** - Floating content
-- **Tooltip** - Hover information
-- **Hover Card** - Hover details
-
-*(Detailed component documentation to be added during audit)*
+**Breakpoint discipline**: inline nav links appear at `lg`, so the mobile menu
+must be `lg:hidden` — not `md:hidden`. Mismatching those two left 768–1023px
+with no navigation at all for some time.
 
 ---
 
-## 6. Component Usage Patterns
+## 6. Motion
 
-### 6.1 Card Patterns
+Three animations survive, defined in `index.css`: `fadeIn`, `slideUp`, and
+Tailwind's `animate-ping` for the live pulse. All decorative motion (`float`,
+`glowPulse`, `iceDrift`, `shimmer`) has been removed.
 
-#### Standard Card with Header and Content
-```tsx
-<Card>
-  <CardHeader>
-    <CardTitle>Card Title</CardTitle>
-    <CardDescription>Supporting description text</CardDescription>
-  </CardHeader>
-  <CardContent>
-    Main card content goes here
-  </CardContent>
-</Card>
-```
-
-#### Stat Card Pattern
-```tsx
-<Card>
-  <CardContent className="p-6 text-center">
-    <Icon className="w-8 h-8 text-primary mx-auto mb-2" />
-    <div className="text-2xl font-bold text-foreground">{value}</div>
-    <div className="text-sm text-muted-foreground">{label}</div>
-  </CardContent>
-</Card>
-```
-
-### 6.2 Badge Patterns
-
-#### Status Badges
-```tsx
-// Use semantic variants, not hardcoded colors
-<Badge variant="default">Completed</Badge>
-<Badge variant="secondary">Pending</Badge>
-<Badge variant="destructive">Cancelled</Badge>
-<Badge variant="outline">Draft</Badge>
-```
-
-#### Info Badges
-```tsx
-<Badge variant="outline">{count} items</Badge>
-<Badge className="bg-primary text-primary-foreground">New</Badge>
-```
-
-### 6.3 Button Patterns
-
-```tsx
-// Primary action
-<Button variant="default">Save Changes</Button>
-
-// Secondary action
-<Button variant="outline">Cancel</Button>
-
-// Destructive action
-<Button variant="destructive">Delete</Button>
-
-// Tertiary action
-<Button variant="ghost">Skip</Button>
-
-// Link-style button
-<Button variant="link">Learn More</Button>
-```
-
-### 6.4 Table Patterns
-
-```tsx
-<Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead>Name</TableHead>
-      <TableHead>Position</TableHead>
-      <TableHead className="text-right">Points</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {data.map((row) => (
-      <TableRow key={row.id}>
-        <TableCell className="font-medium">{row.name}</TableCell>
-        <TableCell>{row.position}</TableCell>
-        <TableCell className="text-right">{row.points}</TableCell>
-      </TableRow>
-    ))}
-  </TableBody>
-</Table>
-```
-
-### 6.5 Form Patterns
-
-```tsx
-<div className="space-y-2">
-  <Label htmlFor="username">Username</Label>
-  <Input
-    id="username"
-    placeholder="Enter your username"
-    aria-describedby="username-error"
-  />
-  {error && (
-    <p id="username-error" className="text-sm text-destructive">
-      {error.message}
-    </p>
-  )}
-</div>
-```
-
-### 6.6 Loading & Error Patterns
-
-#### Loading State
-```tsx
-import Loading from '@/components/ui/loading';
-
-if (isLoading) {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Loading />
-    </div>
-  );
-}
-```
-
-#### Error State
-```tsx
-import { ErrorDisplay } from '@/components/ui/error-display';
-
-if (error) {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <ErrorDisplay
-        error={error}
-        onRetry={() => window.location.reload()}
-      />
-    </div>
-  );
-}
-```
+Every animation must be disabled under `prefers-reduced-motion: reduce`.
+Interactive transitions are declared with explicit `transition-property` and a
+single `transition-duration`; never use the `transition: a, b, c 0.2s` shorthand,
+which silently applies the duration to the last property only.
 
 ---
 
-## 7. Responsive Design Guidelines
+## 7. Known exceptions
 
-### 7.1 Breakpoint System
+These predate v2.0 and are scheduled for follow-up, not endorsed:
 
-Tailwind's default breakpoints:
+- Roughly 300 hardcoded Tailwind palette utilities remain in feature components
+  (tables, badges, tooltips, playoff bracket).
+- `bilan` heatmap cells use hardcoded `#2563eb` / `#60a5fa`.
+- Division banners use blue (Nord) and red (Sud); this arguably encodes a real
+  distinction and may survive review.
+- Four empty states have not yet been migrated onto `EmptyState`.
 
-| Breakpoint | Min Width | Device Target |
-|------------|-----------|---------------|
-| `sm:` | 640px | Mobile landscape, small tablet |
-| `md:` | 768px | Tablet portrait |
-| `lg:` | 1024px | Desktop, tablet landscape |
-| `xl:` | 1280px | Large desktop |
-| `2xl:` | 1536px | Extra large desktop |
-
-### 7.2 Mobile-First Approach
-
-Always design for mobile first, then progressively enhance for larger screens:
-
-```tsx
-// ✅ Good: Mobile-first
-<div className="px-4 sm:px-6 lg:px-8">
-
-// ❌ Bad: Desktop-first with arbitrary values
-<div className="px-8 max-sm:px-4">
-```
-
-### 7.3 Responsive Patterns
-
-#### Container Padding Progression
-```tsx
-className="px-4 sm:px-6 lg:px-8"
-// Mobile: 16px → Tablet: 24px → Desktop: 32px
-```
-
-#### Grid Layout Progression
-```tsx
-className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-// Mobile: 1 column → Tablet: 2 columns → Desktop: 3 columns
-```
-
-#### Typography Scaling
-```tsx
-className="text-3xl md:text-4xl lg:text-5xl"
-// Mobile: 30px → Tablet: 36px → Desktop: 48px
-```
-
-#### Visibility Toggles
-```tsx
-className="hidden md:block"  // Hide on mobile, show on tablet+
-className="block md:hidden"  // Show on mobile, hide on tablet+
-```
-
-### 7.4 Responsive Issues Found
-
-*(To be populated during audit)*
-
----
-
-## 8. Accessibility Standards
-
-### 8.1 Color Contrast
-
-**WCAG 2.1 Level AA Requirements:**
-- **Normal text:** Minimum 4.5:1 contrast ratio
-- **Large text (18px+ or 14px+ bold):** Minimum 3:1 contrast ratio
-- **UI components and graphics:** Minimum 3:1 contrast ratio
-
-All color combinations in this design system meet or exceed these requirements.
-
-### 8.2 Keyboard Navigation
-
-All interactive elements must be:
-- **Focusable:** Accessible via Tab key
-- **Activatable:** Work with Enter/Space keys
-- **Visible:** Clear focus indicators
-- **Logical:** Tab order follows visual order
-
-**Global Focus Styles:**
-```css
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-}
-```
-
-Component-level focus styles use `focus-visible:ring-2 focus-visible:ring-ring`.
-
-### 8.3 Semantic HTML
-
-Use proper HTML elements:
-- `<nav>` for navigation sections
-- `<main>` for primary content
-- `<article>` for independent content
-- `<section>` for thematic grouping
-- `<button>` for actions, `<a>` for navigation
-- Proper heading hierarchy (h1 → h2 → h3, no skipping)
-
-### 8.4 ARIA Attributes
-
-Use ARIA attributes when semantic HTML isn't sufficient:
-
-| Attribute | When to Use | Example |
-|-----------|-------------|---------|
-| `aria-label` | Icon-only buttons | `<button aria-label="Close">✕</button>` |
-| `aria-describedby` | Associate descriptions | `<input aria-describedby="error-msg">` |
-| `aria-live` | Dynamic content | `<div aria-live="polite">` |
-| `aria-expanded` | Collapsible content | `<button aria-expanded="false">` |
-| `aria-selected` | Selected items | `<div role="tab" aria-selected="true">` |
-
-### 8.5 Accessibility Issues Found
-
-*(To be populated during audit)*
-
----
-
-## 9. Animation & Transitions
-
-### 9.1 Custom Animations
-
-Defined in `client/src/index.css`:
-
-#### Fade In
-```css
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-```
-
-#### Slide Up
-```css
-.animate-slide-up {
-  animation: slideUp 0.5s ease-out;
-}
-```
-
-#### Float
-```css
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-```
-
-### 9.2 Transition Standards
-
-All interactive elements have smooth transitions:
-
-```css
-button, input, select, textarea, a {
-  transition: all 0.2s ease-in-out;
-}
-```
-
-### 9.3 Glassmorphism Effect
-
-For special UI elements:
-
-```css
-.glassmorphism {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-```
-
----
-
-## 10. Best Practices
-
-### 10.1 Component Development
-
-1. **Use Semantic Tokens**
-   - Always prefer semantic color tokens over hardcoded values
-   - Ensures automatic dark mode support
-
-2. **Follow Established Patterns**
-   - Reference this design system for all UI decisions
-   - Don't reinvent components that already exist
-
-3. **Maintain Consistency**
-   - Use standard spacing (p-6 for cards)
-   - Follow typography scale
-   - Apply consistent responsive patterns
-
-4. **Test Responsiveness**
-   - Test all components on mobile, tablet, and desktop
-   - Ensure touch targets are at least 44×44px
-
-5. **Ensure Accessibility**
-   - Add proper ARIA labels
-   - Test keyboard navigation
-   - Verify color contrast
-
-### 10.2 Code Organization
-
-1. **Component Location**
-   - UI primitives: `client/src/components/ui/`
-   - Feature components: `client/src/components/[feature]/`
-   - Pages: `client/src/pages/`
-
-2. **Naming Conventions**
-   - PascalCase for components
-   - camelCase for functions and variables
-   - kebab-case for file names (if not components)
-
-3. **Import Organization**
-   - UI components from `@/components/ui`
-   - Feature components from `@/components/[feature]`
-   - Use path alias `@/*` for imports
-
----
-
-## 11. Approved Exceptions
-
-The following hardcoded color usages are intentional and approved:
-
-### Hero Section Gradient
-**File:** `client/src/components/HeroSection.tsx`
-
-`bg-slate-950` and `from-slate-900` are approved for the hero section dark backdrop. This is a deliberate full-bleed dark treatment that semantic tokens (`bg-background`) cannot replicate in both light and dark modes.
-
----
-
-## Appendix
-
-### Related Documentation
-- [UI/UX Documentation](./UI_UX_doc.md) - High-level UX flows
-- [Project Structure](./project_structure.md) - File organization
-- [Implementation Plan](./Implementation.md) - Development roadmap
-- [Design System Cheatsheet](./Design_System_Cheatsheet.md) - Quick reference
-
-### Maintenance
-
-This design system should be updated when:
-- New UI components are added
-- Design patterns evolve
-- Accessibility requirements change
-- New features require new patterns
-
-**Last Comprehensive Audit:** 2026-01-11
+New code does not get to add to this list.

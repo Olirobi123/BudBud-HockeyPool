@@ -68,8 +68,8 @@ This is an **npm workspaces monorepo** with `client/` and `server/` as separate 
 
 Before implementing features, consult in this order:
 1. `/Docs/Bug_tracking.md` - Check for known issues first
-2. `/Docs/Implementation.md` - Current stage tasks and implementation plan
-3. `/Docs/project_structure.md` - File naming and folder structure
+2. `/Docs/Design_System.md` - Design tokens, colour rules, component inventory
+3. `/Docs/Design_System_Cheatsheet.md` - Quick reference for the above
 4. `/Docs/UI_UX_doc.md` - Design system and responsive requirements
 5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (12 tables)
 6. `/Docs/Cron_Jobs.md` - Cron schedule, manual playoff actions, and endpoint reference
@@ -161,4 +161,6 @@ When promoting `dev` to `main`:
 
 ## Current Development Status
 
-The project follows a 5-stage refactoring plan. Stages 1-4 are complete (all phases including Awards and Frontend). Stage 5 (Polish, Testing & Optimization) is next. Check `/Docs/Implementation.md` for current tasks and their status.
+The project follows a 5-stage refactoring plan. Stages 1-4 are complete (all phases including Awards and Frontend). Stage 5 (Polish, Testing & Optimization) is next.
+
+The UI is on **Design System v2.0** — a monochrome dashboard where the chrome carries no hue and colour is reserved for state. See `/Docs/Design_System.md` before touching any styling; open UI items are tracked in `/Docs/UI_Audit.md`.
