@@ -1,44 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * DESIGN TOKENS — 38BudBud
+ *
+ * Chrome is monochrome. Colour is reserved for state, and every hue
+ * encodes exactly one meaning:
+ *   --live        red    → in progress, right now
+ *   --destructive red    → error, injury
+ *   --positive    green  → gain, positive delta
+ *   --negative    red    → loss, negative delta
+ *
+ * Before adding colour, ask what state it encodes. If the answer is
+ * "it looks nice" or "it's the brand colour", use a grey instead.
+ *
+ * See /Docs/Design_System.md
+ */
 :root {
+  /* --- Surfaces & ink (greyscale only) --- */
   --background: 0 0% 100%; /* #FFFFFF */
-  --foreground: 220 26% 14%; /* #1C2B33 */
-  --muted: 210 40% 96%; /* #F1F5F9 */
-  --muted-foreground: 215 16% 47%; /* #64748B */
-  --popover: 0 0% 100%; /* #FFFFFF */
-  --popover-foreground: 220 26% 14%; /* #1C2B33 */
+  --foreground: 0 0% 4%; /* #0A0A0A */
   --card: 0 0% 100%; /* #FFFFFF */
-  --card-foreground: 220 26% 14%; /* #1C2B33 */
-  --border: 214 32% 91%; /* #E2E8F0 */
-  --input: 214 32% 91%; /* #E2E8F0 */
-  --primary: 217 91% 60%; /* #3B82F6 - Hockey blue */
-  --primary-foreground: 210 20% 98%; /* #F8FAFC */
-  --secondary: 215 20% 65%; /* #94A3B8 */
-  --secondary-foreground: 220 26% 14%; /* #1C2B33 */
-  --accent: 6 78% 57%; /* #EF4444 - Hockey red */
-  --accent-foreground: 210 20% 98%; /* #F8FAFC */
-  --destructive: 0 84% 60%; /* #EF4444 */
-  --destructive-foreground: 210 20% 98%; /* #F8FAFC */
-  --success: 142 76% 36%; /* #22C55E - Green for active/live indicators */
-  --success-foreground: 210 20% 98%; /* #F8FAFC */
-  --ring: 217 91% 60%; /* #3B82F6 */
-  --radius: 0.5rem;
-  
-  /* Hockey-themed color variables */
-  --hockey-blue: 217 91% 60%; /* #3B82F6 */
-  --hockey-blue-dark: 213 94% 68%; /* #2563EB */
-  --hockey-red: 6 78% 57%; /* #EF4444 */
-  --hockey-red-dark: 0 84% 60%; /* #DC2626 */
-  --ice-blue: 199 89% 48%; /* #0EA5E9 */
-  --slate-dark: 215 28% 17%; /* #1E293B */
-  
-  --gray-50: 210 20% 98%; /* #F9FAFB */
-  --gray-900: 220 39% 11%; /* #111827 */
+  --card-foreground: 0 0% 4%; /* #0A0A0A */
+  --popover: 0 0% 100%; /* #FFFFFF */
+  --popover-foreground: 0 0% 4%; /* #0A0A0A */
+  --muted: 0 0% 96%; /* #F5F5F5 */
+  --muted-foreground: 240 4% 46%; /* #52525B */
+  --border: 240 6% 90%; /* #E4E4E7 */
+  --input: 240 6% 90%; /* #E4E4E7 */
+
+  /* --- Interactive (greyscale only) --- */
+  --primary: 0 0% 9%; /* #171717 */
+  --primary-foreground: 0 0% 98%; /* #FAFAFA */
+  --secondary: 0 0% 96%; /* #F5F5F5 */
+  --secondary-foreground: 0 0% 9%; /* #171717 */
+  --accent: 0 0% 96%; /* #F5F5F5 — hover surface, no hue */
+  --accent-foreground: 0 0% 9%; /* #171717 */
+  --ring: 0 0% 4%; /* #0A0A0A */
+
+  --radius: 0.375rem;
+
+  /* --- State colours. One hue, one meaning. Never used on chrome. --- */
+  --live: 358 77% 50%; /* #E11D26 — in progress */
+  --live-foreground: 0 0% 98%; /* #FAFAFA */
+  --destructive: 358 70% 45%; /* #C4222A — error, injury */
+  --destructive-foreground: 0 0% 98%; /* #FAFAFA */
+  --positive: 142 60% 30%; /* #1F7A3D — gain */
+  --negative: 358 70% 45%; /* #C4222A — loss */
 }
 
 @layer base {
@@ -47,25 +56,24 @@
   }
 
   body {
-    @apply font-inter antialiased bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+    @apply font-sans antialiased bg-background text-foreground;
   }
 }
 
 @layer utilities {
-  .font-inter {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', sans-serif;
+  .font-display {
+    font-family: 'Oswald', 'Inter', sans-serif;
   }
 
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera */
+    display: none; /* Chrome, Safari, Opera */
   }
-  
+
   .animate-fade-in {
     animation: fadeIn 0.5s ease-in-out;
   }
@@ -74,159 +82,18 @@
     animation: fadeIn 0.6s ease-out forwards;
     opacity: 0;
   }
-  
+
   .animate-slide-up {
     animation: slideUp 0.5s ease-out;
   }
-  
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  
-  .backdrop-blur-sm {
-    backdrop-filter: blur(4px);
-  }
-  
-  .glassmorphism {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .font-display {
-    font-family: 'Oswald', 'Inter', sans-serif;
-  }
-
-  .animate-shimmer {
-    animation: shimmer 2.5s ease-in-out infinite;
-  }
-
-  .animate-glow-pulse {
-    animation: glowPulse 3s ease-in-out infinite;
-  }
-
-  .animate-ice-drift {
-    animation: iceDrift 20s linear infinite;
-  }
-
-  .animate-stagger-1 { animation-delay: 0.1s; }
-  .animate-stagger-2 { animation-delay: 0.2s; }
-  .animate-stagger-3 { animation-delay: 0.3s; }
-  .animate-stagger-4 { animation-delay: 0.4s; }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-in,
     .animate-fadeIn,
-    .animate-slide-up,
-    .animate-float,
-    .animate-shimmer,
-    .animate-glow-pulse,
-    .animate-ice-drift,
-    .ticker-scroll,
-    .animate-stagger-1,
-    .animate-stagger-2,
-    .animate-stagger-3,
-    .animate-stagger-4 {
+    .animate-slide-up {
       animation: none;
       opacity: 1;
       transform: none;
-    }
-  }
-
-  /* Navbar glass effect — only transition background + box-shadow,
-     NOT backdrop-filter (it causes white flashes on toggle) */
-  .nav-glass,
-  .nav-glass-scrolled {
-    backdrop-filter: blur(18px) saturate(1.8);
-    -webkit-backdrop-filter: blur(18px) saturate(1.8);
-    transition: background-color 0.5s ease-out, box-shadow 0.5s ease-out;
-  }
-
-  .nav-glass {
-    background-color: rgba(12, 18, 34, 0.85);
-    box-shadow: none;
-  }
-
-  .nav-glass-scrolled {
-    background-color: rgba(12, 18, 34, 0.95);
-    box-shadow:
-      0 1px 0 0 rgba(6, 182, 212, 0.08),
-      0 4px 24px -4px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Ticker strip */
-  .ticker-strip {
-    background: linear-gradient(180deg, #0f172a 0%, #0e1525 100%);
-    border-bottom: 1px solid rgba(6, 182, 212, 0.08);
-  }
-
-  /* Ticker auto-scroll animation */
-  .ticker-scroll {
-    animation: tickerScroll var(--ticker-duration, 40s) linear infinite;
-  }
-
-  .ticker-scroll:hover {
-    animation-play-state: paused;
-  }
-
-  /* Live game card glow */
-  .game-card-live {
-    box-shadow:
-      0 0 12px rgba(239, 68, 68, 0.15),
-      inset 0 1px 0 rgba(239, 68, 68, 0.1);
-  }
-
-  .game-card-live:hover {
-    box-shadow:
-      0 0 20px rgba(239, 68, 68, 0.25),
-      inset 0 1px 0 rgba(239, 68, 68, 0.15);
-  }
-
-  .text-glow-cyan {
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.5), 0 0 40px rgba(6, 182, 212, 0.2);
-  }
-
-  .border-glow-cyan {
-    box-shadow: 0 0 15px rgba(6, 182, 212, 0.15), inset 0 0 15px rgba(6, 182, 212, 0.05);
-  }
-
-  .hero-ice-bg {
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(6, 182, 212, 0.15), transparent),
-      radial-gradient(ellipse 60% 40% at 80% 50%, rgba(59, 130, 246, 0.1), transparent),
-      radial-gradient(ellipse 50% 60% at 10% 80%, rgba(99, 102, 241, 0.08), transparent),
-      linear-gradient(180deg, #0c1222 0%, #111827 50%, #0f172a 100%);
-  }
-
-  .rink-lines {
-    background-image:
-      linear-gradient(90deg, transparent 49.5%, rgba(6, 182, 212, 0.06) 49.5%, rgba(6, 182, 212, 0.06) 50.5%, transparent 50.5%),
-      linear-gradient(0deg, transparent 49.5%, rgba(6, 182, 212, 0.04) 49.5%, rgba(6, 182, 212, 0.04) 50.5%, transparent 50.5%);
-    background-size: 120px 120px;
-  }
-
-  .hero-gradient-overlay {
-    background:
-      linear-gradient(to right,
-        rgba(12,18,34,0.92) 0%, rgba(12,18,34,0.88) 25%,
-        rgba(12,18,34,0.72) 50%, rgba(12,18,34,0.60) 70%,
-        rgba(12,18,34,0.55) 100%),
-      linear-gradient(to bottom,
-        rgba(12,18,34,0.4) 0%, rgba(12,18,34,0.15) 30%,
-        rgba(12,18,34,0.15) 60%, rgba(12,18,34,0.7) 90%,
-        rgba(12,18,34,0.95) 100%);
-  }
-
-  @media (max-width: 1023px) {
-    .hero-gradient-overlay {
-      background:
-        linear-gradient(to right,
-          rgba(12,18,34,0.95) 0%, rgba(12,18,34,0.88) 40%,
-          rgba(12,18,34,0.65) 70%, rgba(12,18,34,0.40) 100%),
-        linear-gradient(to bottom,
-          rgba(12,18,34,0.5) 0%, rgba(12,18,34,0.15) 30%,
-          rgba(12,18,34,0.15) 60%, rgba(12,18,34,0.8) 90%,
-          rgba(12,18,34,0.95) 100%);
     }
   }
 }
@@ -237,88 +104,65 @@
 }
 
 @keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes shimmer {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
-@keyframes glowPulse {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(6, 182, 212, 0.2), 0 0 20px rgba(6, 182, 212, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
-  }
-}
-
-@keyframes iceDrift {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(10px, -10px) rotate(1deg); }
-  50% { transform: translate(-5px, 5px) rotate(-0.5deg); }
-  75% { transform: translate(-10px, -5px) rotate(0.5deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
-@keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes scoreFlash {
-  0%, 100% { color: #ffffff; }
-  50% { color: #fbbf24; }
 }
 
 /* Custom scrollbar — Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(215 28% 17%) hsl(var(--muted));
+  scrollbar-color: hsl(var(--border)) transparent;
 }
 
 /* Custom scrollbar — Chrome/Safari */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(215 28% 17%);
+  background: hsl(var(--border));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(217 33% 10%);
+  background: hsl(var(--muted-foreground));
 }
 
-/* Smooth transitions for all interactive elements */
+/*
+ * Interactive transitions.
+ * Note: this was previously written as a single shorthand
+ * `transition: color, background-color, ..., opacity 0.2s ease-in-out`,
+ * where only `opacity` actually received a duration. (UI_Audit P0)
+ */
 button, input, select, textarea, a {
-  transition: color, background-color, border-color, box-shadow, opacity 0.2s ease-in-out;
+  transition-property: color, background-color, border-color, box-shadow, opacity;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button, input, select, textarea, a {
+    transition-duration: 0.01ms;
+  }
 }
 
 /* Focus styles */
-button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 2px solid hsl(var(--primary));
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
