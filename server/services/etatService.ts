@@ -1,7 +1,8 @@
-import { NHLClient, getCurrentSeasonId } from '@olirobi/nhl_api_client';
+import { NHLClient } from '@olirobi/nhl_api_client';
 import pool from '../config/database';
 import { QUERIES, TABLES } from '../models';
 import { EtatInfo, Last5GameSnapshot } from '../types';
+import { getCurrentSeasonStartDate } from './seasonHelper';
 
 export class EtatService {
   async getEtat(): Promise<Record<number, EtatInfo>> {
@@ -42,9 +43,7 @@ export class EtatService {
 
     type InsertRow = [number, string, number | null, number | null, number | null, number | null, string];
 
-    const seasonId = getCurrentSeasonId();
-    const seasonStartYear = Math.floor(seasonId / 10000);
-    const CURRENT_SEASON_START = new Date(`${seasonStartYear}-10-01`);
+    const CURRENT_SEASON_START = new Date(getCurrentSeasonStartDate());
 
     const classifyPlayer = async (player: { nhl_player_id: number; position: string }): Promise<InsertRow | null> => {
       const stats = await nhlClient.players.get(player.nhl_player_id).stats();
