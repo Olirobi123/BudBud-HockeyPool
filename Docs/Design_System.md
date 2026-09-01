@@ -165,12 +165,12 @@ text-muted-foreground` is the standard section-label recipe.
 
 ## 4. Components
 
-23 primitives in `client/src/components/ui/`:
+26 primitives in `client/src/components/ui/`:
 
 `GoalieIcon`, `alert`, `avatar`, `badge`, `breadcrumb`, `button`, `card`,
-`dialog`, `empty-state`, `error-display`, `form`, `input`, `label`, `loading`,
-`pagination`, `select`, `sheet`, `skeleton`, `stat-tooltip`, `table`, `tabs`,
-`team-dg-tooltip`, `textarea`, `toast`, `toaster`.
+`dialog`, `empty-state`, `error-display`, `form`, `input`, `label`, `page-header`,
+`pagination`, `rank-badge`, `select`, `sheet`, `skeleton`, `stat-tooltip`, `table`,
+`tabs`, `team-dg-tooltip`, `textarea`, `toast`, `toaster`.
 
 That is the whole list. There is no accordion, checkbox, switch, slider,
 calendar, popover, tooltip, dropdown-menu, separator, scroll-area, progress,
@@ -209,7 +209,44 @@ with no navigation at all for some time.
 
 ---
 
-## 6. Motion
+## 6. Loading states
+
+**The shell never blocks.** There is no global loading overlay and no
+full-page spinner — `LoadingProvider`, `usePageLoading` and the `Loading`
+component were all removed. A page mounts its `<Layout>` on the first frame,
+so navigation, the ticker and the page header are usable while data is still
+in flight.
+
+Inside the layout, the content region renders a skeleton:
+
+```tsx
+<Layout>
+  <PageHeader title="Échanges" subtitle="Historique des transactions" />
+  {isLoading && <EchangeListSkeleton />}
+  {!isLoading && error !== null && <ErrorDisplay error={error} … />}
+  {!isLoading && error === null && <EchangeList echanges={filtered} />}
+</Layout>
+```
+
+Rules:
+
+- **A skeleton mirrors the real layout.** Same card count, same column widths,
+  same row heights — its whole job is to stop the page jumping when data
+  lands. Name it `<Feature>Skeleton.tsx` and put it beside the component it
+  stands in for.
+- **Errors stay inside the layout too.** An error is not a reason to throw
+  away the nav.
+- **Render what you already know.** Static content does not wait on a fetch:
+  the Québec map draws immediately and only its team counts are deferred.
+- **Never show a zero you have not measured.** A count that reads `0` during
+  load is a wrong answer, not a placeholder — show `—` or a skeleton.
+- **Watch disabled queries.** A TanStack query with `enabled: false` reports
+  `isLoading: false`, so a page keyed off a second fetch can flash an empty
+  state. Fold the gating query's own loading flag in.
+
+---
+
+## 7. Motion
 
 Three animations survive, defined in `index.css`: `fadeIn`, `slideUp`, and
 Tailwind's `animate-ping` for the live pulse. All decorative motion (`float`,
@@ -222,7 +259,7 @@ which silently applies the duration to the last property only.
 
 ---
 
-## 7. Known exceptions
+## 8. Known exceptions
 
 These predate v2.0 and are scheduled for follow-up, not endorsed:
 

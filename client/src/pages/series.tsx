@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useSeries } from '@/hooks/series/useSeries';
-import { usePageLoading } from '@/hooks/usePageLoading';
 
 // First year playoffs were tracked; upper bound = current season end year
 const FIRST_YEAR = 2023;
@@ -56,7 +55,6 @@ export default function Series(): JSX.Element {
   const [selectedYear, setSelectedYear] = useState<number>(LAST_YEAR);
   const saison = yearToSaison(selectedYear);
   const { data, isLoading, error } = useSeries(saison);
-  usePageLoading({ dependencies: [isLoading] });
 
   return (
     <Layout bgClassName="bg-background" mainPadding="py-12">

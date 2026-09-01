@@ -1,8 +1,6 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { queryClient } from '@/lib/queryClient';
-import { LoadingProvider, useLoading } from '@/lib/loading-context';
-import Loading from '@/components/ui/loading';
 
 // Import des pages
 import Home from '@/pages/home';
@@ -15,50 +13,35 @@ import Series from '@/pages/series';
 import Bilan from '@/pages/bilan';
 import NotFound from '@/pages/not-found';
 
-function LoadingOverlay() {
-  const { isPageLoading } = useLoading();
-
-  if (!isPageLoading) return null;
-
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background">
-      <Loading className="min-h-screen" />
-    </div>
-  );
-}
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LoadingProvider>
-        <LoadingOverlay />
-        <BrowserRouter>
-          <Routes>
-            {/* Route principale */}
-            <Route path="/" element={<Home />} />
+      <BrowserRouter>
+        <Routes>
+          {/* Route principale */}
+          <Route path="/" element={<Home />} />
 
-            {/* Routes équipes */}
-            <Route path="/equipes" element={<Equipes />} />
-            <Route path="/equipes/:id" element={<TeamDetails />} />
+          {/* Routes équipes */}
+          <Route path="/equipes" element={<Equipes />} />
+          <Route path="/equipes/:id" element={<TeamDetails />} />
 
-            {/* Autres pages */}
-            <Route path="/draft" element={<Draft />} />
-            <Route path="/echanges" element={<Echanges />} />
+          {/* Autres pages */}
+          <Route path="/draft" element={<Draft />} />
+          <Route path="/echanges" element={<Echanges />} />
 
-            {/* Route joueurs */}
-            <Route path="/joueur/:id" element={<Joueur />} />
+          {/* Route joueurs */}
+          <Route path="/joueur/:id" element={<Joueur />} />
 
-            {/* Séries éliminatoires */}
-            <Route path="/series" element={<Series />} />
+          {/* Séries éliminatoires */}
+          <Route path="/series" element={<Series />} />
 
-            {/* Bilan de saison */}
-            <Route path="/bilan" element={<Bilan />} />
+          {/* Bilan de saison */}
+          <Route path="/bilan" element={<Bilan />} />
 
-            {/* 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </LoadingProvider>
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }

@@ -60,6 +60,25 @@ rules. Neither goes on a heading, a row background or a points figure, and
 - Check 375 / 768 / 1024 / 1440
 - Inline nav at `lg` ⇒ mobile menu is `lg:hidden`
 
+## Loading
+
+The shell never blocks — there is no global spinner. Mount `<Layout>`
+immediately, skeleton the content region.
+
+```tsx
+<Layout>
+  <PageHeader title="…" subtitle="…" />
+  {isLoading && <FeatureSkeleton />}
+  {!isLoading && error !== null && <ErrorDisplay error={error} … />}
+  {!isLoading && error === null && <Feature … />}
+</Layout>
+```
+
+- Skeleton mirrors the real layout so nothing jumps · name it `<Feature>Skeleton.tsx`
+- Errors render inside the layout too
+- Never render a `0` you have not measured — use `—`
+- `enabled: false` queries report `isLoading: false`; fold in the gating query
+
 ## New component checklist
 
 - [ ] One component per file, PascalCase name matching the export
@@ -67,7 +86,7 @@ rules. Neither goes on a heading, a row background or a points figure, and
 - [ ] Zero hardcoded colours — semantic tokens only
 - [ ] Data fetching lives in the thin wrapper, not the presentational child
 - [ ] Pure logic extracted to a `.ts` module, not trapped in the component
-- [ ] Loading, empty (`EmptyState`) and error states all handled
+- [ ] Loading, empty (`EmptyState`) and error states all handled — **inside** `<Layout>`, never as a full-page block
 - [ ] `tabular-nums` on every figure that can change
 - [ ] Keyboard reachable, `aria-label` on icon-only controls
 - [ ] Responsive at all four breakpoints

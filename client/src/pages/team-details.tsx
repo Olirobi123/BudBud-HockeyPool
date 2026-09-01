@@ -1,11 +1,10 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Users, Trophy, CalendarDays, ArrowLeftRight } from 'lucide-react';
 import Layout from '@/components/Layout';
-import Loading from '@/components/ui/loading';
+import TeamDetailsSkeleton from '@/components/equipes/TeamDetailsSkeleton';
 import { useTeam, useTeamRoster, useTeamLatestTrade, useTeamDraftPicks } from '@/hooks/useTeam';
 import { useInjuries } from '@/hooks/useInjuries';
 import { useEtat } from '@/hooks/useEtat';
-import { usePageLoading } from '@/hooks/usePageLoading';
 import { TeamHeader } from '@/components/equipes/TeamHeader';
 import { TeamRoster } from '@/components/equipes/TeamRoster';
 import { TeamLatestTrade } from '@/components/equipes/TeamLatestTrade';
@@ -27,15 +26,8 @@ export default function TeamDetails() {
   const { data: injuries } = useInjuries();
   const { data: etat } = useEtat();
 
-  // Gestion automatique du loading de la page
-  usePageLoading({ dependencies: [isLoadingTeam] });
-
   if (isLoadingTeam) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading />
-      </div>
-    );
+    return <TeamDetailsSkeleton />;
   }
 
   if (isNaN(idNum) || idNum === 0 || errorTeam || !team) {
@@ -46,7 +38,7 @@ export default function TeamDetails() {
     <Layout>
       {/* Back Button */}
       <Link to="/equipes">
-        <Button variant="ghost" className="mb-6 hover:bg-transparent hover:text-blue-600 pl-0 transition-colors">
+        <Button variant="ghost" className="mb-6 hover:bg-transparent hover:text-foreground pl-0 transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Retour aux équipes
         </Button>

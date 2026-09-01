@@ -26,7 +26,7 @@ This is an **npm workspaces monorepo** with `client/` and `server/` as separate 
 ### Frontend (`client/`)
 - **Entry**: `main.tsx` → `App.tsx` (routing with `react-router-dom` BrowserRouter)
 - **Pages**: `home`, `equipes`, `team-details`, `draft`, `echanges`, `joueur`, `not-found`
-- **State**: TanStack Query for server state, React Context for loading state (`lib/loading-context.tsx`)
+- **State**: TanStack Query for server state. There is no global loading state — each page mounts its `<Layout>` immediately and renders a `*Skeleton` component in its content region while its queries resolve.
 - **Components**: Feature folders under `components/` (draft/, echanges/, equipes/, home/, joueur/, navigation/, player-search/, trophees/)
 - **UI Primitives**: Radix-based components in `components/ui/` (shadcn/ui)
 - **Hooks**: Feature-specific hooks in `hooks/[feature]/` folders; shared hooks at `hooks/` root

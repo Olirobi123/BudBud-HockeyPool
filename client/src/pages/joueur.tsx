@@ -1,14 +1,13 @@
-import { useParams } from "react-router-dom";
-import Loading from '@/components/ui/loading';
+import { useParams } from 'react-router-dom';
+import Layout from '@/components/Layout';
+import JoueurSkeleton from '@/components/joueur/JoueurSkeleton';
 import JoueurLayout from '@/components/joueur/JoueurLayout';
 import { usePlayerDetails } from '@/hooks/usePlayerDetails';
 import { ErrorDisplay } from '@/components/ui/error-display';
-import { usePageLoading } from '@/hooks/usePageLoading';
-import NotFound from "./not-found";
+import NotFound from './not-found';
 
 export default function Joueur() {
   const { id } = useParams();
-  console.log(id)
 
   const {
     data: player,
@@ -16,25 +15,19 @@ export default function Joueur() {
     error,
   } = usePlayerDetails(id || '');
 
-  // Gestion automatique du loading de la page
-  usePageLoading({ dependencies: [isLoading] });
-
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading />
-      </div>
-    );
+    return <JoueurSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <Layout>
         <ErrorDisplay error={error} onRetry={() => window.location.reload()} />
-      </div>
+      </Layout>
     );
   }
-  if (!player){
+
+  if (!player) {
     return <NotFound />;
   }
 
