@@ -154,10 +154,28 @@ When promoting `dev` to `main`:
 
 2. **Merge using "Rebase and merge"** on GitHub — preserves commits and triggers Render/Vercel redeploy correctly. Never use "Squash and merge" (bypasses redeploy).
 
-3. **After merging**, sync dev to match main:
+3. **After merging**, reset dev onto main:
    ```bash
-   git checkout dev && git merge origin/main --no-edit && git push origin dev
+   git checkout dev
+   git fetch origin
+   git reset --hard origin/main
+   git push --force-with-lease origin dev
    ```
+
+   **Reset, not merge.** "Rebase and merge" rewrites every SHA, so after the
+   promotion `dev` still holds the *original* commits while `main` holds their
+   rebased twins. `git merge origin/main` then joins two copies of identical
+   work and every commit appears twice in `dev`'s history. Resetting is safe
+   here precisely because the promotion just replayed all of `dev` onto `main`
+   — the trees are identical, so nothing is lost.
+
+   Confirm that before force-pushing. Both should print nothing:
+   ```bash
+   git diff --stat origin/main origin/dev   # no output = identical content
+   git log --oneline origin/main..origin/dev # no output = nothing unique to dev
+   ```
+   If either prints anything, `dev` has work that did not make it into `main`.
+   Stop and reconcile rather than resetting.
 
 ## Current Development Status
 
