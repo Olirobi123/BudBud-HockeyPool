@@ -7,6 +7,14 @@ interface ApiResponse {
   data: LivePointsResponse;
 }
 
+/**
+ * `livePointsService` caches its response for 10 minutes, so a faster poll
+ * would just re-receive the same payload. Refetching at half the TTL keeps
+ * the worst-case staleness near one cache generation without hammering the
+ * endpoint — most of these requests are served straight from that cache.
+ */
+const REFETCH_INTERVAL_MS = 5 * 60 * 1000;
+
 const fetchLivePoints = async (): Promise<LivePointsResponse> => {
   const response = await fetch(`${BACKEND_URL}/api/live-points`);
   const json: ApiResponse = await response.json();
@@ -21,7 +29,9 @@ export function useLivePoints(): UseQueryResult<LivePointsResponse, Error> {
   return useQuery<LivePointsResponse, Error>({
     queryKey: ['livePoints'],
     queryFn: fetchLivePoints,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: REFETCH_INTERVAL_MS,
+    refetchInterval: REFETCH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
 }
