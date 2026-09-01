@@ -11,6 +11,8 @@
  *   --destructive red    → error, injury
  *   --positive    green  → gain, positive delta
  *   --negative    red    → loss, negative delta
+ *   --rank-*      medal  → finishing position: 1st, 2nd, 3rd
+ *   --division-*  blue   → Nord    / red → Sud
  *
  * Before adding colour, ask what state it encodes. If the answer is
  * "it looks nice" or "it's the brand colour", use a grey instead.
@@ -48,6 +50,34 @@
   --destructive-foreground: 0 0% 98%; /* #FAFAFA */
   --positive: 142 60% 30%; /* #1F7A3D — gain */
   --negative: 358 70% 45%; /* #C4222A — loss */
+
+  /*
+   * --- Podium. Gold / silver / bronze, rank 1-2-3 only. ---
+   * Encodes finishing position, which is data, not decoration. Confined to
+   * the rank badge itself — never a row background, a border or a heading.
+   * `-ink` is the on-fill text colour; the bare token is the ring.
+   */
+  --rank-gold: 43 89% 38%; /* #B7900F */
+  --rank-gold-fill: 45 94% 93%; /* #FDF4DC */
+  --rank-gold-ink: 38 88% 26%; /* #7C5308 */
+  --rank-silver: 215 16% 55%; /* #7A879B */
+  --rank-silver-fill: 214 25% 94%; /* #EDF0F5 */
+  --rank-silver-ink: 215 22% 34%; /* #44546A */
+  --rank-bronze: 24 60% 45%; /* #B86A2E */
+  --rank-bronze-fill: 26 62% 93%; /* #FAEBE0 */
+  --rank-bronze-ink: 22 62% 30%; /* #7B3F1D */
+
+  /*
+   * --- Divisions. Nord is blue, Sud is red. ---
+   * A team's division is a fixed property, so the pair also serves as the
+   * "two sides" palette on a trade card. --division-sud sits deliberately
+   * darker and browner than --live so a division marker never reads as a
+   * live game; keep it off borders and off anything that animates.
+   */
+  --division-nord: 217 91% 60%; /* #3B82F6 — marker/rule */
+  --division-nord-ink: 224 76% 48%; /* #1D4ED8 — text on white */
+  --division-sud: 6 78% 57%; /* #EA4B3B — marker/rule */
+  --division-sud-ink: 6 72% 42%; /* #B82D1E — text on white */
 }
 
 @layer base {

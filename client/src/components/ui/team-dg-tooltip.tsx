@@ -42,7 +42,7 @@ export function TeamDGTooltip({
   // Division-specific colors
   const colors = division === 'sud'
     ? {
-        primary: 'hsl(6 78% 57%)',      // Sud red/orange
+        primary: 'hsl(var(--division-sud))',
         light: 'hsl(6 78% 67%)',
         gradient: 'from-red-500/10 via-transparent to-orange-500/10',
         text: 'text-red-600 dark:text-red-400',
@@ -50,7 +50,7 @@ export function TeamDGTooltip({
         glowBright: 'rgba(239, 68, 68, 0.3)',
       }
     : {
-        primary: 'hsl(217 91% 60%)',    // Nord blue
+        primary: 'hsl(var(--division-nord))',
         light: 'hsl(217 91% 70%)',
         gradient: 'from-blue-500/10 via-transparent to-cyan-500/10',
         text: 'text-blue-600 dark:text-blue-400',

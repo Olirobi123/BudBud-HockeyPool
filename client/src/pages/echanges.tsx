@@ -9,25 +9,28 @@ import Layout from '@/components/Layout';
 import Loading from '@/components/ui/loading';
 import { usePageLoading } from '@/hooks/usePageLoading';
 
-function HeroBanner({ count }: { count: number }) {
+function PageHeader({ count }: { count: number }) {
   return (
-    <div className="bg-slate-950 border-b border-slate-800/60 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-xs uppercase tracking-[0.25em] text-cyan-400 mb-3 font-medium">
-          Ligue 38BudBud
-        </p>
-        <h1 className="font-display text-5xl sm:text-6xl font-black uppercase tracking-widest text-white leading-none mb-4">
+    <div className="mb-10">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-1.5">
+          <div className="w-1 h-8 bg-primary rounded-full" />
+          <div className="w-0.5 h-6 bg-primary/60 rounded-full" />
+        </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
           Échanges
         </h1>
-        <p className="text-slate-400 text-sm tracking-wide mb-6">
-          Historique des transactions
-        </p>
-        <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-slate-700 rounded-xl px-4 py-2.5">
-          <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-            <ArrowLeftRight className="w-4 h-4 text-cyan-400" />
-          </div>
-          <span className="text-white font-bold text-sm">{count}</span>
-          <span className="text-slate-400 text-sm">échanges confirmés</span>
+      </div>
+
+      <p className="text-base text-muted-foreground ml-6 pl-2 mb-5">
+        Historique des transactions
+      </p>
+
+      <div className="ml-6 pl-2">
+        <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2">
+          <ArrowLeftRight className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-bold tabular-nums text-foreground">{count}</span>
+          <span className="text-sm text-muted-foreground">échanges confirmés</span>
         </div>
       </div>
     </div>
@@ -101,7 +104,8 @@ export default function Echanges() {
   const confirmed = (echanges ?? []).filter((e) => e.statut_confirmer);
 
   return (
-    <Layout beforeContainer={<HeroBanner count={confirmed.length} />}>
+    <Layout mainPadding="pt-12 pb-12">
+      <PageHeader count={confirmed.length} />
       <EchangesContent confirmed={confirmed} />
     </Layout>
   );

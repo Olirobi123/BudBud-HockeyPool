@@ -28,7 +28,6 @@ export function DivisionStandings({
           <DivisionTable
             division="nord"
             standings={nordStandings}
-            color="hsl(217 91% 60%)"
           />
         </div>
       )}
@@ -42,7 +41,6 @@ export function DivisionStandings({
           <DivisionTable
             division="sud"
             standings={sudStandings}
-            color="hsl(6 78% 57%)"
           />
         </div>
       )}

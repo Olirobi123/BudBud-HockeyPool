@@ -30,7 +30,7 @@ export default function Bilan(): JSX.Element {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-1 h-8 rounded-full bg-gradient-to-b from-cyan-400 to-blue-500" />
+            <div className="w-1 h-8 rounded-full bg-primary" />
             <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground uppercase tracking-wide">
               Bilan de saison
             </h1>

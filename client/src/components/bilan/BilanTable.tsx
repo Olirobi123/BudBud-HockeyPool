@@ -1,14 +1,6 @@
+import { RankBadge } from '@/components/ui/rank-badge';
 import { PointsMensuelEntry } from '@/hooks/bilan/usePointsMensuel';
 import { MONTH_LABELS } from './bilanUtils';
-
-const RANK_BASE = 'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold tabular-nums shrink-0';
-
-function rankClass(rank: number): string {
-  if (rank === 1) return `${RANK_BASE} bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/30`;
-  if (rank === 2) return `${RANK_BASE} bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/20`;
-  if (rank === 3) return `${RANK_BASE} bg-orange-500/15 text-orange-400 ring-1 ring-orange-500/20`;
-  return `${RANK_BASE} text-muted-foreground`;
-}
 import type { BilanCategory } from './BilanCategoryToggle';
 import BilanMobileCards from './BilanMobileCards';
 
@@ -78,7 +70,7 @@ export default function BilanTable({ data, category }: Props): JSX.Element {
                   {MONTH_LABELS[m]}
                 </th>
               ))}
-              <th className="text-center py-3 pl-4 font-semibold uppercase tracking-wider text-xs text-blue-600" >
+              <th className="text-center py-3 pl-4 font-semibold uppercase tracking-wider text-xs text-foreground" >
                 {CATEGORY_LABELS[category]}
               </th>
             </tr>
@@ -93,7 +85,7 @@ export default function BilanTable({ data, category }: Props): JSX.Element {
                 >
                   <td className="sticky left-0 bg-card py-3 pr-4">
                     <div className="flex items-center gap-2">
-                      <span className={rankClass(rowIdx + 1)}>{rowIdx + 1}</span>
+                      <RankBadge rank={rowIdx + 1} />
                       <span className="text-foreground">{nomLong}</span>
                     </div>
                   </td>
@@ -117,7 +109,7 @@ export default function BilanTable({ data, category }: Props): JSX.Element {
                       </td>
                     );
                   })}
-                  <td className="text-center py-3 pl-4 font-bold tabular-nums text-blue-600" >
+                  <td className="text-center py-3 pl-4 font-bold tabular-nums text-foreground" >
                     {total > 0 ? total : <span className="opacity-30 font-normal">—</span>}
                   </td>
                 </tr>

@@ -2,6 +2,7 @@ import { User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import Equipe from '@/types/IEquipes';
+import { cn } from '@/lib/utils';
 import { TeamAvatar } from './TeamAvatar';
 
 interface TeamHeaderProps {
@@ -11,16 +12,22 @@ interface TeamHeaderProps {
 export function TeamHeader({ team }: TeamHeaderProps) {
   return (
     <Card className="mb-6 overflow-hidden">
-      <div className={`h-24 bg-gradient-to-r ${team.division === 'sud' ? 'from-red-600 to-rose-400' : 'from-blue-600 to-cyan-500'}`} />
+      {/* Division band — the one place a team's division is stated in colour. */}
+      <div
+        className={cn(
+          'h-24 bg-gradient-to-r to-transparent',
+          team.division === 'sud' ? 'from-division-sud' : 'from-division-nord',
+        )}
+      />
       <CardContent className="relative pt-0 pb-6">
         <div className="flex flex-col md:flex-row items-center md:items-end -mt-12 px-2 gap-4">
-          <div className="rounded-full p-1 bg-white shadow-lg">
+          <div className="rounded-full p-1 bg-card shadow-lg">
             <TeamAvatar teamId={team.id} teamName={team.nom} size="xl" bordered={false} />
           </div>
 
           <div className="flex-1 mt-4 md:mt-0 md:mb-2 text-center md:text-left">
-            <h1 className="text-3xl font-bold text-gray-900">{team.nom}</h1>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-2 text-sm text-gray-600">
+            <h1 className="text-3xl font-bold text-foreground">{team.nom}</h1>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-2 text-sm text-muted-foreground">
               <span className="flex items-center">
                 <User className="w-4 h-4 mr-1" />
                 DG: {team.dg_name ?? 'Non disponible'}
