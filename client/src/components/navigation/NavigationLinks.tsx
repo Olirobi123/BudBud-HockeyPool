@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationLink } from './NavigationLink';
+import { NavigationLink, isNavLinkActive } from './NavigationLink';
 
 interface NavLink {
   href: string;
@@ -20,7 +20,7 @@ export const NavigationLinks: React.FC<NavigationLinksProps> = ({ navLinks, loca
         href={link.href}
         label={link.label}
         external={link.external}
-        active={location === link.href}
+        active={isNavLinkActive(location, link.href, link.external)}
       />
     ))}
   </div>

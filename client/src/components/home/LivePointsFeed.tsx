@@ -26,16 +26,16 @@ export function LivePointsFeed({ players, liveGamesCount, isLoading }: LivePoint
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-cyan-400" />
+            <Target className="w-5 h-5 text-muted-foreground" />
             <span>Marqueurs</span>
           </div>
           {liveGamesCount > 0 && (
             <div className="flex items-center gap-1.5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-live opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-live" />
               </span>
-              <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-live uppercase tracking-wider">
                 {`${liveGamesCount} en cours`}
               </span>
             </div>

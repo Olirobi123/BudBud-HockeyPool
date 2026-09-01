@@ -70,7 +70,7 @@ export function PlayoffWidget(): JSX.Element | null {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-400" />
+            <Trophy className="w-5 h-5 text-muted-foreground" />
             <span>
               {rondeActive !== null ? ROUND_LABELS[rondeActive] : 'Séries éliminatoires'}
             </span>

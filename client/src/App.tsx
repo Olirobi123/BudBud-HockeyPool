@@ -21,7 +21,7 @@ function LoadingOverlay() {
   if (!isPageLoading) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background">
       <Loading className="min-h-screen" />
     </div>
   );

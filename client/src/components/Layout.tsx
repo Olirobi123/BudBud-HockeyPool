@@ -9,6 +9,8 @@ interface LayoutProps {
   maxWidth?: 'max-w-5xl' | 'max-w-7xl' | 'full';
   hideFooter?: boolean;
   hideNavigation?: boolean;
+  /** Home renders its own scoreboard, so the ticker would be redundant there. */
+  hideTicker?: boolean;
   bgClassName?: string;
   mainPadding?: string;
   containerPadding?: string;
@@ -21,6 +23,7 @@ export default function Layout({
   maxWidth = 'max-w-7xl',
   hideFooter = false,
   hideNavigation = false,
+  hideTicker = false,
   bgClassName = 'bg-background',
   mainPadding = 'pt-4 pb-12',
   containerPadding = 'px-4 sm:px-6 lg:px-8',
@@ -34,9 +37,9 @@ export default function Layout({
       {!hideNavigation && (
         <>
           <Navigation />
-          {/* Solid dark backdrop behind the fixed nav so glass doesn't show page content through */}
-          <div className="h-16 bg-slate-900" />
-          <LiveScoresTicker />
+          {/* Offsets the fixed nav. */}
+          <div className="h-16" />
+          {!hideTicker && <LiveScoresTicker />}
         </>
       )}
 

@@ -167,13 +167,13 @@ function LeaderboardEmpty() {
 function RankBadge({ rank }: { rank: number }) {
   const base = 'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold tabular-nums shrink-0';
   if (rank === 1) {
-    return <span className={cn(base, 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/30')}>{rank}</span>;
+    return <span className={cn(base, 'bg-foreground text-background')}>{rank}</span>;
   }
   if (rank === 2) {
-    return <span className={cn(base, 'bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/20')}>{rank}</span>;
+    return <span className={cn(base, 'bg-muted text-foreground ring-1 ring-border')}>{rank}</span>;
   }
   if (rank === 3) {
-    return <span className={cn(base, 'bg-orange-500/15 text-orange-400 ring-1 ring-orange-500/20')}>{rank}</span>;
+    return <span className={cn(base, 'bg-muted text-muted-foreground ring-1 ring-border')}>{rank}</span>;
   }
   return <span className={cn(base, 'text-muted-foreground')}>{rank}</span>;
 }
@@ -324,7 +324,7 @@ export function LivePointsLeaderboard({ teams, isLoading }: LivePointsLeaderboar
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-amber-400" />
+          <Trophy className="w-5 h-5 text-muted-foreground" />
           <span>Classement quotidien</span>
         </CardTitle>
       </CardHeader>

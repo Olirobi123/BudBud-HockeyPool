@@ -35,19 +35,15 @@ export default function Navigation() {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 duration-500 ease-out',
+        'fixed left-0 right-0 top-0 z-50 border-b bg-background/90 backdrop-blur-md',
+        'transition-shadow duration-300',
         // Keeps the nav the same width when a Radix dropdown removes the scrollbar
         SCROLL_LOCK_FIXED_WIDTH,
-        isScrolled
-          ? 'nav-glass-scrolled'
-          : 'nav-glass',
+        isScrolled ? 'border-border shadow-sm' : 'border-transparent',
       )}
     >
-      {/* Subtle top accent line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-10">
             <NavigationLogo />
             <div className="hidden lg:block">
@@ -59,7 +55,12 @@ export default function Navigation() {
             <PlayerSearch onPlayerSelect={handlePlayerSelect} className="w-64" />
           </div>
 
-          <div className="md:hidden">
+          {/*
+            Hamburger covers everything below `lg`, where the inline links are
+            hidden. It previously stopped at `md`, leaving 768–1023px with no
+            navigation at all.
+          */}
+          <div className="lg:hidden">
             <NavigationMobileMenu
               navLinks={navLinks}
               isOpen={isMobileMenuOpen}
@@ -69,16 +70,6 @@ export default function Navigation() {
             />
           </div>
         </div>
-      </div>
-
-      {/* Bottom edge — only visible when not scrolled, dissolves into hero */}
-      <div
-        className={cn(
-          'absolute bottom-0 left-0 right-0 h-px transition-opacity duration-500',
-          isScrolled ? 'opacity-0' : 'opacity-100',
-        )}
-      >
-        <div className="h-full bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       </div>
     </nav>
   );
