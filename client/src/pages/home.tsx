@@ -21,7 +21,12 @@ export default function Home(): JSX.Element {
     >
       {/* Each card carries its own title — no eyebrow labels here. (UI_Audit P3) */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="order-1 lg:order-none lg:col-span-2">
+        {/*
+          * Le classement quotidien s'aligne sur la hauteur des marqueurs à sa
+          * droite : la rangée est déjà à la hauteur du plus grand des deux, il
+          * ne reste qu'à faire descendre la carte jusqu'en bas.
+          */}
+        <div className="order-1 lg:order-none lg:col-span-2 lg:h-full">
           <LivePointsLeaderboard
             teams={data?.teamLeaderboard ?? []}
             isLoading={isLoading}
@@ -43,7 +48,12 @@ export default function Home(): JSX.Element {
           />
         </div>
 
-        <div className="order-4 lg:order-none">
+        {/*
+          * La pile d'échanges se cale sur la hauteur du classement à sa
+          * gauche : `relative` lui sert d'ancrage, `overflow-hidden` garantit
+          * qu'elle ne le dépassera jamais.
+          */}
+        <div className="order-4 lg:order-none lg:relative lg:overflow-hidden">
           <HomeLatestTrade />
         </div>
 

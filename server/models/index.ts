@@ -77,7 +77,7 @@ export const QUERIES = {
     GROUP BY e.id, src.nom, dest.nom
     ORDER BY e.date DESC, e.id DESC
   `,
-  GET_LATEST_ECHANGE: `
+  GET_RECENT_ECHANGES: `
     SELECT
       e.id, e.date, e.equipe_source_id, e.equipe_destination_id, e.statut_confirmer,
       src.nom  AS equipe_source_nom,
@@ -99,7 +99,7 @@ export const QUERIES = {
     LEFT JOIN ${TABLES.JOUEURS} j           ON ej.joueur_id  = j.id
     GROUP BY e.id, src.nom, dest.nom
     ORDER BY e.date DESC, e.id DESC
-    LIMIT 1
+    LIMIT $1
   `,
   GET_LATEST_TRADE_BY_TEAM: `
     SELECT

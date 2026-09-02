@@ -308,7 +308,7 @@ export function LivePointsLeaderboard({ teams, isLoading }: LivePointsLeaderboar
   };
 
   return (
-    <Card>
+    <Card className="lg:h-full">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <Trophy className="w-5 h-5 text-muted-foreground" />
