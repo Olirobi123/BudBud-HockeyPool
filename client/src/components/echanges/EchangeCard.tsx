@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import Echange from '@/types/IEchange';
 
 /*
@@ -24,6 +24,12 @@ interface EchangeCardProps {
   echange: Echange;
   animationDelay?: string;
   highlightPlayer?: string;
+  /**
+   * Occuper toute la hauteur offerte plutôt que de s'en tenir au contenu, et
+   * centrer les deux colonnes dans l'espace obtenu. Utilisé par la pile de la
+   * page d'accueil, qui remplit la colonne laissée par le classement.
+   */
+  stretch?: boolean;
 }
 
 function TeamHeader({ name, side }: { name: string; side: Side }) {
@@ -64,9 +70,14 @@ function PlayerList(
   );
 }
 
-export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, animationDelay, highlightPlayer }) => (
+export const EchangeCard: React.FC<EchangeCardProps> = ({
+  echange, animationDelay, highlightPlayer, stretch = false,
+}) => (
   <Card
-    className="overflow-hidden hover:shadow-md transition-all duration-200 animate-slide-up"
+    className={cn(
+      'overflow-hidden hover:shadow-md transition-all duration-200 animate-slide-up',
+      stretch && 'grow flex flex-col',
+    )}
     style={{ animationDelay, animationFillMode: 'both' }}
   >
     <CardHeader className="py-2.5 px-4 bg-muted/40 border-b flex flex-row items-center justify-between space-y-0">
@@ -78,7 +89,7 @@ export const EchangeCard: React.FC<EchangeCardProps> = ({ echange, animationDela
       </time>
     </CardHeader>
 
-    <CardContent className="p-4">
+    <CardContent className={cn('p-4', stretch && 'flex-1 flex flex-col justify-center')}>
       {/* Mobile: simple stacked */}
       <div className="sm:hidden space-y-3">
         <div className="pb-3 border-b border-border">
