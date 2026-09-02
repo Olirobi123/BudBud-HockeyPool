@@ -155,9 +155,9 @@ function GoalieStatsContent({ s }: { s: StatsData }) {
         <p className="text-xs text-muted-foreground">Fiche</p>
         <p className="text-sm font-bold tabular-nums">
           {s.wins ?? 0}
-          {'-'}
+          -
           {s.losses ?? 0}
-          {'-'}
+          -
           {s.otLosses ?? 0}
         </p>
       </div>

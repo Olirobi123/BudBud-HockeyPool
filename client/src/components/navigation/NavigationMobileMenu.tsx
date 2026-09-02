@@ -2,8 +2,8 @@ import React from 'react';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { NavigationLink, isNavLinkActive } from './NavigationLink';
 import PlayerSearch from '@/components/PlayerSearch';
+import { NavigationLink, isNavLinkActive } from './NavigationLink';
 
 interface NavLink {
   href: string;

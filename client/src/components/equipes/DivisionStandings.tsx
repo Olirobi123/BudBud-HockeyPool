@@ -1,5 +1,5 @@
-import { DivisionTable } from './DivisionTable';
 import type { TeamStanding } from '@/types/IEquipes';
+import { DivisionTable } from './DivisionTable';
 
 interface DivisionStandingsProps {
   nordStandings: TeamStanding[];

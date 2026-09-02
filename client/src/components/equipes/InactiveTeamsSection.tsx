@@ -40,6 +40,7 @@ export function InactiveTeamsSection({ teams, isLoading }: InactiveTeamsSectionP
             {teams.map((team) => (
               <button
                 key={team.id}
+                type="button"
                 onClick={() => navigate(`/equipes/${team.id}`)}
                 className="text-sm text-muted-foreground p-3 rounded-md bg-muted/30 text-center hover:bg-muted/50 hover:text-foreground transition-colors cursor-pointer"
               >

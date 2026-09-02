@@ -3,7 +3,7 @@ import {
   LayoutDashboard, BarChart2, CalendarDays, History,
 } from 'lucide-react';
 import {
-  Tabs, TabsContent, TabsList, TabsTrigger,
+  Tabs, TabsList, TabsTrigger,
 } from '@/components/ui/tabs';
 import PlayerDetails from '@/types/IPlayerDetails';
 

@@ -44,6 +44,7 @@ function RosterSkeleton() {
   return (
     <div className="space-y-2">
       {Array.from({ length: 5 }).map((_, i) => (
+        // eslint-disable-next-line react/no-array-index-key
         <Skeleton key={i} className="h-10 w-full" />
       ))}
     </div>
@@ -402,7 +403,7 @@ export function TeamRoster({ roster, isLoading, injuries, etat }: TeamRosterProp
             <Users className="w-12 h-12 text-gray-300 mb-3" />
             <h3 className="text-lg font-medium text-gray-900">Effectif à venir</h3>
             <p className="max-w-sm mt-1">
-              L'effectif de cette équipe n'est pas encore disponible. Il sera affiché ici dès que les données seront importées.
+              L&apos;effectif de cette équipe n&apos;est pas encore disponible. Il sera affiché ici dès que les données seront importées.
             </p>
           </div>
         ) : (

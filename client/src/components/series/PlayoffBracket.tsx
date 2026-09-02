@@ -1,6 +1,6 @@
 import { SeriesData, SeriesMatchup } from '@/types/ISeries';
-import { BracketCard } from './BracketCard';
 import { cn } from '@/lib/utils';
+import { BracketCard } from './BracketCard';
 
 /* ------------------------------------------------------------------ */
 /*  Round column                                                        */

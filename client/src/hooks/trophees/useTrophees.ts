@@ -3,15 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { TropheeGagnant, GroupedTrophee } from '@/types';
 import { BACKEND_URL } from '@/lib/apiConfig';
 
-async function fetchFromApi<T>(path: string, errorMessage: string): Promise<T> {
-  const response = await fetch(`${BACKEND_URL}${path}`);
-  if (!response.ok) {
-    throw new Error(errorMessage);
-  }
-  const result = await response.json();
-  return result.data ?? [];
-}
-
 const fetchTrophies = async (teamId: number): Promise<TropheeGagnant[]> => {
   const response = await fetch(`${BACKEND_URL}/api/trophees/equipe/${teamId}`);
   if (!response.ok) {
@@ -34,7 +25,7 @@ export function useTeamTrophies(teamId: number) {
 function groupTrophees(trophees: TropheeGagnant[]): GroupedTrophee[] {
   const grouped = new Map<string, GroupedTrophee>();
 
-  for (const t of trophees) {
+  trophees.forEach((t) => {
     const existing = grouped.get(t.trophee_nom);
     if (existing) {
       existing.annees.push(t.annee);
@@ -45,7 +36,7 @@ function groupTrophees(trophees: TropheeGagnant[]): GroupedTrophee[] {
         equipe_nom: t.equipe_nom,
       });
     }
-  }
+  });
 
   return Array.from(grouped.values());
 }

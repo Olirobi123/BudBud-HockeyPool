@@ -1,0 +1,8 @@
+dist
+node_modules
+
+# Build tooling, deliberately outside tsconfig.json's "src/**/*" include.
+# Type-aware linting cannot parse files the TSConfig does not cover.
+vite.config.ts
+tailwind.config.ts
+postcss.config.js

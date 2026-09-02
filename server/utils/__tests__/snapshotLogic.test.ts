@@ -36,7 +36,6 @@ function game(gameDate: string, gameState: string): GameScore {
 // ---------------------------------------------------------------------------
 
 // Snapshots (all taken by the cron at 3:15 AM ET on their respective days)
-const SNAP_MAR27 = snap('2026-03-27T07:15:00Z'); // 3:15 AM ET Mar 27
 const SNAP_MAR28 = snap('2026-03-28T07:15:00Z'); // 3:15 AM ET Mar 28
 const SNAP_MAR29 = snap('2026-03-29T07:15:00Z'); // 3:15 AM ET Mar 29
 const SNAP_MAR30 = snap('2026-03-30T07:15:00Z'); // 3:15 AM ET Mar 30

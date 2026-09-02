@@ -12,7 +12,15 @@ interface PlayerSearchResultItemProps {
 export const PlayerSearchResultItem: React.FC<PlayerSearchResultItemProps> = ({ player, onClick }) => (
   <div
     className="p-3 hover:bg-muted cursor-pointer transition-colors duration-150"
+    role="button"
+    tabIndex={0}
     onClick={onClick}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick();
+      }
+    }}
   >
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-3">

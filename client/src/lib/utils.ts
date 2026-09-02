@@ -64,7 +64,7 @@ export function formatYearRanges(years: number[]): string {
   let rangeStart = sorted[0];
   let rangeEnd = sorted[0];
 
-  for (let i = 1; i < sorted.length; i++) {
+  for (let i = 1; i < sorted.length; i += 1) {
     if (sorted[i] === rangeEnd - 1) {
       rangeEnd = sorted[i];
     } else {

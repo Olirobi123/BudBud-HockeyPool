@@ -2,11 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../types';
 import { sendError, sendServerError } from '../utils/response';
 
+// Express only treats a middleware as an error handler when it declares four
+// parameters, so `_next` must stay in the signature even though it is unused.
 export const errorHandler = (
   err: Error | ApiError,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ): void => {
   console.error('Error:', err);
 
@@ -20,6 +22,12 @@ export const errorHandler = (
   sendServerError(res, err.message || 'Une erreur interne est survenue');
 };
 
-export const asyncHandler = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
+type RouteHandler = (req: Request, res: Response, next: NextFunction) => unknown;
+
+export const asyncHandler = (fn: RouteHandler) => (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };

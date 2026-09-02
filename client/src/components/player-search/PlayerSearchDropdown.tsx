@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { PlayerSearchResultItem } from './PlayerSearchResultItem';
 import { NHLPlayer } from '@/types/IPlayerDetails';
+import { PlayerSearchResultItem } from './PlayerSearchResultItem';
 
 interface PlayerSearchDropdownProps {
   isOpen: boolean;
@@ -36,9 +36,7 @@ export const PlayerSearchDropdown: React.FC<PlayerSearchDropdownProps> = ({
           </div>
         ) : !isLoading ? (
           <div className="p-4 text-center text-muted-foreground">
-            Aucun joueur trouvé pour "
-            {search}
-            "
+            {`Aucun joueur trouvé pour "${search}"`}
           </div>
         ) : null}
       </CardContent>
