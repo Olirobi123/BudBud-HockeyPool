@@ -12,8 +12,8 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
   const { toast } = useToast();
   const [error, setError] = useState<Error | null>(null);
 
-  const handleError = useCallback((error: Error | unknown) => {
-    const errorObj = error instanceof Error ? error : new Error('Une erreur inconnue est survenue');
+  const handleError = useCallback((err: Error | unknown) => {
+    const errorObj = err instanceof Error ? err : new Error('Une erreur inconnue est survenue');
 
     // Log l'erreur
     if (logError) {
@@ -49,8 +49,8 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}) {
       if (result instanceof Promise) {
         result.catch(handleError);
       }
-    } catch (error) {
-      handleError(error);
+    } catch (err) {
+      handleError(err);
     }
   }, [clearError, handleError]);
 

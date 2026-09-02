@@ -215,6 +215,7 @@ export function QuebecMap({
           </div>
           {activeFilter && (
             <button
+              type="button"
               onClick={() => onRegionClick(null)}
               className="text-xs text-primary hover:underline"
             >

@@ -10,7 +10,7 @@ export function useMobileTooltip() {
   const isMobile = React.useRef('ontouchstart' in window || navigator.maxTouchPoints > 0).current;
 
   React.useEffect(() => {
-    if (!isMobile || !open) return;
+    if (!isMobile || !open) return undefined;
     const handleOutside = () => setOpen(false);
     document.addEventListener('pointerdown', handleOutside, { once: true });
     return () => document.removeEventListener('pointerdown', handleOutside);

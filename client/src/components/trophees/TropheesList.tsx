@@ -1,7 +1,7 @@
 import { Trophy } from 'lucide-react';
 import { GroupedTrophee } from '@/types';
-import { TropheeCard } from './TropheeCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TropheeCard } from './TropheeCard';
 
 interface TropheesListProps {
   generalTrophees: GroupedTrophee[];

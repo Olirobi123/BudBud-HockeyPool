@@ -8,7 +8,10 @@
     "airbnb-typescript",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
-    "plugin:jsx-a11y/recommended"
+    "plugin:jsx-a11y/recommended",
+    // Must stay last: switches off every rule that only polices formatting,
+    // so ESLint reports defects and a formatter can own layout.
+    "prettier"
   ],
   "parserOptions": {
     "project": "./tsconfig.json",
@@ -22,14 +25,58 @@
   "settings": {
     "react": {
       "version": "detect"
+    },
+    // Without this, the only resolver is eslint-import-resolver-node, which
+    // knows .js/.json/.node and nothing about the "@/*" alias. Every unresolved
+    // import then fell through to import/extensions' "always" default and was
+    // reported as "Missing file extension".
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json",
+        "alwaysTryTypes": true
+      },
+      "node": {
+        "extensions": [".ts", ".tsx", ".js", ".jsx", ".json"]
+      }
     }
   },
   "rules": {
-    "@typescript-eslint/explicit-module-boundary-types": "error",
     "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/strict-boolean-expressions": "error",
+
+    // tsc --noEmit (npm run check) already infers and checks every return type.
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    // Bans `if (someString)` / `if (someNumber)`. Not part of recommended and
+    // not a defect class we care about here.
+    "@typescript-eslint/strict-boolean-expressions": "off",
+
+    // The DB and API layer speaks snake_case French (equipe_a_nom, gagnant_id),
+    // so destructured API fields cannot be camelCase.
+    "@typescript-eslint/naming-convention": [
+      "error",
+      { "selector": "variable", "modifiers": ["destructured"], "format": null },
+      { "selector": "typeLike", "format": ["PascalCase"] }
+    ],
+    // Hoisted function declarations are safe to reference above their definition.
+    "@typescript-eslint/no-use-before-define": ["error", { "functions": false }],
+    // Deliberate diagnostics; console.log stays banned.
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+
     "react/react-in-jsx-scope": "off",
-    "react/jsx-filename-extension": [1, { "extensions": [".tsx"] }],
+    // TypeScript prop types are the validation; propTypes are not used here.
+    "react/prop-types": "off",
+    "react/jsx-filename-extension": ["error", { "extensions": [".tsx"] }],
+    // {...props} is how the Radix/shadcn primitives in components/ui are built.
+    "react/jsx-props-no-spreading": "off",
+    // TypeScript optional props already express "may be absent".
+    "react/require-default-props": "off",
+    // The codebase declares components with `function`, not arrow consts.
+    "react/function-component-definition": "off",
+    // Every instance is a formatted class ladder inside cn(...), which reads as
+    // a decision table rather than a nested conditional.
+    "no-nested-ternary": "off",
+
+    // Contradicts the one-component-per-file, named-export convention in CLAUDE.md.
+    "import/prefer-default-export": "off",
     "import/extensions": [
       "error",
       "ignorePackages",
@@ -40,5 +87,31 @@
         "jsx": "never"
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      // Vendored shadcn/ui primitives. Their content arrives through {...props},
+      // which these rules cannot see, so both fire as false positives.
+      "files": ["src/components/ui/**"],
+      "rules": {
+        "jsx-a11y/heading-has-content": "off",
+        "jsx-a11y/anchor-has-content": "off"
+      }
+    },
+    {
+      "files": ["src/**/__tests__/**/*.ts", "src/**/*.test.ts", "src/**/*.test.tsx"],
+      "env": { "node": true },
+      "globals": {
+        "describe": "readonly",
+        "it": "readonly",
+        "expect": "readonly",
+        "vi": "readonly",
+        "beforeEach": "readonly",
+        "afterEach": "readonly"
+      },
+      "rules": {
+        "import/no-extraneous-dependencies": "off"
+      }
+    }
+  ]
 }

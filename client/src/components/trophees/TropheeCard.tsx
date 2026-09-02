@@ -1,7 +1,7 @@
-import { TropheeIcon } from './TropheeIcon';
 import { Badge } from '@/components/ui/badge';
 import { cn, formatYearRanges } from '@/lib/utils';
 import { GroupedTrophee } from '@/types';
+import { TropheeIcon } from './TropheeIcon';
 
 interface TropheeCardProps {
   trophee: GroupedTrophee;

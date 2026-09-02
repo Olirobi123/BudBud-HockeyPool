@@ -120,7 +120,7 @@ export default function LiveScoresTicker(): JSX.Element | null {
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el) return;
+    if (!el) return undefined;
     const check = () => setHasOverflow(el.scrollWidth > el.clientWidth);
     check();
     const ro = new ResizeObserver(check);

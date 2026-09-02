@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { seriesService } from '../services/seriesService';
-import { sendSuccess, sendServerError, sendValidationError } from '../utils/response';
+import { sendSuccess, sendValidationError } from '../utils/response';
 import { asyncHandler } from '../middleware/errorHandler';
 import { getCurrentSeason } from '../services/seasonHelper';
 

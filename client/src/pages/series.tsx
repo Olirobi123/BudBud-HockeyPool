@@ -37,7 +37,7 @@ function SeriesSkeleton() {
         // eslint-disable-next-line react/no-array-index-key
         <div key={col} className="flex flex-col gap-4">
           <Skeleton className="h-4 w-32" />
-          {Array.from({ length: col === 0 ? 4 : col === 1 ? 2 : 1 }).map((_, i) => (
+          {Array.from({ length: col === 0 ? 4 : col === 1 ? 2 : 1 }).map((__, i) => (
             // eslint-disable-next-line react/no-array-index-key
             <div key={i} className="rounded-xl border border-border/40 overflow-hidden">
               <Skeleton className="h-10 w-full" />

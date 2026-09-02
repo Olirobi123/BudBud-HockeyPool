@@ -16,8 +16,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import NotFound from '@/pages/not-found';
 
 export default function TeamDetails() {
-  let { id }= useParams();
-   let idNum =  id != undefined && id.trim() != ""  ? parseInt(id.trim()) : 0;
+  const { id } = useParams();
+  const idNum = id !== undefined && id.trim() !== '' ? Number.parseInt(id.trim(), 10) : 0;
 
   const { data: team, isLoading: isLoadingTeam, error: errorTeam } = useTeam(idNum);
   const { data: roster, isLoading: isLoadingRoster } = useTeamRoster(idNum);
@@ -30,7 +30,7 @@ export default function TeamDetails() {
     return <TeamDetailsSkeleton />;
   }
 
-  if (isNaN(idNum) || idNum === 0 || errorTeam || !team) {
+  if (Number.isNaN(idNum) || idNum === 0 || errorTeam || !team) {
     return <NotFound />;
   }
 

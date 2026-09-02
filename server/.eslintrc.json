@@ -3,7 +3,9 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "import"],
   "extends": [
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    // Must stay last: switches off every formatting-only rule.
+    "prettier"
   ],
   "parserOptions": {
     "project": "./tsconfig.json",
@@ -14,10 +16,31 @@
     "node": true,
     "es2021": true
   },
+  "settings": {
+    // See the note in client/.eslintrc.json: without a TypeScript-aware
+    // resolver, import/extensions cannot resolve .ts files and reports every
+    // extensionless relative import as "Missing file extension".
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json",
+        "alwaysTryTypes": true
+      },
+      "node": {
+        "extensions": [".ts", ".js", ".json"]
+      }
+    }
+  },
   "rules": {
-    "@typescript-eslint/explicit-module-boundary-types": "error",
     "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/strict-boolean-expressions": "error",
+    // Express identifies error handlers by arity, so unused-but-required
+    // parameters are marked with a leading underscore rather than removed.
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+
+    // tsc --noEmit (npm run check) already infers and checks every return type.
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    // Not part of recommended; bans truthiness checks on strings/numbers.
+    "@typescript-eslint/strict-boolean-expressions": "off",
+
     "import/extensions": [
       "error",
       "ignorePackages",

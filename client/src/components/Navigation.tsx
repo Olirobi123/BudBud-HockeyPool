@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useNavigationScroll } from '@/hooks/navigation/useNavigationScroll';
-import { NavigationLogo } from './navigation/NavigationLogo';
-import { NavigationLinks } from './navigation/NavigationLinks';
-import { NavigationMobileMenu } from './navigation/NavigationMobileMenu';
 import PlayerSearch from '@/components/PlayerSearch';
 import type { NHLPlayer } from '@/types';
 import { cn, SCROLL_LOCK_FIXED_WIDTH } from '@/lib/utils';
+import { NavigationLogo } from './navigation/NavigationLogo';
+import { NavigationLinks } from './navigation/NavigationLinks';
+import { NavigationMobileMenu } from './navigation/NavigationMobileMenu';
 
 const navLinks = [
   { href: '/equipes', label: 'Équipes' },

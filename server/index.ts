@@ -30,7 +30,10 @@ app.set('trust proxy', 1);
 const allowedOriginsEnv = process.env.ALLOWED_ORIGINS; // e.g. "http://localhost:5173,https://my-frontend.vercel.app"
 
 const corsOptions = {
-  origin: (origin: string | undefined, callback: Function) => {
+  origin: (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void,
+  ) => {
     if (!origin) {
       // Allow server-to-server requests or tools like Postman
       return callback(null, true);

@@ -19,7 +19,6 @@ interface EchangeFiltersProps {
   setSelectedYear: (v: string) => void;
   hasActiveFilter: boolean;
   onReset: () => void;
-  filteredCount: number;
 }
 
 export default function EchangeFilters({

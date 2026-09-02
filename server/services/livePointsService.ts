@@ -58,17 +58,6 @@ interface OwnershipRow {
   equipe_nom: string | null;
 }
 
-/** Returns ET date string (YYYY-MM-DD) for the given Date. */
-function toEtDateString(d: Date): string {
-  return d.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-}
-
-/** Returns total minutes since midnight in ET for the given Date. */
-function toEtMinutes(d: Date): number {
-  const et = new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  return et.getHours() * 60 + et.getMinutes();
-}
-
 export class LivePointsService {
   private nhlClient: NHLClient;
 

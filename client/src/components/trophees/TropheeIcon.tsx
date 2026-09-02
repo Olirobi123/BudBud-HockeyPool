@@ -36,12 +36,6 @@ const sizeMap = {
   lg: 'w-8 h-8 md:w-10 md:h-10',
 };
 
-const pixelSizeMap = {
-  sm: 16,
-  md: 20,
-  lg: 32,
-};
-
 const goaliePixelSizeMap = {
   sm: 28,
   md: 38,

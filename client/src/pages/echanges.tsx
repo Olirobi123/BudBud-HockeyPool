@@ -51,7 +51,6 @@ function EchangesContent({ confirmed }: EchangesContentProps) {
         setSelectedYear={setSelectedYear}
         hasActiveFilter={hasActiveFilter}
         onReset={handleReset}
-        filteredCount={filtered.length}
       />
       <EchangeList echanges={filtered} isFiltered={hasActiveFilter} />
     </>

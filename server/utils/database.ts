@@ -3,7 +3,7 @@ import pool from '../config/database';
 /**
  * Exécuter une requête SQL avec gestion d'erreurs
  */
-export const executeQuery = async (query: string, params: any[] = []) => {
+export const executeQuery = async (query: string, params: unknown[] = []) => {
   try {
     const result = await pool.query(query, params);
     return result;
