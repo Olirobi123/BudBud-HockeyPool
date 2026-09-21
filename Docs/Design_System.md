@@ -144,6 +144,11 @@ are structured so a `.dark {}` block could be added later, but **there is no dar
 mode today** — no theme provider, no toggle, and no `.dark` selector. Do not add
 `dark:` utilities; they will not do anything.
 
+The page declares `color-scheme: only light` (a `<meta>` in `index.html` and
+on `:root`) so browsers that force-darken light sites — Chrome's auto dark mode,
+Samsung Internet — leave it alone. Without it they darken the page but not the
+images, and the NHL `_light` team logos end up on a dark background.
+
 ---
 
 ## 3. Typography
