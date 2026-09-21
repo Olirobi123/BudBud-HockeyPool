@@ -9,6 +9,7 @@ import {
   isCritical,
   type GameStatus,
 } from '@/components/scores/gameState';
+import { TeamLogo } from '@/components/ui/team-logo';
 
 interface TeamLineProps {
   team: GameScore['awayTeam'] | GameScore['homeTeam'];
@@ -24,7 +25,7 @@ function TeamLine({ team, isWinner, status }: TeamLineProps): JSX.Element {
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="flex min-w-0 items-center gap-2">
-        <img
+        <TeamLogo
           src={team.logo}
           alt=""
           aria-hidden="true"
