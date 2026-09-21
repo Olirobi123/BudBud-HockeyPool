@@ -4,21 +4,12 @@ import useNHLScores from '@/hooks/useNHLScores';
 import { useLivePoints } from '@/hooks/home/useLivePoints';
 import { TonightMeta } from './TonightMeta';
 import { ScoreboardRail } from './ScoreboardRail';
-import { TonightPoolPanel, hasScoredTonight } from './TonightPoolPanel';
-import { TonightScorersPanel } from './TonightScorersPanel';
 import { TonightBoardSkeleton } from './TonightBoardSkeleton';
 
-function PanelHeading({ children }: { children: string }): JSX.Element {
-  return (
-    <h2 className="mb-2 font-display text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-      {children}
-    </h2>
-  );
-}
-
 /**
- * The home page hero: what is happening in the league and in the pool
- * right now, in three bands — meta, tonight's games, tonight's pool movement.
+ * The home page hero: what is happening in the league right now, in two
+ * bands — meta and tonight's games. Tonight's pool movement is left to the
+ * cards below, which already show it.
  *
  * Thin wrapper per the convention in CLAUDE.md: it owns the two queries and
  * the loading/error/empty states, and delegates all rendering to the
@@ -32,14 +23,6 @@ export function TonightBoard(): JSX.Element {
   const { data: livePoints, isLoading: pointsLoading } = useLivePoints();
 
   const isLoading = scoresLoading || pointsLoading;
-
-  // The cards further down the page already render their own empty states for
-  // this data. Showing empty panels here too would duplicate that message and
-  // push the scoreboard up against 300px of dead space, so the band only
-  // appears once there is something to report.
-  const scoringTeams = livePoints?.teamLeaderboard.filter(hasScoredTonight) ?? [];
-  const topPlayers = livePoints?.topPlayers ?? [];
-  const hasPoolActivity = scoringTeams.length > 0 || topPlayers.length > 0;
 
   return (
     <section
@@ -64,19 +47,6 @@ export function TonightBoard(): JSX.Element {
               </div>
             ) : (
               <ScoreboardRail games={games ?? []} />
-            )}
-
-            {hasPoolActivity && (
-              <div className="grid gap-x-10 gap-y-6 border-t border-border pt-6 sm:grid-cols-2">
-                <div>
-                  <PanelHeading>Ce soir — Pool</PanelHeading>
-                  <TonightPoolPanel teams={scoringTeams} />
-                </div>
-                <div>
-                  <PanelHeading>Marqueurs</PanelHeading>
-                  <TonightScorersPanel players={topPlayers} />
-                </div>
-              </div>
             )}
           </div>
         )}
