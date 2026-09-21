@@ -31,21 +31,6 @@ export function TonightBoardSkeleton(): JSX.Element {
           </div>
         ))}
       </div>
-
-      <div className="grid gap-6 sm:grid-cols-2">
-        {[0, 1].map((col) => (
-          <div key={col} className="space-y-3">
-            <Skeleton className="h-3 w-28" />
-            {Array.from({ length: 4 }, (_, i) => i).map((i) => (
-              <div key={i} className="flex items-center gap-3">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-4 flex-1" />
-                <Skeleton className="h-4 w-8" />
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
