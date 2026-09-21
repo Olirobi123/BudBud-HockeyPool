@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { DraftPick, DraftType } from '@/types/IDraft';
 
-export function useDraftFilters(draftPicks: DraftPick[] = [], types: DraftType[] = []) {
-  // Compute available years and teams
-  const annees = useMemo(() => Array.from(new Set(draftPicks.map((pick) => pick.annee))).sort((a, b) => b - a), [draftPicks]);
+export function useDraftFilters(draftPicks: DraftPick[] = [], types: DraftType[] = [], ballotageYears: number[] = []) {
+  // Compute available years and teams — a year can have a ballotage before any pick exists
+  const annees = useMemo(() => Array.from(new Set([...draftPicks.map((pick) => pick.annee), ...ballotageYears])).sort((a, b) => b - a), [draftPicks, ballotageYears]);
   const equipes = useMemo(() => Array.from(new Set(draftPicks.map((pick) => pick.nom))).sort(), [draftPicks]);
 
   // State for filters
