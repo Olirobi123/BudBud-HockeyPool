@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { RankBadge } from '@/components/ui/rank-badge';
 import { cn } from '@/lib/utils';
 import type { LiveTeamPoints, LivePlayerPoints } from '@/types/ILivePoints';
+import { TeamLogo } from '@/components/ui/team-logo';
 
 interface LivePointsLeaderboardProps {
   teams: LiveTeamPoints[];
@@ -59,7 +60,7 @@ function PlayerRow({ player }: { player: LivePlayerPoints }) {
           alt=""
           className="w-8 h-8 rounded-full object-cover bg-muted"
         />
-        <img
+        <TeamLogo
           src={player.nhlTeamLogo}
           alt={player.nhlTeamAbbrev}
           className="w-6 h-6 object-contain absolute -bottom-0.5 -right-1.5"

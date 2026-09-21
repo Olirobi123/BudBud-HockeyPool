@@ -149,6 +149,11 @@ on `:root`) so browsers that force-darken light sites — Chrome's auto dark mod
 Samsung Internet — leave it alone. Without it they darken the page but not the
 images, and the NHL `_light` team logos end up on a dark background.
 
+Samsung Internet's own Dark mode setting ignores `color-scheme` and darkens
+the page anyway. For that case, render NHL team logos with `<TeamLogo>`
+(`components/ui/team-logo.tsx`), never a bare `<img>`: it swaps to the
+`_dark.svg` variant when Samsung Internet reports `prefers-color-scheme: dark`.
+
 ---
 
 ## 3. Typography

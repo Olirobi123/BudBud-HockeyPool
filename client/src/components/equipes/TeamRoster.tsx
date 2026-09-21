@@ -13,6 +13,7 @@ import {
 } from '@/types';
 import { InjuryInfo } from '@/types/IInjury';
 import { EtatInfo } from '@/types/IEtat';
+import { TeamLogo } from '@/components/ui/team-logo';
 import { InjuryBadge } from './InjuryBadge';
 import { EtatBadge } from './EtatBadge';
 
@@ -86,7 +87,7 @@ function MobileSkaterRow({ player, injuries, etat }: MobileSkaterRowProps) {
   return (
     <div className={`flex items-center px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
       {player.teamLogo
-        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2" />
+        ? <TeamLogo src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2" />
         : <span className="w-7 shrink-0 mr-2" />}
       <div className="flex-1 min-w-0">
         <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug">
@@ -112,7 +113,7 @@ function MobileGoalieRow({ player, injuries, etat }: MobileSkaterRowProps) {
   return (
     <div className={`flex items-center px-1 py-2 ${player.isActive === false ? 'opacity-50' : ''}`}>
       {player.teamLogo
-        ? <img src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2" />
+        ? <TeamLogo src={player.teamLogo} alt="" className="w-7 h-7 object-contain shrink-0 mr-2" />
         : <span className="w-7 shrink-0 mr-2" />}
       <div className="flex-1 min-w-0">
         <Link to={`/joueur/${player.nhl_player_id}`} className="text-sm font-medium text-primary hover:underline leading-snug">
@@ -218,7 +219,7 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
                         className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 flex-1"
                       >
                         {player.teamLogo && (
-                          <img src={player.teamLogo} alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain shrink-0" />
+                          <TeamLogo src={player.teamLogo} alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain shrink-0" />
                         )}
                         <span className="truncate">{player.prenom} {player.nom}</span>
                       </Link>
@@ -344,7 +345,7 @@ function GoaliesTable({ goalies, injuries, etat }: {
                         className="flex items-center gap-1.5 sm:gap-2 font-medium hover:underline text-primary min-w-0 flex-1"
                       >
                         {player.teamLogo && (
-                          <img src={player.teamLogo} alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain shrink-0" />
+                          <TeamLogo src={player.teamLogo} alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain shrink-0" />
                         )}
                         <span className="truncate">{player.prenom} {player.nom}</span>
                       </Link>

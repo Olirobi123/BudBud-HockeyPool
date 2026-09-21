@@ -14,6 +14,7 @@ import {
   sortGamesByPriority,
   type GameStatus,
 } from '@/components/scores/gameState';
+import { TeamLogo } from '@/components/ui/team-logo';
 
 interface TeamRowProps {
   team: GameScore['awayTeam'] | GameScore['homeTeam'];
@@ -27,7 +28,7 @@ function TeamRow({ team, isWinner, status }: TeamRowProps): JSX.Element {
   return (
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-1.5">
-        <img
+        <TeamLogo
           src={team.logo}
           alt=""
           aria-hidden="true"

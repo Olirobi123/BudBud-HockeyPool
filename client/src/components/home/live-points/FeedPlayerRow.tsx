@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { LivePlayerPoints } from '@/types/ILivePoints';
+import { TeamLogo } from '@/components/ui/team-logo';
 
 interface FeedPlayerRowProps {
   player: LivePlayerPoints;
@@ -26,7 +27,7 @@ export function FeedPlayerRow({ player, rank, animationDelay }: FeedPlayerRowPro
           alt=""
           className="w-8 h-8 rounded-full object-cover bg-muted"
         />
-        <img
+        <TeamLogo
           src={player.nhlTeamLogo}
           alt={player.nhlTeamAbbrev}
           className="w-6 h-6 object-contain absolute -bottom-0.5 -right-1.5"
