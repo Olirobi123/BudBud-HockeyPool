@@ -5,6 +5,7 @@ import { useDraftPicks } from '@/hooks/draft/useDraftPicks';
 import { useDraftTypes } from '@/hooks/draft/useDraftTypes';
 import { useDraftFilters } from '@/hooks/draft/useDraftFilters';
 import { useMisAuBallotage } from '@/hooks/draft/useMisAuBallotage';
+import { useBallotageYears } from '@/hooks/draft/useBallotageYears';
 import { DraftFilters } from '@/components/draft/DraftFilters';
 import { DraftTable } from '@/components/draft/DraftTable';
 import { DraftTableSkeleton } from '@/components/draft/DraftTableSkeleton';
@@ -18,6 +19,7 @@ export default function Draft(): JSX.Element {
   } = useDraftPicks();
 
   const { data: types = [], isLoading: isTypesLoading } = useDraftTypes();
+  const { data: ballotageYears } = useBallotageYears();
 
   // Use the custom hook for filtering logic
   const {
@@ -33,7 +35,7 @@ export default function Draft(): JSX.Element {
     setSelectedEquipe,
     availableRounds,
     filteredPicksEquipe,
-  } = useDraftFilters(draftPicks, types);
+  } = useDraftFilters(draftPicks, types, ballotageYears);
 
   const { data: misAuBallotage = [], isLoading: isBallotageLoading } = useMisAuBallotage(selectedType, selectedYear);
 
