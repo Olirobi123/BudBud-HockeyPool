@@ -11,6 +11,7 @@ import Echanges from '@/pages/echanges';
 import Joueur from '@/pages/joueur';
 import Series from '@/pages/series';
 import Bilan from '@/pages/bilan';
+import RegieRepechage from '@/pages/regie-repechage';
 import NotFound from '@/pages/not-found';
 
 function App() {
@@ -37,6 +38,9 @@ function App() {
 
           {/* Bilan de saison */}
           <Route path="/bilan" element={<Bilan />} />
+
+          {/* Régie du draft en direct — aucun lien n'y mène */}
+          <Route path="/regie-repechage" element={<RegieRepechage />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />

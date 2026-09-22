@@ -40,3 +40,12 @@ export interface ListeClassementJoueur {
 /** F = attaquants (C, LW, RW). */
 export type ListePositionFilter = 'ALL' | 'F' | 'D' | 'G';
 export type ListeOwnershipFilter = 'ALL' | 'AVAILABLE' | 'OWNED';
+
+export interface DraftProspectSearchResult {
+  nhlPlayerId: number;
+  nom: string;
+  position: string;
+  equipe: string | null;
+  /** false pour un prospect qui n'a pas encore joué dans la LNH. */
+  actif: boolean;
+}

@@ -29,6 +29,21 @@ const NHL_HEADERS = { Accept: 'application/json', 'User-Agent': 'nhl-api-client'
 
 const apiError = (status: number, message: string): ApiError => ({ status, message });
 
+const normalize = (value: string): string => value
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .trim();
+
+// L'API NHL ne classe pas par pertinence (« Jake O'Brien » sortait 7e) :
+// nom exact d'abord, puis les noms qui contiennent tous les mots tapés, puis les actifs.
+const relevance = (name: string, active: boolean, query: string): number => {
+  const n = normalize(name);
+  const q = normalize(query);
+  const allWords = q.split(/\s+/).every((w) => n.includes(w));
+  return (n === q ? 4 : 0) + (allWords ? 2 : 0) + (active ? 1 : 0);
+};
+
 async function withTransaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
   const client = await pool.connect();
   try {
@@ -62,7 +77,10 @@ export class DraftRegieService {
     const response = await fetch(url, { headers: NHL_HEADERS });
     if (!response.ok) throw apiError(502, `Recherche NHL indisponible (${response.status})`);
     const hits = (await response.json() as NhlSearchHit[]) ?? [];
-    return hits.map((h) => ({
+    return hits
+      .map((h, i) => ({ h, i, score: relevance(h.name, h.active, query) }))
+      .sort((a, b) => b.score - a.score || a.i - b.i)
+      .map(({ h }) => ({
       nhlPlayerId: Number(h.playerId),
       nom: h.name,
       position: h.positionCode,
