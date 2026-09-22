@@ -589,4 +589,42 @@ export const QUERIES = {
     WHERE lj.liste_id = $1
     ORDER BY lj.rang
   `,
+
+  // Régie du draft en direct (page /regie-repechage)
+  GET_DRAFT_PICK_FOR_UPDATE: `
+    SELECT id, equipe_id, equipe_source_id, joueur_id
+    FROM ${TABLES.REPECHAGES}
+    WHERE annee = $1 AND type_id = 2 AND rang = $2
+    FOR UPDATE
+  `,
+  SET_DRAFT_PICK_EQUIPE: `
+    UPDATE ${TABLES.REPECHAGES} SET equipe_id = $2, equipe_source_id = $3 WHERE id = $1
+  `,
+  SET_DRAFT_PICK_JOUEUR: `
+    UPDATE ${TABLES.REPECHAGES} SET joueur = $2, joueur_id = $3 WHERE id = $1
+  `,
+  GET_JOUEUR_OWNER: `
+    SELECT e.id, e.nom
+    FROM ${TABLES.EQUIPE_JOUEURS} ej
+    JOIN ${TABLES.EQUIPES} e ON e.id = ej.equipe_id
+    WHERE ej.joueur_id = $1
+  `,
+  UPSERT_JOUEUR_BY_NHL_ID: `
+    INSERT INTO ${TABLES.JOUEURS} (nhl_player_id, nom, prenom, position)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (nhl_player_id) DO UPDATE SET updated_at = NOW()
+    RETURNING id, prenom, nom
+  `,
+  ADD_JOUEUR_TO_EQUIPE: `
+    INSERT INTO ${TABLES.EQUIPE_JOUEURS} (equipe_id, joueur_id) VALUES ($1, $2)
+  `,
+  MOVE_JOUEUR_EQUIPE: `
+    UPDATE ${TABLES.EQUIPE_JOUEURS} SET equipe_id = $3 WHERE joueur_id = $1 AND equipe_id = $2
+  `,
+  REMOVE_JOUEUR_FROM_EQUIPE: `
+    DELETE FROM ${TABLES.EQUIPE_JOUEURS} WHERE joueur_id = $1 AND equipe_id = $2
+  `,
+  GET_ACTIVE_EQUIPE: `
+    SELECT id FROM ${TABLES.EQUIPES} WHERE id = $1 AND active = TRUE
+  `,
 } as const;
