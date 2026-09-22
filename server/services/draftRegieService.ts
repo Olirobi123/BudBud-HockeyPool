@@ -80,7 +80,7 @@ export class DraftRegieService {
    * comme inactifs (Jake O'Brien, SEA 2025). Une équipe LNH actuelle suffit donc à garder un joueur.
    */
   async searchProspects(query: string): Promise<DraftProspectSearchResult[]> {
-    if (query.trim().length < 2) return [];
+    if (query.trim().length < 3) return [];
     const url = `https://search.d3.nhle.com/api/v1/search/player?culture=fr-ca&limit=${SEARCH_FETCH_LIMIT}&q=${encodeURIComponent(query.trim())}`;
     const response = await fetch(url, { headers: NHL_HEADERS });
     if (!response.ok) throw apiError(502, `Recherche NHL indisponible (${response.status})`);
