@@ -14,7 +14,7 @@ import pool from '../config/database';
 interface ListeJoueurInput {
   rang: number;
   nom: string;
-  position: 'C' | 'LW' | 'RW' | 'D' | 'G';
+  position: 'C' | 'LW' | 'RW' | 'F' | 'D' | 'G';
   equipe?: string;
   tier?: string;
 }
@@ -60,8 +60,11 @@ const normalize = (name: string): string => stripAccents(name)
   .trim()
   .toLowerCase();
 
-// La recherche NHL code les ailiers « L » / « R ».
-const toNhlPosition = (position: string): string => (position === 'LW' ? 'L' : position === 'RW' ? 'R' : position);
+// La recherche NHL code les ailiers « L » / « R », et « F » couvre les trois postes d'attaquant.
+const NHL_POSITIONS: Record<string, string[]> = {
+  C: ['C'], LW: ['L'], RW: ['R'], F: ['C', 'L', 'R'], D: ['D'], G: ['G'],
+};
+const toNhlPositions = (position: string): string[] => NHL_POSITIONS[position] ?? [position];
 
 async function searchNhl(nom: string): Promise<NhlSearchHit[]> {
   const url = `https://search.d3.nhle.com/api/v1/search/player?culture=fr-ca&limit=20&q=${encodeURIComponent(stripAccents(nom))}`;
@@ -82,7 +85,8 @@ const lastName = (nom: string): string => normalize(nom).split(' ').slice(1).joi
 
 // Un seul candidat après filtrage par position, sinon un seul tout court.
 const pickUnique = (hits: NhlSearchHit[], position: string): NhlSearchHit | null => {
-  const samePosition = hits.filter((h) => h.positionCode === toNhlPosition(position));
+  const wanted = toNhlPositions(position);
+  const samePosition = hits.filter((h) => wanted.includes(h.positionCode));
   if (samePosition.length === 1) return samePosition[0];
   return hits.length === 1 ? hits[0] : null;
 };
