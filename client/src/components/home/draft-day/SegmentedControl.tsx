@@ -4,6 +4,8 @@ import { cn } from '@/lib/utils';
 interface SegmentedOption<T extends string> {
   value: T;
   label: string;
+  /** Libellé court sous `sm`, comme le sélecteur du classement de la home. */
+  mobileLabel?: string;
 }
 
 interface SegmentedControlProps<T extends string> {
@@ -32,6 +34,7 @@ export function SegmentedControl<T extends string>({
             type="button"
             role="radio"
             aria-checked={isActive}
+            aria-label={option.label}
             onClick={() => onChange(option.value)}
             className={cn(
               'flex-1 cursor-pointer rounded-md px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide transition-colors sm:flex-none',
@@ -40,7 +43,12 @@ export function SegmentedControl<T extends string>({
                 : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
             )}
           >
-            {option.label}
+            {option.mobileLabel !== undefined ? (
+              <>
+                <span className="sm:hidden">{option.mobileLabel}</span>
+                <span className="hidden sm:inline">{option.label}</span>
+              </>
+            ) : option.label}
           </button>
         );
       })}
