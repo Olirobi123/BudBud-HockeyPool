@@ -1,17 +1,30 @@
 import { JSX } from 'react';
 import Layout from '@/components/Layout';
 import { TonightBoard } from '@/components/home/tonight/TonightBoard';
-import { LivePointsFeed } from '@/components/home/LivePointsFeed';
-import { LivePointsLeaderboard } from '@/components/home/LivePointsLeaderboard';
-import { HomeLatestTrade } from '@/components/home/HomeLatestTrade';
-import { PointsLeaderboard } from '@/components/home/PointsLeaderboard';
-import { PlayoffWidget } from '@/components/home/PlayoffWidget';
-import { useLivePoints } from '@/hooks/home/useLivePoints';
-import { usePointsRankings } from '@/hooks/home/usePointsRankings';
+import { RegularHome } from '@/components/home/RegularHome';
+import { DraftDayHome } from '@/components/home/draft-day/DraftDayHome';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useDraftDayFlag } from '@/hooks/draft-day/useDraftDayFlag';
 
 export default function Home(): JSX.Element {
-  const { data, isLoading } = useLivePoints();
-  const { data: rankingsData, isLoading: rankingsLoading } = usePointsRankings();
+  const { data: flag, isLoading } = useDraftDayFlag();
+
+  if (isLoading) {
+    return (
+      <Layout hideTicker mainPadding="py-10">
+        <Skeleton className="h-[60vh] w-full" />
+      </Layout>
+    );
+  }
+
+  // Jour du repêchage : bascule manuelle en BD (api_store, clé `draft_day`).
+  if (flag?.actif === true) {
+    return (
+      <Layout mainPadding="py-10">
+        <DraftDayHome annee={flag.annee} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout
@@ -19,48 +32,7 @@ export default function Home(): JSX.Element {
       beforeContainer={<TonightBoard />}
       mainPadding="py-10"
     >
-      {/* Each card carries its own title — no eyebrow labels here. (UI_Audit P3) */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/*
-          * Le classement quotidien s'aligne sur la hauteur des marqueurs à sa
-          * droite : la rangée est déjà à la hauteur du plus grand des deux, il
-          * ne reste qu'à faire descendre la carte jusqu'en bas.
-          */}
-        <div className="order-1 lg:order-none lg:col-span-2 lg:h-full">
-          <LivePointsLeaderboard
-            teams={data?.teamLeaderboard ?? []}
-            isLoading={isLoading}
-          />
-        </div>
-
-        <div className="order-2 lg:order-none">
-          <LivePointsFeed
-            players={data?.topPlayers ?? []}
-            liveGamesCount={data?.liveGamesCount ?? 0}
-            isLoading={isLoading}
-          />
-        </div>
-
-        <div className="order-3 lg:order-none lg:col-span-2">
-          <PointsLeaderboard
-            teams={rankingsData ?? []}
-            isLoading={rankingsLoading}
-          />
-        </div>
-
-        {/*
-          * La pile d'échanges se cale sur la hauteur du classement à sa
-          * gauche : `relative` lui sert d'ancrage, `overflow-hidden` garantit
-          * qu'elle ne le dépassera jamais.
-          */}
-        <div className="order-4 lg:order-none lg:relative lg:overflow-hidden">
-          <HomeLatestTrade />
-        </div>
-
-        <div className="order-5 lg:order-none lg:col-span-2">
-          <PlayoffWidget />
-        </div>
-      </div>
+      <RegularHome />
     </Layout>
   );
 }
