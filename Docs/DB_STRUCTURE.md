@@ -215,15 +215,20 @@ Stocke les choix de repêchage futurs détenus par chaque équipe (picks échang
 | sort_year_offset | integer           | Non  | 0                                               |
 | sort_month       | integer           | Non  | 1                                               |
 | sort_day         | integer           | Non  | 1                                               |
+| ordre            | integer           | Oui  | -                                               |
 
 #### Données de référence
-| id | nom                   | sort_year_offset | sort_month | sort_day |
-|----|-----------------------|------------------|------------|----------|
-| 1  | Ballotage de décembre | -1               | 12         | 1        |
-| 2  | Draft annuel          | -1               | 10         | 3        |
-| 3  | Draft d'expansion     | -1               | 6          | 20       |
-| 4  | Ballotage de mars     | 0                | 3          | 1        |
-| 5  | Draft de dispersion   | -1               | 6          | 1        |
+| id | nom                   | sort_year_offset | sort_month | sort_day | ordre |
+|----|-----------------------|------------------|------------|----------|-------|
+| 1  | Ballotage de décembre | -1               | 12         | 1        | 4     |
+| 2  | Draft annuel          | -1               | 10         | 3        | 1     |
+| 3  | Draft d'expansion     | -1               | 6          | 20       | 3     |
+| 4  | Ballotage de mars     | 0                | 3          | 1        | 5     |
+| 5  | Draft de dispersion   | -1               | 6          | 1        | 2     |
+
+#### Notes
+- `sort_year_offset` / `sort_month` / `sort_day` : ordre **chronologique**, utilisé pour situer les événements dans l'historique d'un joueur
+- `ordre` : ordre **d'affichage** du filtre de la page Repêchage (`GET /api/repechage/types`) — indépendant de la chronologie ; un type sans `ordre` passe à la fin
 
 ---
 

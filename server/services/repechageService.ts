@@ -34,7 +34,8 @@ export class RepechageService {
    */
   async getRepechageTypes(): Promise<RepechageType[]> {
     try {
-      const result = await pool.query('SELECT id, nom FROM types_repechage ORDER BY id');
+      // `ordre` fixe l'ordre d'affichage du filtre ; un type sans ordre passe à la fin.
+      const result = await pool.query('SELECT id, nom FROM types_repechage ORDER BY ordre NULLS LAST, id');
       return result.rows;
     } catch (error) {
       console.error('Erreur lors de la récupération des types de repêchage:', error);
