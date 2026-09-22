@@ -434,3 +434,11 @@ export interface ListeClassementJoueur {
   nhlPlayerId: number | null;
   proprietaire: { id: number; nom: string } | null;
 }
+
+export interface DraftProspectSearchResult {
+  nhlPlayerId: number;
+  nom: string;
+  position: string;
+  equipe: string | null;
+  actif: boolean;
+}
