@@ -4,6 +4,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { getPositionLabel } from '@/lib/positionLabel';
 import type { ListeClassementJoueur } from '@/types/IDraftDay';
 
 interface RankingListTableProps {
@@ -40,13 +41,13 @@ export function RankingListTable({ joueurs }: RankingListTableProps): JSX.Elemen
               )}
               <span className="block text-[11px] text-muted-foreground md:hidden">
                 <span className="sm:hidden">
-                  {j.position}
+                  {getPositionLabel(j.position)}
                   {j.equipeNhl !== null && ' · '}
                 </span>
                 {j.equipeNhl}
               </span>
             </TableCell>
-            <TableCell className="hidden text-xs sm:table-cell">{j.position}</TableCell>
+            <TableCell className="hidden text-xs sm:table-cell">{getPositionLabel(j.position)}</TableCell>
             <TableCell className="hidden text-muted-foreground md:table-cell">{j.equipeNhl ?? '—'}</TableCell>
             <TableCell className="text-right">
               {j.proprietaire !== null ? (
