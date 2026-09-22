@@ -25,6 +25,10 @@ interface NhlLanding {
   position: string;
 }
 
+// On demande large à l'API puisque les retraités sont retirés ensuite.
+const SEARCH_FETCH_LIMIT = 40;
+const SEARCH_RESULT_LIMIT = 10;
+
 const NHL_HEADERS = { Accept: 'application/json', 'User-Agent': 'nhl-api-client' };
 
 const apiError = (status: number, message: string): ApiError => ({ status, message });
@@ -36,12 +40,12 @@ const normalize = (value: string): string => value
   .trim();
 
 // L'API NHL ne classe pas par pertinence (« Jake O'Brien » sortait 7e) :
-// nom exact d'abord, puis les noms qui contiennent tous les mots tapés, puis les actifs.
-const relevance = (name: string, active: boolean, query: string): number => {
+// nom exact d'abord, puis les noms qui contiennent tous les mots tapés.
+const relevance = (name: string, query: string): number => {
   const n = normalize(name);
   const q = normalize(query);
   const allWords = q.split(/\s+/).every((w) => n.includes(w));
-  return (n === q ? 4 : 0) + (allWords ? 2 : 0) + (active ? 1 : 0);
+  return (n === q ? 2 : 0) + (allWords ? 1 : 0);
 };
 
 async function withTransaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
@@ -70,22 +74,35 @@ async function lockPick(client: PoolClient, annee: number, rang: number): Promis
  * et `equipe_joueurs` synchronisés dans une même transaction.
  */
 export class DraftRegieService {
-  /** Recherche NHL incluant les prospects (non actifs), contrairement à /api/players/search. */
+  /**
+   * Recherche NHL limitée aux joueurs actifs (repêchés ou sous contrat) — les retraités sont exclus.
+   * On ne passe pas `active=true` à l'API : son index marque à tort certains prospects repêchés
+   * comme inactifs (Jake O'Brien, SEA 2025). Une équipe LNH actuelle suffit donc à garder un joueur.
+   */
   async searchProspects(query: string): Promise<DraftProspectSearchResult[]> {
     if (query.trim().length < 2) return [];
-    const url = `https://search.d3.nhle.com/api/v1/search/player?culture=fr-ca&limit=10&q=${encodeURIComponent(query.trim())}`;
+    const url = `https://search.d3.nhle.com/api/v1/search/player?culture=fr-ca&limit=${SEARCH_FETCH_LIMIT}&q=${encodeURIComponent(query.trim())}`;
     const response = await fetch(url, { headers: NHL_HEADERS });
     if (!response.ok) throw apiError(502, `Recherche NHL indisponible (${response.status})`);
-    const hits = (await response.json() as NhlSearchHit[]) ?? [];
+    const hits = ((await response.json() as NhlSearchHit[]) ?? [])
+      .filter((h) => h.active || h.teamAbbrev !== null);
+
+    const owners = await pool.query<{ nhl_player_id: number; nom: string }>(
+      QUERIES.GET_OWNERS_BY_NHL_IDS,
+      [hits.map((h) => Number(h.playerId))],
+    );
+    const ownerByNhlId = new Map(owners.rows.map((r) => [r.nhl_player_id, r.nom.trim()]));
+
     return hits
-      .map((h, i) => ({ h, i, score: relevance(h.name, h.active, query) }))
+      .map((h, i) => ({ h, i, score: relevance(h.name, query) }))
       .sort((a, b) => b.score - a.score || a.i - b.i)
+      .slice(0, SEARCH_RESULT_LIMIT)
       .map(({ h }) => ({
       nhlPlayerId: Number(h.playerId),
       nom: h.name,
       position: h.positionCode,
       equipe: h.teamAbbrev ?? h.lastTeamAbbrev,
-      actif: h.active,
+      proprietaire: ownerByNhlId.get(Number(h.playerId)) ?? null,
     }));
   }
 

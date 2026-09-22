@@ -25,10 +25,11 @@ export function RegiePlayerPicker({
   const showResults = query.trim().length >= 2;
 
   // Entrée ne valide que si le premier résultat contient tous les mots tapés : pas de choix au hasard.
-  const firstIsMatch = results.length > 0 && normalizeSearch(query).split(/\s+/)
-    .every((w) => normalizeSearch(results[0].nom).includes(w));
+  const firstIsMatch = results.length > 0 && results[0].proprietaire === null
+    && normalizeSearch(query).split(/\s+/).every((w) => normalizeSearch(results[0].nom).includes(w));
 
   const pick = (player: DraftProspectSearchResult) => {
+    if (player.proprietaire !== null) return;
     setQuery('');
     onPick(player);
   };
@@ -64,14 +65,18 @@ export function RegiePlayerPicker({
               <button
                 type="button"
                 onClick={() => pick(player)}
-                className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-accent focus:bg-accent focus:outline-none"
+                disabled={player.proprietaire !== null}
+                title={player.proprietaire !== null ? `Déjà à ${player.proprietaire}` : undefined}
+                className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-accent focus:bg-accent focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
               >
-                <span className="flex-1 truncate text-sm font-medium text-foreground">{player.nom}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium text-foreground">{player.nom}</span>
+                  {player.proprietaire !== null && (
+                    <span className="block truncate text-[11px] text-muted-foreground">{`Déjà à ${player.proprietaire}`}</span>
+                  )}
+                </span>
                 <span className="w-6 text-xs text-muted-foreground">{player.position}</span>
                 <span className="w-10 text-xs text-muted-foreground">{player.equipe ?? '—'}</span>
-                <span className="w-14 text-right text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {!player.actif && 'Inactif'}
-                </span>
               </button>
             </li>
           ))}
