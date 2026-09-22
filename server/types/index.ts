@@ -440,5 +440,6 @@ export interface DraftProspectSearchResult {
   nom: string;
   position: string;
   equipe: string | null;
-  actif: boolean;
+  /** Équipe du pool qui possède déjà le joueur — la régie ne peut pas le choisir. */
+  proprietaire: string | null;
 }
