@@ -20,7 +20,6 @@ export function RankingListTable({ joueurs }: RankingListTableProps): JSX.Elemen
           <TableHead>Joueur</TableHead>
           <TableHead className="hidden w-12 sm:table-cell">Pos</TableHead>
           <TableHead className="hidden md:table-cell">Équipe LNH</TableHead>
-          <TableHead className="hidden sm:table-cell">Tier</TableHead>
           <TableHead className="text-right">Pool</TableHead>
         </TableRow>
       </TableHeader>
@@ -49,7 +48,6 @@ export function RankingListTable({ joueurs }: RankingListTableProps): JSX.Elemen
             </TableCell>
             <TableCell className="hidden text-xs sm:table-cell">{j.position}</TableCell>
             <TableCell className="hidden text-muted-foreground md:table-cell">{j.equipeNhl ?? '—'}</TableCell>
-            <TableCell className="hidden text-xs text-muted-foreground sm:table-cell">{j.tier ?? '—'}</TableCell>
             <TableCell className="text-right">
               {j.proprietaire !== null ? (
                 <Link
