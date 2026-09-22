@@ -14,6 +14,7 @@ import misAuBallotageRoutes from './routes/misAuBallotage';
 import injuriesRoutes from './routes/injuries';
 import etatRoutes from './routes/etat';
 import seriesRoutes from './routes/series';
+import draftDayRoutes from './routes/draftDay';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Routes pour les équipes
@@ -57,6 +58,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Routes pour les séries éliminatoires
   app.use('/api/series', seriesRoutes);
+
+  // Routes pour la home « draft day » (tableau des rondes + listes publiques)
+  app.use('/api/draft-day', draftDayRoutes);
 
   const httpServer = createServer(app);
 
