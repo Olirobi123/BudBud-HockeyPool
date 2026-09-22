@@ -20,6 +20,9 @@ export const TABLES = {
   SERIES_PLAYOFFS: 'series_playoffs',
   SERIES_SEMAINE_BASELINE: 'series_semaine_baseline',
   EQUIPE_POINTS_MENSUEL: 'equipe_points_mensuel',
+  REPECHAGES: 'repechages',
+  LISTES_CLASSEMENT: 'listes_classement',
+  LISTE_CLASSEMENT_JOUEURS: 'liste_classement_joueurs',
 } as const;
 
 export const QUERIES = {
@@ -532,5 +535,58 @@ export const QUERIES = {
     SELECT equipe_id, total_matchs
     FROM ${TABLES.EQUIPE_SEMAINE_POINTS}
     WHERE saison = $1 AND semaine = $2
+  `,
+
+  // Draft day (issue #137)
+  GET_DRAFT_BOARD: `
+    SELECT
+      r.rang,
+      r.round,
+      r.equipe_id,
+      e.nom       AS equipe_nom,
+      e.nom_court AS equipe_nom_court,
+      src.nom       AS source_nom,
+      src.nom_court AS source_nom_court,
+      r.joueur,
+      j.nhl_player_id AS joueur_nhl_id,
+      j.position      AS joueur_position
+    FROM ${TABLES.REPECHAGES} r
+    JOIN ${TABLES.EQUIPES} e        ON e.id = r.equipe_id
+    LEFT JOIN ${TABLES.EQUIPES} src ON src.id = r.equipe_source_id
+    LEFT JOIN ${TABLES.JOUEURS} j   ON j.id = r.joueur_id
+    WHERE r.annee = $1 AND r.type_id = 2
+    ORDER BY r.rang
+  `,
+  GET_LISTES_CLASSEMENT: `
+    SELECT l.id, l.nom, l.auteur, l.publie_le, COUNT(lj.id)::int AS total
+    FROM ${TABLES.LISTES_CLASSEMENT} l
+    LEFT JOIN ${TABLES.LISTE_CLASSEMENT_JOUEURS} lj ON lj.liste_id = l.id
+    GROUP BY l.id
+    ORDER BY l.ordre, l.id
+  `,
+  // Propriétaire = alignement actuel ; à défaut, le choix entré en direct dans le draft en cours.
+  GET_LISTE_CLASSEMENT_JOUEURS: `
+    SELECT
+      lj.rang,
+      lj.nom,
+      lj.position,
+      lj.equipe_nhl,
+      lj.tier,
+      lj.nhl_player_id,
+      COALESCE(ej_e.id, dr_e.id)   AS proprietaire_id,
+      COALESCE(ej_e.nom, dr_e.nom) AS proprietaire_nom
+    FROM ${TABLES.LISTE_CLASSEMENT_JOUEURS} lj
+    LEFT JOIN ${TABLES.JOUEURS} j ON j.nhl_player_id = lj.nhl_player_id
+    LEFT JOIN ${TABLES.EQUIPE_JOUEURS} ej ON ej.joueur_id = j.id
+    LEFT JOIN ${TABLES.EQUIPES} ej_e ON ej_e.id = ej.equipe_id
+    LEFT JOIN LATERAL (
+      SELECT r.equipe_id
+      FROM ${TABLES.REPECHAGES} r
+      WHERE r.joueur_id = j.id AND r.annee = $2 AND r.type_id = 2
+      LIMIT 1
+    ) dr ON TRUE
+    LEFT JOIN ${TABLES.EQUIPES} dr_e ON dr_e.id = dr.equipe_id
+    WHERE lj.liste_id = $1
+    ORDER BY lj.rang
   `,
 } as const;
