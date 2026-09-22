@@ -288,7 +288,8 @@ export interface RepechageChoice {
   rang: number;
   round: number;
   nom: string;
-  joueur: string;
+  // NULL tant que le choix du draft en cours n'a pas été fait.
+  joueur: string | null;
 }
 
 export interface RepechageType {
@@ -394,4 +395,42 @@ export interface EtatInfo {
   savePctg5Matchs: number | null;
   derniersMatchs: Last5GameSnapshot[];
   lastUpdate: string;
+}
+
+// Draft day (issue #137)
+export interface DraftDayFlag {
+  actif: boolean;
+  annee: number;
+}
+
+export interface DraftBoardPick {
+  rang: number;
+  round: number;
+  pickInRound: number;
+  equipeId: number;
+  equipeNom: string;
+  equipeNomCourt: string | null;
+  sourceNom: string | null;
+  sourceNomCourt: string | null;
+  joueur: string | null;
+  joueurNhlId: number | null;
+  joueurPosition: string | null;
+}
+
+export interface ListeClassement {
+  id: number;
+  nom: string;
+  auteur: string | null;
+  publieLe: string | null;
+  total: number;
+}
+
+export interface ListeClassementJoueur {
+  rang: number;
+  nom: string;
+  position: string;
+  equipeNhl: string | null;
+  tier: string | null;
+  nhlPlayerId: number | null;
+  proprietaire: { id: number; nom: string } | null;
 }
