@@ -3,11 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import type { DraftProspectSearchResult } from '@/types/IDraftDay';
 import { fetchDraftDay } from './fetchDraftDay';
 
-const DEBOUNCE_MS = 250;
-const MIN_LENGTH = 2;
+// On attend 3 lettres et 1 s sans frappe avant d'interroger la LNH.
+const DEBOUNCE_MS = 1000;
+export const PROSPECT_SEARCH_MIN_LENGTH = 3;
 
-/** Recherche NHL (prospects compris) pour la régie, avec un léger délai de frappe. */
-// eslint-disable-next-line import/prefer-default-export
+/** Recherche NHL pour la régie. `isWaiting` : la frappe n'est pas encore envoyée. */
 export function useProspectSearch(query: string) {
   const [debounced, setDebounced] = useState(query);
 
@@ -16,13 +16,15 @@ export function useProspectSearch(query: string) {
     return () => clearTimeout(timer);
   }, [query]);
 
-  return useQuery<DraftProspectSearchResult[]>({
+  const search = useQuery<DraftProspectSearchResult[]>({
     queryKey: ['draft-day', 'regie-recherche', debounced],
     queryFn: () => fetchDraftDay<DraftProspectSearchResult[]>(
       `/regie/recherche?q=${encodeURIComponent(debounced)}`,
       'Erreur lors de la recherche NHL',
     ),
-    enabled: debounced.length >= MIN_LENGTH,
+    enabled: debounced.length >= PROSPECT_SEARCH_MIN_LENGTH,
     staleTime: 5 * 60 * 1000,
   });
+
+  return { ...search, isWaiting: query.trim() !== debounced };
 }
