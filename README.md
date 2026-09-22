@@ -1,5 +1,7 @@
 # 🇫🇷 38BudBud
 
+<img width="1408" height="837" alt="image" src="https://github.com/user-attachments/assets/3be98ce2-60ed-4a1c-a181-05c771afdb30" />
+
 **38BudBud** est une plateforme web bilingue (français/anglais) pour la gestion de pools de hockey. Elle offre un suivi en temps réel des scores NHL, la gestion des équipes et des effectifs, des statistiques avancées, un système d'échanges et de repêchage, ainsi qu'un palmarès de trophées.
 
 ## Fonctionnalités
