@@ -112,7 +112,7 @@ export function DraftTable({
                             {pick.nom}
                           </TableCell>
                           <TableCell className="font-medium text-foreground">
-                            {pick.joueur}
+                            {pick.joueur ?? '—'}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -151,7 +151,7 @@ export function DraftTable({
                   </TableCell>
                   <TableCell className="text-foreground">{pick.nom}</TableCell>
                   <TableCell className="font-medium text-foreground">
-                    {pick.joueur}
+                    {pick.joueur ?? '—'}
                   </TableCell>
                 </TableRow>
               ))}

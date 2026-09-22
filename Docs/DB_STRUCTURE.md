@@ -161,16 +161,23 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie.
 | annee      | integer           | Non  | -                                               |
 | type_id    | integer           | Oui  | -                                               |
 | equipe_id  | integer           | Oui  | -                                               |
-| joueur     | character varying | Non  | -                                               |
+| joueur     | character varying | Oui  | -                                               |
 | joueur_id  | integer           | Oui  | -                                               |
 | rang       | integer           | Non  | -                                               |
 | round      | integer           | Oui  | -                                               |
+| equipe_source_id | integer     | Oui  | -                                               |
 
 #### Contraintes
 - `PRIMARY KEY (id)`
 - `FOREIGN KEY (type_id)` → `types_repechage(id)`
 - `FOREIGN KEY (equipe_id)` → `equipes(id)`
 - `FOREIGN KEY (joueur_id)` → `joueurs(id)`
+- `FOREIGN KEY (equipe_source_id)` → `equipes(id)`
+
+#### Notes
+- `annee` suit `types_repechage.sort_year_offset` : le draft annuel d'octobre 2026 est `annee = 2027`
+- `joueur` : `NULL` tant qu'un choix du draft en cours n'a pas été fait (choix pré-remplis, voir `server/migrations/seed_draft_2027.sql`)
+- `equipe_source_id` : équipe d'origine d'un choix échangé — `NULL` pour l'historique et les choix non échangés
 
 ---
 
@@ -302,6 +309,7 @@ Stocke des snapshots JSON persistants, indexés par clé textuelle. Conçu pour 
 |-------------------|-----------------------------------------------------------------------|--------------------------|
 | `live_points`     | `{ topPlayers, teamLeaderboard, gamesCount, liveGamesCount }`         | Cron nightly (après minuit UTC) |
 | `classement_prev` | `{ teams: { [equipe_id]: total_points }, updatedAt }`                 | Cron `POST /api/points/update` |
+| `draft_day`       | `{ actif: boolean, annee: number }`                                   | À la main — `actif = true` remplace la home par le tableau du repêchage |
 
 #### Notes
 - `classement_prev` : baseline des points cumulés avant la journée de matchs — utilisé pour calculer le diff journalier dans `live_points`
@@ -456,6 +464,45 @@ Snapshot des points cumulés (`equipe_points`) au début de chaque semaine de pl
 
 ---
 
+### 19. `listes_classement`
+
+Listes de classement publiques affichées sur la home du jour du repêchage (Pronman U23, top 200 fantasy, ...). Importées avec `npm run import:liste -w server -- <fichier.json>` (fichiers dans `server/data/listes/`).
+
+#### Colonnes
+| Nom       | Type    | Null | Par défaut                                     |
+|-----------|---------|------|------------------------------------------------|
+| id        | integer | Non  | nextval('listes_classement_id_seq'::regclass)  |
+| nom       | text    | Non  | -                                              |
+| auteur    | text    | Oui  | -                                              |
+| publie_le | date    | Oui  | -                                              |
+| ordre     | integer | Non  | 0                                              |
+
+---
+
+### 20. `liste_classement_joueurs`
+
+#### Colonnes
+| Nom           | Type       | Null | Par défaut                                           |
+|---------------|------------|------|------------------------------------------------------|
+| id            | integer    | Non  | nextval('liste_classement_joueurs_id_seq'::regclass) |
+| liste_id      | integer    | Non  | -                                                    |
+| rang          | integer    | Non  | -                                                    |
+| nom           | text       | Non  | -                                                    |
+| position      | varchar(2) | Non  | -                                                    |
+| equipe_nhl    | text       | Oui  | -                                                    |
+| tier          | text       | Oui  | -                                                    |
+| nhl_player_id | integer    | Oui  | -                                                    |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (liste_id)` → `listes_classement(id) ON DELETE CASCADE`
+- `UNIQUE (liste_id, rang)`
+
+#### Notes
+- `nhl_player_id` n'est pas une FK : un prospect peut ne pas être dans `joueurs`. Le propriétaire est déduit via `joueurs.nhl_player_id` → `equipe_joueurs`, ou via le choix du draft en cours (`repechages.joueur_id`)
+
+---
+
 ## Relations entre les tables
 
 - `echanges` → `equipes` (equipe_source_id, equipe_destination_id)
@@ -464,7 +511,8 @@ Snapshot des points cumulés (`equipe_points`) au début de chaque semaine de pl
 - `echange_joueurs` → `joueurs` ON DELETE SET NULL
 - `equipe_joueurs` → `equipes` + `joueurs` (junction roster)
 - `equipe_points` → `equipes`
-- `repechages` → `types_repechage`, `equipes`, `joueurs`
+- `repechages` → `types_repechage`, `equipes` (equipe_id + equipe_source_id), `joueurs`
+- `liste_classement_joueurs` → `listes_classement` ON DELETE CASCADE
 - `choix_repechage` → `equipes` (equipe_id + equipe_source_id)
 - `trophee_gagnants` → `trophees`, `equipes`
 - `mis_au_ballotage` → `equipes`, `joueurs`, `types_repechage`
