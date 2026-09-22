@@ -624,6 +624,13 @@ export const QUERIES = {
   REMOVE_JOUEUR_FROM_EQUIPE: `
     DELETE FROM ${TABLES.EQUIPE_JOUEURS} WHERE joueur_id = $1 AND equipe_id = $2
   `,
+  GET_OWNERS_BY_NHL_IDS: `
+    SELECT j.nhl_player_id, e.nom
+    FROM ${TABLES.JOUEURS} j
+    JOIN ${TABLES.EQUIPE_JOUEURS} ej ON ej.joueur_id = j.id
+    JOIN ${TABLES.EQUIPES} e ON e.id = ej.equipe_id
+    WHERE j.nhl_player_id = ANY($1::int[])
+  `,
   GET_ACTIVE_EQUIPE: `
     SELECT id FROM ${TABLES.EQUIPES} WHERE id = $1 AND active = TRUE
   `,

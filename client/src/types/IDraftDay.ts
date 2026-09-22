@@ -46,6 +46,6 @@ export interface DraftProspectSearchResult {
   nom: string;
   position: string;
   equipe: string | null;
-  /** false pour un prospect qui n'a pas encore joué dans la LNH. */
-  actif: boolean;
+  /** Équipe du pool qui possède déjà le joueur : il ne peut pas être choisi. */
+  proprietaire: string | null;
 }
