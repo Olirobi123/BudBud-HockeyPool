@@ -2,7 +2,7 @@ import { JSX, useState } from 'react';
 import { Loader2, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useProspectSearch } from '@/hooks/draft-day/useProspectSearch';
+import { PROSPECT_SEARCH_MIN_LENGTH, useProspectSearch } from '@/hooks/draft-day/useProspectSearch';
 import { normalizeSearch } from '@/lib/rankingListFilter';
 import type { DraftProspectSearchResult } from '@/types/IDraftDay';
 
@@ -21,11 +21,14 @@ export function RegiePlayerPicker({
   onPick, disabled, size = 'compact', autoFocus = false,
 }: RegiePlayerPickerProps): JSX.Element {
   const [query, setQuery] = useState('');
-  const { data: results = [], isFetching, error } = useProspectSearch(query);
-  const showResults = query.trim().length >= 2;
+  const {
+    data: results = [], isFetching, isWaiting, error,
+  } = useProspectSearch(query);
+  const showResults = query.trim().length >= PROSPECT_SEARCH_MIN_LENGTH;
+  const isSearching = isWaiting || isFetching;
 
   // Entrée ne valide que si le premier résultat contient tous les mots tapés : pas de choix au hasard.
-  const firstIsMatch = results.length > 0 && results[0].proprietaire === null
+  const firstIsMatch = !isSearching && results.length > 0 && results[0].proprietaire === null
     && normalizeSearch(query).split(/\s+/).every((w) => normalizeSearch(results[0].nom).includes(w));
 
   const pick = (player: DraftProspectSearchResult) => {
@@ -51,13 +54,16 @@ export function RegiePlayerPicker({
         autoFocus={autoFocus}
         className={cn('pl-9', size === 'large' && 'h-12 text-base')}
       />
-      {isFetching && (
+      {isSearching && showResults && (
         <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" aria-hidden="true" />
       )}
       {showResults && (
         <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-md border border-border bg-card shadow-lg">
           {error !== null && <li className="p-3 text-sm text-destructive">Recherche NHL indisponible</li>}
-          {error === null && !isFetching && results.length === 0 && (
+          {isSearching && results.length === 0 && (
+            <li className="p-3 text-sm text-muted-foreground">Recherche…</li>
+          )}
+          {error === null && !isSearching && results.length === 0 && (
             <li className="p-3 text-sm text-muted-foreground">Aucun joueur trouvé</li>
           )}
           {results.map((player) => (
