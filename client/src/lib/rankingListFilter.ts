@@ -6,7 +6,7 @@ import type {
 
 export const RANKING_LIST_PAGE_SIZE = 25;
 
-const FORWARD_POSITIONS = ['C', 'LW', 'RW'];
+const FORWARD_POSITIONS = ['C', 'LW', 'RW', 'F'];
 
 function matchesPosition(position: string, filter: ListePositionFilter): boolean {
   if (filter === 'ALL') return true;
