@@ -6,11 +6,17 @@ export function useDraftFilters(draftPicks: DraftPick[] = [], types: DraftType[]
   const annees = useMemo(() => Array.from(new Set([...draftPicks.map((pick) => pick.annee), ...ballotageYears])).sort((a, b) => b - a), [draftPicks, ballotageYears]);
   const equipes = useMemo(() => Array.from(new Set(draftPicks.map((pick) => pick.nom))).sort(), [draftPicks]);
 
-  // State for filters
-  const [selectedYear, setSelectedYear] = useState(annees[0]);
-  const [selectedType, setSelectedType] = useState(types[0]?.id ?? 1);
+  // State for filters. L'état ne retient que le choix explicite de l'utilisateur : les
+  // valeurs par défaut sont dérivées à chaque rendu, car `annees` et `types` arrivent des
+  // requêtes après le premier rendu et `useState` ne relit jamais sa valeur initiale.
+  const [yearChoice, setYearChoice] = useState<number | undefined>(undefined);
+  const [typeChoice, setTypeChoice] = useState<number | undefined>(undefined);
   const [selectedRound, setSelectedRound] = useState(0);
   const [selectedEquipe, setSelectedEquipe] = useState<string>('');
+
+  const selectedYear = yearChoice ?? annees[0];
+  // 0 tant que les types n'ont pas chargé : les requêtes dépendantes restent désactivées.
+  const selectedType = typeChoice ?? types[0]?.id ?? 0;
 
   // Filter picks by year and type
   const currentYearPicks = useMemo(() => draftPicks.filter((pick) => pick.annee === selectedYear && pick.type_id === selectedType), [draftPicks, selectedYear, selectedType]);
@@ -25,9 +31,9 @@ export function useDraftFilters(draftPicks: DraftPick[] = [], types: DraftType[]
   const filteredPicksEquipe = useMemo(() => (selectedEquipe ? filteredPicks.filter((pick) => pick.nom === selectedEquipe) : filteredPicks), [filteredPicks, selectedEquipe]);
 
   // Handlers for filter changes
-  const handleYearChange = (year: number) => setSelectedYear(year);
+  const handleYearChange = (year: number) => setYearChoice(year);
   const handleTypeChange = (typeId: number) => {
-    setSelectedType(typeId);
+    setTypeChoice(typeId);
     setSelectedRound(0);
   };
   const handleRoundChange = (round: number) => setSelectedRound(round);
