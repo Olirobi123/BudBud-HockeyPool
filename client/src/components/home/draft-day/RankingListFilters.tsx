@@ -4,13 +4,11 @@ import { Input } from '@/components/ui/input';
 import type { ListeOwnershipFilter, ListePositionFilter } from '@/types/IDraftDay';
 import { SegmentedControl } from './SegmentedControl';
 
-const POSITIONS: { value: ListePositionFilter; label: string }[] = [
+const POSITIONS: { value: ListePositionFilter; label: string; mobileLabel?: string }[] = [
   { value: 'ALL', label: 'Tous' },
-  { value: 'C', label: 'C' },
-  { value: 'LW', label: 'LW' },
-  { value: 'RW', label: 'RW' },
-  { value: 'D', label: 'D' },
-  { value: 'G', label: 'G' },
+  { value: 'F', label: 'Attaquants', mobileLabel: 'Att' },
+  { value: 'D', label: 'Défenseurs', mobileLabel: 'Déf' },
+  { value: 'G', label: 'Gardiens', mobileLabel: 'Gar' },
 ];
 
 const OWNERSHIP: { value: ListeOwnershipFilter; label: string }[] = [

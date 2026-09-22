@@ -37,5 +37,6 @@ export interface ListeClassementJoueur {
   proprietaire: { id: number; nom: string } | null;
 }
 
-export type ListePositionFilter = 'ALL' | 'C' | 'LW' | 'RW' | 'D' | 'G';
+/** F = attaquants (C, LW, RW). */
+export type ListePositionFilter = 'ALL' | 'F' | 'D' | 'G';
 export type ListeOwnershipFilter = 'ALL' | 'AVAILABLE' | 'OWNED';
