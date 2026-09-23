@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 npm run dev          # Start development server (Vite + tsx)
 npm run build        # Build for production (Vite client + esbuild server)
-npm start            # Run production server
+npm start -w server  # Run production server (no root-level "start" script)
 npm run check        # TypeScript type checking
 npm run lint         # ESLint with strict mode (max 0 warnings)
 npm run lint:fix     # Auto-fix lint issues
@@ -25,9 +25,9 @@ This is an **npm workspaces monorepo** with `client/` and `server/` as separate 
 
 ### Frontend (`client/`)
 - **Entry**: `main.tsx` → `App.tsx` (routing with `react-router-dom` BrowserRouter)
-- **Pages**: `home`, `equipes`, `team-details`, `draft`, `echanges`, `joueur`, `not-found`
+- **Pages**: `home`, `equipes`, `team-details`, `draft`, `regie-repechage`, `echanges`, `joueur`, `bilan`, `series`, `not-found`
 - **State**: TanStack Query for server state. There is no global loading state — each page mounts its `<Layout>` immediately and renders a `*Skeleton` component in its content region while its queries resolve.
-- **Components**: Feature folders under `components/` (draft/, echanges/, equipes/, home/, joueur/, navigation/, player-search/, trophees/)
+- **Components**: Feature folders under `components/` (bilan/, draft/, draft-regie/, echanges/, equipes/, home/, joueur/, navigation/, player-search/, scores/, series/, trophees/)
 - **UI Primitives**: Radix-based components in `components/ui/` (shadcn/ui)
 - **Hooks**: Feature-specific hooks in `hooks/[feature]/` folders; shared hooks at `hooks/` root
 - **Styling**: Tailwind CSS with dark mode support
@@ -47,17 +47,27 @@ This is an **npm workspaces monorepo** with `client/` and `server/` as separate 
   - `/api/trophees` — pool awards
   - `/api/snapshot` — nightly data snapshots for cron jobs (protected by `requireApiKey`)
   - `/api/mis-au-ballotage` — waiver wire player history
+  - `/api/injuries` — NHL player injury status
+  - `/api/etat` — hot/cold/normal player form (`GET /`)
+  - `/api/series` — playoff series and weekly snapshots
+  - `/api/draft-day` — public draft board/rankings + unlinked live draft régie (no auth)
   - `/api/health` — health check
 - **Database**: PostgreSQL via connection pool (`config/database.ts`); all SQL queries in `models/index.ts`
 - **Error handling**: Centralized middleware in `middleware/errorHandler.ts`
 
-### Database (12 tables)
-`equipes`, `joueurs`, `equipe_joueurs` (junction), `equipe_points`, `repechages`, `types_repechage`, `echanges`, `echange_joueurs` (junction), `trophees`, `trophee_gagnants`, `api_store`, `mis_au_ballotage`
+### Database (22 tables)
+`equipes`, `joueurs`, `equipe_joueurs` (junction), `equipe_points`, `equipe_points_mensuel`, `equipe_saison_totaux`, `equipe_semaine_points`, `repechages`, `choix_repechage`, `types_repechage`, `echanges`, `echange_joueurs` (junction), `trophees`, `trophee_gagnants`, `api_store`, `mis_au_ballotage`, `blessures`, `etat_joueurs`, `series_playoffs`, `series_semaine_baseline`, `listes_classement`, `liste_classement_joueurs`
+
+See `/Docs/DB_STRUCTURE.md` for full column-level detail (verified against the live Neon schema). Highlights:
 - `equipes.nhl_player_ids` has been **dropped** — use `equipe_joueurs` junction table
 - `echanges.details` has been **dropped** — use `echange_joueurs` junction table
 - `equipes` has two columns: `division` (varchar) and `dg_name` (text)
 - `api_store` — persistent JSON cache for cron snapshots (keyed by text, UPSERT pattern)
 - `mis_au_ballotage` — tracks players waived/dropped before each draft event
+- `blessures` / `etat_joueurs` — injury status and hot/cold form, refreshed by cron
+- `series_playoffs` / `series_semaine_baseline` / `equipe_semaine_points` — playoff bracket and weekly point tracking
+- `equipe_points_mensuel` / `equipe_saison_totaux` — monthly/season point breakdowns powering the Bilan page
+- `listes_classement` / `liste_classement_joueurs` — imported public ranking lists shown on the draft-day home page
 - Player positions: `'C'`, `'LW'`, `'RW'`, `'D'`, `'G'`
 
 ### Data Flow
@@ -70,10 +80,10 @@ Before implementing features, consult in this order:
 1. `/Docs/Bug_tracking.md` - Check for known issues first
 2. `/Docs/Design_System.md` - Design tokens, colour rules, component inventory
 3. `/Docs/Design_System_Cheatsheet.md` - Quick reference for the above
-4. `/Docs/UI_UX_doc.md` - Design system and responsive requirements
-5. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (12 tables)
-6. `/Docs/Cron_Jobs.md` - Cron schedule, manual playoff actions, and endpoint reference
-6. `/Docs/Git_Workflow.md` - Branching strategy and deployment process
+4. `/Docs/DB_STRUCTURE.md` - PostgreSQL schema (22 tables)
+5. `/Docs/Cron_Jobs.md` - Cron schedule, manual playoff actions, and endpoint reference
+
+Branching strategy and deployment process are documented below in **Git Workflow**, not in a separate doc.
 
 ## Component Structure
 
@@ -179,6 +189,6 @@ When promoting `dev` to `main`:
 
 ## Current Development Status
 
-The project follows a 5-stage refactoring plan. Stages 1-4 are complete (all phases including Awards and Frontend). Stage 5 (Polish, Testing & Optimization) is next.
+The original 5-stage refactoring plan (through Awards/Frontend) is complete. Active development has since moved to new features on top of that base: a live draft-day board with an unlinked régie control page, playoff series tracking, waiver/ballotage history, player injury and hot/cold state, and the season Bilan page. Check `git log` for the latest work rather than assuming a fixed stage.
 
 The UI is on **Design System v2.0** — a monochrome dashboard where the chrome carries no hue and colour is reserved for state. See `/Docs/Design_System.md` before touching any styling; open UI items are tracked in `/Docs/UI_Audit.md`.
