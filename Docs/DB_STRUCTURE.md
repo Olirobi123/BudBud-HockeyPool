@@ -508,6 +508,51 @@ Listes de classement publiques affichées sur la home du jour du repêchage (Pro
 
 ---
 
+### 21. `equipe_points_mensuel`
+
+Décomposition mensuelle des points par équipe et par catégorie, utilisée pour la page Bilan.
+
+#### Colonnes
+| Nom          | Type    | Null | Par défaut                                        |
+|--------------|---------|------|----------------------------------------------------|
+| id           | integer | Non  | nextval('equipe_points_mensuel_id_seq'::regclass)  |
+| equipe_id    | integer | Non  | -                                                   |
+| saison       | text    | Non  | -                                                   |
+| mois         | integer | Non  | -                                                   |
+| total_points | integer | Non  | 0                                                   |
+| categorie    | text    | Non  | 'general'                                           |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `UNIQUE (equipe_id, saison, mois, categorie)`
+- `CHECK (mois BETWEEN 1 AND 7)`
+- `CHECK (categorie IN ('general', 'attaque', 'defense', 'gardien'))`
+
+---
+
+### 22. `equipe_saison_totaux`
+
+Totaux de saison par équipe et par catégorie, en parallèle de `equipe_points_mensuel` (également pour la page Bilan).
+
+#### Colonnes
+| Nom            | Type    | Null | Par défaut                                       |
+|----------------|---------|------|---------------------------------------------------|
+| id             | integer | Non  | nextval('equipe_saison_totaux_id_seq'::regclass)  |
+| equipe_id      | integer | Non  | -                                                  |
+| saison         | text    | Non  | -                                                  |
+| total_points   | integer | Non  | 0                                                  |
+| attaque_points | integer | Non  | 0                                                  |
+| defense_points | integer | Non  | 0                                                  |
+| gardien_points | integer | Non  | 0                                                  |
+
+#### Contraintes
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (equipe_id)` → `equipes(id)`
+- `UNIQUE (equipe_id, saison)`
+
+---
+
 ## Relations entre les tables
 
 - `echanges` → `equipes` (equipe_source_id, equipe_destination_id)
@@ -524,6 +569,8 @@ Listes de classement publiques affichées sur la home du jour du repêchage (Pro
 - `series_playoffs` → `equipes` (equipe_a_id, equipe_b_id, gagnant_id)
 - `equipe_semaine_points` → `equipes`
 - `series_semaine_baseline` → `equipes`
+- `equipe_points_mensuel` → `equipes`
+- `equipe_saison_totaux` → `equipes`
 
 ---
 
