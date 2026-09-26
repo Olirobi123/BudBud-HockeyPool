@@ -8,6 +8,7 @@ import { QuebecMap } from '@/components/equipes/QuebecMap';
 import { DivisionStandings } from '@/components/equipes/DivisionStandings';
 import { DivisionStandingsSkeleton } from '@/components/equipes/DivisionStandingsSkeleton';
 import { InactiveTeamsSection } from '@/components/equipes/InactiveTeamsSection';
+import { getCurrentSeasonLabel } from '@/lib/season';
 
 export default function Equipes() {
   const [divisionFilter, setDivisionFilter] = useState<'nord' | 'sud' | null>(null);
@@ -42,7 +43,7 @@ export default function Equipes() {
           DIVISIONS
         </h1>
         <div className="flex items-center justify-center gap-3 flex-wrap">
-          <p className="text-muted-foreground text-lg">Saison 2025-26</p>
+          <p className="text-muted-foreground text-lg">Saison {getCurrentSeasonLabel()}</p>
           {!isLoading && error === null && (
             <Badge variant="outline" className="text-sm font-semibold">
               {totalTeams} équipes actives
