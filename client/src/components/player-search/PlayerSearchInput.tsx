@@ -29,8 +29,11 @@ export const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
       className="pl-9"
       onFocus={onFocus}
     />
+    {/* Le wrapper centre, l'icône tourne : animate-spin écraserait le translate s'ils étaient sur le même élément. */}
     {isLoading && (
-      <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 animate-spin" />
+      <span className="absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true">
+        <Loader2 className="block w-4 h-4 text-muted-foreground animate-spin" />
+      </span>
     )}
   </div>
 );

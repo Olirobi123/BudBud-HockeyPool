@@ -5,8 +5,9 @@ import { NHLPlayer } from '@/types/IPlayerDetails';
 import { BACKEND_URL } from '@/lib/apiConfig';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
-// Même rythme que la régie : 3 lettres et une pause de frappe avant d'interroger la LNH.
+// Comme la régie, 3 lettres et une pause de frappe avant d'interroger la LNH ; pause plus courte ici.
 export const PLAYER_SEARCH_MIN_LENGTH = 3;
+const PLAYER_SEARCH_DEBOUNCE_MS = 500;
 
 async function searchPlayers(query: string): Promise<NHLPlayer[]> {
   if (query.length < PLAYER_SEARCH_MIN_LENGTH) return [];
@@ -22,7 +23,7 @@ export function usePlayerSearch(onPlayerSelect?: (player: NHLPlayer) => void) {
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
 
-  const debounced = useDebouncedValue(search.trim());
+  const debounced = useDebouncedValue(search.trim(), PLAYER_SEARCH_DEBOUNCE_MS);
   const isWaiting = search.trim() !== debounced;
 
   const { data: players, isFetching, error } = useQuery<NHLPlayer[]>({

@@ -55,7 +55,10 @@ export function RegiePlayerPicker({
         className={cn('pl-9', size === 'large' && 'h-12 text-base')}
       />
       {isSearching && showResults && (
-        <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" aria-hidden="true" />
+        // Le wrapper centre, l'icône tourne : animate-spin écraserait le translate s'ils étaient sur le même élément.
+        <span className="absolute right-3 top-1/2 -translate-y-1/2" aria-hidden="true">
+          <Loader2 className="block h-4 w-4 animate-spin text-muted-foreground" />
+        </span>
       )}
       {showResults && (
         <ul className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-md border border-border bg-card shadow-lg">
