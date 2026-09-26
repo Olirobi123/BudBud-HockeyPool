@@ -4,6 +4,11 @@ export interface TeamDraftPick {
   equipe_source_nom: string | null;
 }
 
+export interface TeamDraftPicksResponse {
+  annees: number[];
+  picks: TeamDraftPick[];
+}
+
 export default interface Equipe {
   id: number;
   nom: string;

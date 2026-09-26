@@ -3,12 +3,12 @@ import { TeamDraftPick } from '@/types';
 
 interface TeamDraftPicksProps {
   picks: TeamDraftPick[];
+  /** Les trois dernières années de choix_repechage, triées en ordre croissant */
+  years: number[];
   isLoading: boolean;
 }
 
-const YEARS = [2026, 2027, 2028];
-
-export function TeamDraftPicks({ picks, isLoading }: TeamDraftPicksProps) {
+export function TeamDraftPicks({ picks, years, isLoading }: TeamDraftPicksProps) {
   if (isLoading) {
     return (
       <div className="space-y-4 animate-pulse">
@@ -35,7 +35,7 @@ export function TeamDraftPicks({ picks, isLoading }: TeamDraftPicksProps) {
       </h3>
 
       <div className="grid grid-cols-3 gap-2">
-        {YEARS.map((year) => {
+        {years.map((year) => {
           const yearPicks = [...picks.filter((p) => p.annee === year)].sort(
             (a, b) => a.round - b.round,
           );
