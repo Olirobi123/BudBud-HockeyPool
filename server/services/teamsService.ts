@@ -8,6 +8,7 @@ import {
   SkaterStats,
   GoalieStats,
   TeamDraftPick,
+  TeamDraftPicksResponse,
 } from '../types';
 import { QUERIES } from '../models';
 import { getCurrentSeasonNumber } from './seasonHelper';
@@ -246,12 +247,15 @@ export class TeamsService {
   }
 
   /**
-   * Récupérer les choix de repêchage futurs d'une équipe
+   * Récupérer les choix de repêchage futurs d'une équipe, pour les trois
+   * dernières années de choix_repechage (les colonnes affichées).
    */
-  async getTeamDraftPicks(teamId: number): Promise<TeamDraftPick[]> {
+  async getTeamDraftPicks(teamId: number): Promise<TeamDraftPicksResponse> {
     try {
-      const result = await pool.query(QUERIES.GET_TEAM_DRAFT_PICKS, [teamId]);
-      return result.rows;
+      const yearsResult = await pool.query<{ annee: number }>(QUERIES.GET_DRAFT_PICK_YEARS);
+      const annees = yearsResult.rows.map((row) => row.annee);
+      const picksResult = await pool.query<TeamDraftPick>(QUERIES.GET_TEAM_DRAFT_PICKS, [teamId, annees]);
+      return { annees, picks: picksResult.rows };
     } catch (error) {
       console.error('Erreur lors de la récupération des choix de repêchage:', error);
       throw new Error('Erreur lors de la récupération des choix de repêchage');

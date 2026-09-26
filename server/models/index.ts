@@ -349,7 +349,12 @@ export const QUERIES = {
       updated_at = NOW()
   `,
 
-  // Choix de repêchage futurs
+  // Choix de repêchage futurs — limités aux trois dernières années de la table
+  GET_DRAFT_PICK_YEARS: `
+    SELECT annee
+    FROM (SELECT DISTINCT annee FROM choix_repechage ORDER BY annee DESC LIMIT 3) y
+    ORDER BY annee ASC
+  `,
   GET_TEAM_DRAFT_PICKS: `
     SELECT
       cr.annee,
@@ -358,6 +363,7 @@ export const QUERIES = {
     FROM choix_repechage cr
     LEFT JOIN equipes src ON cr.equipe_source_id = src.id
     WHERE cr.equipe_id = $1
+      AND cr.annee = ANY($2::int[])
     ORDER BY cr.annee ASC, cr.round ASC
   `,
 

@@ -74,7 +74,7 @@ export default function TeamDetails() {
             <TeamTrophies teamId={idNum} />
           </TabsContent>
           <TabsContent value="picks" className="mt-4">
-            <TeamDraftPicks picks={draftPicks || []} isLoading={isLoadingDraftPicks} />
+            <TeamDraftPicks picks={draftPicks?.picks ?? []} years={draftPicks?.annees ?? []} isLoading={isLoadingDraftPicks} />
           </TabsContent>
           <TabsContent value="transaction" className="mt-4">
             <TeamLatestTrade trades={latestTrade || []} isLoading={isLoadingTrade} />
@@ -92,7 +92,7 @@ export default function TeamDetails() {
         {/* Sidebar: sticky, no stretching */}
         <div className="space-y-6 self-start">
           <TeamTrophies teamId={idNum} />
-          <TeamDraftPicks picks={draftPicks || []} isLoading={isLoadingDraftPicks} />
+          <TeamDraftPicks picks={draftPicks?.picks ?? []} years={draftPicks?.annees ?? []} isLoading={isLoadingDraftPicks} />
           <TeamLatestTrade trades={latestTrade || []} isLoading={isLoadingTrade} />
         </div>
       </div>

@@ -104,7 +104,7 @@ export class TeamsController {
 
   /**
    * GET /api/teams/:id/draft-picks
-   * Returns future draft picks for a team
+   * Returns the team's future draft picks and the three years (latest in the table) they cover
    */
   getTeamDraftPicks = asyncHandler(async (req: Request, res: Response) => {
     const id = parseInt(req.params.id);

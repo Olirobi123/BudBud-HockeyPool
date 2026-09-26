@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Equipe, Echange, RosterPlayerWithStats, TeamDraftPick } from '@/types';
+import { Equipe, Echange, RosterPlayerWithStats, TeamDraftPicksResponse } from '@/types';
 import { BACKEND_URL } from '@/lib/apiConfig';
 
 const fetchTeam = async (id: number): Promise<Equipe> => {
@@ -55,17 +55,17 @@ export function useTeamLatestTrade(id: number) {
   });
 }
 
-const fetchTeamDraftPicks = async (id: number): Promise<TeamDraftPick[]> => {
+const fetchTeamDraftPicks = async (id: number): Promise<TeamDraftPicksResponse> => {
   const response = await fetch(`${BACKEND_URL}/api/teams/${id}/draft-picks`);
   if (!response.ok) {
     throw new Error('Erreur lors de la récupération des choix de repêchage');
   }
   const result = await response.json();
-  return result.data ?? [];
+  return result.data ?? { annees: [], picks: [] };
 };
 
 export function useTeamDraftPicks(id: number) {
-  return useQuery<TeamDraftPick[]>({
+  return useQuery<TeamDraftPicksResponse>({
     queryKey: ['team-draft-picks', id],
     queryFn: () => fetchTeamDraftPicks(id),
     enabled: !!id,
