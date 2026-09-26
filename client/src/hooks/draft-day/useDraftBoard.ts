@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import type { DraftBoardPick } from '@/types/IDraftDay';
 import { fetchDraftDay } from './fetchDraftDay';
 
-// Les choix sont entrés pendant le draft : on recharge le tableau aux 1 min 30 s.
-const REFRESH_MS = 90 * 1000;
+// Les choix sont entrés pendant le draft : on recharge le tableau chaque minute.
+const REFRESH_MS = 60 * 1000;
 
 // eslint-disable-next-line import/prefer-default-export
 export function useDraftBoard() {

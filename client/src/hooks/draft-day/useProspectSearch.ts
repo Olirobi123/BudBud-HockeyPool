@@ -1,20 +1,14 @@
-import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { DraftProspectSearchResult } from '@/types/IDraftDay';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { fetchDraftDay } from './fetchDraftDay';
 
-// On attend 3 lettres et 1 s sans frappe avant d'interroger la LNH.
-const DEBOUNCE_MS = 1000;
+// On attend 3 lettres et une pause de frappe (SEARCH_DEBOUNCE_MS) avant d'interroger la LNH.
 export const PROSPECT_SEARCH_MIN_LENGTH = 3;
 
 /** Recherche NHL pour la régie. `isWaiting` : la frappe n'est pas encore envoyée. */
 export function useProspectSearch(query: string) {
-  const [debounced, setDebounced] = useState(query);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebounced(query.trim()), DEBOUNCE_MS);
-    return () => clearTimeout(timer);
-  }, [query]);
+  const debounced = useDebouncedValue(query.trim());
 
   const search = useQuery<DraftProspectSearchResult[]>({
     queryKey: ['draft-day', 'regie-recherche', debounced],
