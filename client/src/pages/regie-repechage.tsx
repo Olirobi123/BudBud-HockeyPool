@@ -2,6 +2,7 @@ import { JSX, useState } from 'react';
 import Layout from '@/components/Layout';
 import { PageHeader } from '@/components/ui/page-header';
 import { ErrorDisplay, InlineError } from '@/components/ui/error-display';
+import { RegieAddPick } from '@/components/draft-regie/RegieAddPick';
 import { RegieCurrentPick } from '@/components/draft-regie/RegieCurrentPick';
 import { RegiePickRow } from '@/components/draft-regie/RegiePickRow';
 import { DraftBoardSkeleton } from '@/components/home/draft-day/DraftBoardSkeleton';
@@ -10,6 +11,10 @@ import { useDraftBoard } from '@/hooks/draft-day/useDraftBoard';
 import { useDraftRegieMutations } from '@/hooks/draft-day/useDraftRegieMutations';
 import { useDraftDayFlag } from '@/hooks/draft-day/useDraftDayFlag';
 import { formatAnnee } from '@/lib/utils';
+import { DYNAMIC_ROUND } from '@/lib/draftDay';
+
+// Clé « occupée » de l'ajout d'un choix : aucun rang ne vaut 0.
+const ADD_PICK_KEY = 0;
 
 /**
  * Régie du draft en direct. Aucune navigation n'y mène : on y accède par l'URL
@@ -19,7 +24,9 @@ export default function RegieRepechage(): JSX.Element {
   const { data: flag } = useDraftDayFlag();
   const { data: picks, isLoading, error } = useDraftBoard();
   const { data: equipes = [], isLoading: equipesLoading } = useActiveTeams();
-  const { setEquipe, setJoueur, clearJoueur } = useDraftRegieMutations();
+  const {
+    setEquipe, setJoueur, clearJoueur, addPick, removePick,
+  } = useDraftRegieMutations();
   const [busyRang, setBusyRang] = useState<number | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
 
@@ -32,9 +39,11 @@ export default function RegieRepechage(): JSX.Element {
   };
 
   const current = picks?.find((p) => p.joueur === null) ?? null;
-  const rounds = (picks ?? [])
-    .map((p) => p.round)
-    .filter((round, i, all) => all.indexOf(round) === i);
+  // La ronde dynamique s'affiche même vide : c'est là qu'on ajoute ses choix.
+  const rounds = [...(picks ?? []).map((p) => p.round), DYNAMIC_ROUND]
+    .filter((round, i, all) => all.indexOf(round) === i)
+    .sort((a, b) => a - b);
+  const nextRang = (picks ?? []).reduce((max, p) => Math.max(max, p.rang), 0) + 1;
 
   const renderContent = (): JSX.Element => {
     if (isLoading || equipesLoading) return <DraftBoardSkeleton />;
@@ -65,9 +74,18 @@ export default function RegieRepechage(): JSX.Element {
                   onTeamChange={(equipeId) => run(pick.rang, () => setEquipe.mutateAsync({ rang: pick.rang, equipeId }))}
                   onPlayerPick={(player) => run(pick.rang, () => setJoueur.mutateAsync({ rang: pick.rang, nhlPlayerId: player.nhlPlayerId }))}
                   onClear={() => run(pick.rang, () => clearJoueur.mutateAsync({ rang: pick.rang }))}
+                  onRemove={round === DYNAMIC_ROUND ? () => run(pick.rang, () => removePick.mutateAsync({ rang: pick.rang })) : undefined}
                 />
               ))}
             </ol>
+            {round === DYNAMIC_ROUND && (
+              <RegieAddPick
+                equipes={equipes}
+                nextRang={nextRang}
+                isBusy={busyRang !== null}
+                onAdd={(equipeId) => run(ADD_PICK_KEY, () => addPick.mutateAsync({ equipeId }))}
+              />
+            )}
           </section>
         ))}
       </div>

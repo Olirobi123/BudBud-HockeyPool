@@ -178,6 +178,7 @@ Stocke les points cumulés par équipe par saison, décomposés par catégorie.
 - `annee` suit `types_repechage.sort_year_offset` : le draft annuel d'octobre 2026 est `annee = 2027`
 - `joueur` : `NULL` tant qu'un choix du draft en cours n'a pas été fait (choix pré-remplis, voir `server/migrations/seed_draft_2027.sql`)
 - `equipe_source_id` : équipe d'origine d'un choix échangé — `NULL` pour l'historique et les choix non échangés
+- Ronde 7 (dynamique) : ses choix sont créés et supprimés depuis la régie (`POST /api/draft-day/picks`, `DELETE /api/draft-day/picks/:rang`), toujours en fin de draft ; une suppression fait remonter les rangs suivants
 
 ---
 

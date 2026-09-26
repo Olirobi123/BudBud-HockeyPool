@@ -542,6 +542,7 @@ export const QUERIES = {
     SELECT
       r.rang,
       r.round,
+      ROW_NUMBER() OVER (PARTITION BY r.round ORDER BY r.rang)::int AS pick_in_round,
       r.equipe_id,
       e.nom       AS equipe_nom,
       e.nom_court AS equipe_nom_court,
@@ -592,7 +593,7 @@ export const QUERIES = {
 
   // Régie du draft en direct (page /regie-repechage)
   GET_DRAFT_PICK_FOR_UPDATE: `
-    SELECT id, equipe_id, equipe_source_id, joueur_id
+    SELECT id, round, equipe_id, equipe_source_id, joueur_id
     FROM ${TABLES.REPECHAGES}
     WHERE annee = $1 AND type_id = 2 AND rang = $2
     FOR UPDATE
@@ -630,6 +631,26 @@ export const QUERIES = {
     JOIN ${TABLES.EQUIPE_JOUEURS} ej ON ej.joueur_id = j.id
     JOIN ${TABLES.EQUIPES} e ON e.id = ej.equipe_id
     WHERE j.nhl_player_id = ANY($1::int[])
+  `,
+  // Ronde dynamique : choix ajoutés et retirés pendant la soirée, toujours en fin de draft.
+  LOCK_REPECHAGES: `
+    LOCK TABLE ${TABLES.REPECHAGES} IN SHARE ROW EXCLUSIVE MODE
+  `,
+  GET_DRAFT_MAX_RANG: `
+    SELECT COALESCE(MAX(rang), 0)::int AS max_rang
+    FROM ${TABLES.REPECHAGES}
+    WHERE annee = $1 AND type_id = 2
+  `,
+  INSERT_DRAFT_PICK: `
+    INSERT INTO ${TABLES.REPECHAGES} (annee, type_id, equipe_id, equipe_source_id, joueur, joueur_id, rang, round)
+    VALUES ($1, 2, $2, NULL, NULL, NULL, $3, $4)
+  `,
+  DELETE_DRAFT_PICK: `
+    DELETE FROM ${TABLES.REPECHAGES} WHERE id = $1
+  `,
+  SHIFT_DRAFT_RANGS_AFTER: `
+    UPDATE ${TABLES.REPECHAGES} SET rang = rang - 1
+    WHERE annee = $1 AND type_id = 2 AND rang > $2
   `,
   GET_ACTIVE_EQUIPE: `
     SELECT id FROM ${TABLES.EQUIPES} WHERE id = $1 AND active = TRUE

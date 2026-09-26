@@ -59,6 +59,28 @@ export class DraftDayController {
     sendSuccess(res, null);
   });
 
+  addDynamicPick = asyncHandler(async (req: Request, res: Response) => {
+    const equipeId = Number((req.body as { equipeId?: unknown }).equipeId);
+    if (!Number.isInteger(equipeId)) {
+      sendValidationError(res, 'equipeId doit être un nombre');
+      return;
+    }
+    const { annee } = await draftDayService.getFlag();
+    await draftRegieService.addDynamicPick(annee, equipeId);
+    sendSuccess(res, null);
+  });
+
+  removeDynamicPick = asyncHandler(async (req: Request, res: Response) => {
+    const rang = parseInt(req.params.rang, 10);
+    if (isNaN(rang)) {
+      sendValidationError(res, 'Le rang doit être un nombre');
+      return;
+    }
+    const { annee } = await draftDayService.getFlag();
+    await draftRegieService.removeDynamicPick(annee, rang);
+    sendSuccess(res, null);
+  });
+
   clearPickJoueur = asyncHandler(async (req: Request, res: Response) => {
     const rang = parseInt(req.params.rang, 10);
     if (isNaN(rang)) {

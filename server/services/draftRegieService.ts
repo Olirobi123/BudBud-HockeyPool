@@ -5,6 +5,7 @@ import { ApiError, DraftProspectSearchResult } from '../types';
 
 interface PickRow {
   id: number;
+  round: number | null;
   equipe_id: number;
   equipe_source_id: number | null;
   joueur_id: number | null;
@@ -24,6 +25,9 @@ interface NhlLanding {
   lastName: { default: string };
   position: string;
 }
+
+/** Ronde ajoutée en direct : ses choix se créent et se retirent depuis la régie. */
+const DYNAMIC_ROUND = 7;
 
 // On demande large à l'API puisque les retraités sont retirés ensuite.
 const SEARCH_FETCH_LIMIT = 40;
@@ -155,6 +159,34 @@ export class DraftRegieService {
       }
       await client.query(QUERIES.SET_DRAFT_PICK_JOUEUR, [pick.id, `${prenom} ${nom}`, joueur.id]);
       await client.query(QUERIES.ADD_JOUEUR_TO_EQUIPE, [pick.equipe_id, joueur.id]);
+    });
+  }
+
+  /** Ajoute un choix à la fin de la ronde dynamique (toujours la dernière du draft). */
+  async addDynamicPick(annee: number, equipeId: number): Promise<void> {
+    await withTransaction(async (client) => {
+      const equipe = await client.query(QUERIES.GET_ACTIVE_EQUIPE, [equipeId]);
+      if (equipe.rows.length === 0) throw apiError(400, 'Équipe inconnue ou inactive');
+
+      // Verrou : deux ajouts simultanés ne doivent pas obtenir le même rang.
+      await client.query(QUERIES.LOCK_REPECHAGES);
+      const { max_rang: maxRang } = (await client.query<{ max_rang: number }>(QUERIES.GET_DRAFT_MAX_RANG, [annee])).rows[0];
+      await client.query(QUERIES.INSERT_DRAFT_PICK, [annee, equipeId, maxRang + 1, DYNAMIC_ROUND]);
+    });
+  }
+
+  /** Supprime un choix vide de la ronde dynamique ; les rangs suivants remontent. */
+  async removeDynamicPick(annee: number, rang: number): Promise<void> {
+    await withTransaction(async (client) => {
+      await client.query(QUERIES.LOCK_REPECHAGES);
+      const pick = await lockPick(client, annee, rang);
+      if (pick.round !== DYNAMIC_ROUND) {
+        throw apiError(400, `Seuls les choix de la ronde ${DYNAMIC_ROUND} peuvent être retirés`);
+      }
+      // Un choix fait doit d'abord être annulé : évite de sortir un joueur de l'alignement par erreur.
+      if (pick.joueur_id !== null) throw apiError(409, `Retirez d'abord le joueur du choix #${rang}`);
+      await client.query(QUERIES.DELETE_DRAFT_PICK, [pick.id]);
+      await client.query(QUERIES.SHIFT_DRAFT_RANGS_AFTER, [annee, rang]);
     });
   }
 

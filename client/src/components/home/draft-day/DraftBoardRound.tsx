@@ -27,11 +27,15 @@ export function DraftBoardRound({ round, picks, onTheClockRang }: DraftBoardRoun
           {picks.length}
         </span>
       </div>
-      <ol className="divide-y divide-border/60">
-        {picks.map((pick) => (
-          <DraftBoardPick key={pick.rang} pick={pick} isOnTheClock={pick.rang === onTheClockRang} />
-        ))}
-      </ol>
+      {picks.length === 0 ? (
+        <p className="px-3 py-4 text-sm text-muted-foreground">Aucun choix pour l&apos;instant</p>
+      ) : (
+        <ol className="divide-y divide-border/60">
+          {picks.map((pick) => (
+            <DraftBoardPick key={pick.rang} pick={pick} isOnTheClock={pick.rang === onTheClockRang} />
+          ))}
+        </ol>
+      )}
     </Card>
   );
 }

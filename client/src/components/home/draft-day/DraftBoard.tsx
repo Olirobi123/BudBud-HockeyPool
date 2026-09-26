@@ -1,4 +1,5 @@
 import { JSX, useMemo } from 'react';
+import { DYNAMIC_ROUND } from '@/lib/draftDay';
 import type { DraftBoardPick } from '@/types/IDraftDay';
 import { DraftBoardRound } from './DraftBoardRound';
 
@@ -9,8 +10,8 @@ interface DraftBoardProps {
 // eslint-disable-next-line import/prefer-default-export
 export function DraftBoard({ picks }: DraftBoardProps): JSX.Element {
   const rounds = useMemo(() => {
-    const roundNumbers = picks
-      .map((p) => p.round)
+    // La ronde dynamique reste visible même sans choix : on en ajoute pendant la soirée.
+    const roundNumbers = [...picks.map((p) => p.round), DYNAMIC_ROUND]
       .filter((round, i, all) => all.indexOf(round) === i)
       .sort((a, b) => a - b);
     return roundNumbers.map((round) => [round, picks.filter((p) => p.round === round)] as const);
