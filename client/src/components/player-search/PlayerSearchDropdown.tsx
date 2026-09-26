@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { NHLPlayer } from '@/types/IPlayerDetails';
+import { PLAYER_SEARCH_MIN_LENGTH } from '@/hooks/player-search/usePlayerSearch';
 import { PlayerSearchResultItem } from './PlayerSearchResultItem';
 
 interface PlayerSearchDropdownProps {
@@ -20,7 +21,7 @@ export const PlayerSearchDropdown: React.FC<PlayerSearchDropdownProps> = ({
   error,
   onSelect,
 }) => {
-  if (!isOpen || search.length < 2) return null;
+  if (!isOpen || search.trim().length < PLAYER_SEARCH_MIN_LENGTH) return null;
   return (
     <Card className="absolute top-full left-0 right-0 z-50 mt-1 max-h-80 overflow-y-auto bg-card border shadow-lg">
       <CardContent className="p-0">
