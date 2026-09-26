@@ -8,7 +8,6 @@ import {
 } from '../types';
 
 const DRAFT_DAY_KEY = 'draft_day';
-const PICKS_PER_ROUND = 10;
 
 export class DraftDayService {
   /**
@@ -30,6 +29,7 @@ export class DraftDayService {
     const result = await pool.query<{
       rang: number;
       round: number;
+      pick_in_round: number;
       equipe_id: number;
       equipe_nom: string;
       equipe_nom_court: string | null;
@@ -43,7 +43,7 @@ export class DraftDayService {
     return result.rows.map((row) => ({
       rang: row.rang,
       round: row.round,
-      pickInRound: ((row.rang - 1) % PICKS_PER_ROUND) + 1,
+      pickInRound: row.pick_in_round,
       equipeId: row.equipe_id,
       equipeNom: row.equipe_nom,
       equipeNomCourt: row.equipe_nom_court,

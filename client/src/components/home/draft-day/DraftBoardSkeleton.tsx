@@ -2,7 +2,7 @@ import { JSX } from 'react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const ROUNDS = 6;
+const ROUNDS = 7;
 const PICKS_PER_ROUND = 10;
 
 // eslint-disable-next-line import/prefer-default-export

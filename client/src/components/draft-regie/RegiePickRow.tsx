@@ -1,5 +1,5 @@
 import { JSX } from 'react';
-import { X } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type Equipe from '@/types/IEquipes';
@@ -15,16 +15,20 @@ interface RegiePickRowProps {
   onTeamChange: (equipeId: number) => void;
   onPlayerPick: (player: DraftProspectSearchResult) => void;
   onClear: () => void;
+  /** Présent seulement pour les choix de la ronde dynamique ; un choix fait doit d'abord être retiré. */
+  // eslint-disable-next-line react/require-default-props
+  onRemove?: () => void;
 }
 
 // eslint-disable-next-line import/prefer-default-export
 export function RegiePickRow({
-  pick, equipes, isOnTheClock, isBusy, onTeamChange, onPlayerPick, onClear,
+  pick, equipes, isOnTheClock, isBusy, onTeamChange, onPlayerPick, onClear, onRemove,
 }: RegiePickRowProps): JSX.Element {
   return (
     <li
       className={cn(
-        'grid grid-cols-1 gap-2 border-l-2 px-3 py-3 sm:grid-cols-[3rem_17rem_minmax(0,1fr)] sm:items-center',
+        'grid grid-cols-1 gap-2 border-l-2 px-3 py-3 sm:items-center',
+        onRemove ? 'sm:grid-cols-[3rem_17rem_minmax(0,1fr)_auto]' : 'sm:grid-cols-[3rem_17rem_minmax(0,1fr)]',
         isOnTheClock ? 'border-l-live bg-muted/40' : 'border-l-transparent',
         isBusy && 'opacity-60',
       )}
@@ -60,6 +64,20 @@ export function RegiePickRow({
         </div>
       ) : (
         <RegiePlayerPicker onPick={onPlayerPick} disabled={isBusy} />
+      )}
+      {onRemove && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="justify-self-start text-muted-foreground hover:text-destructive"
+          onClick={onRemove}
+          disabled={isBusy || pick.joueur !== null}
+          title={pick.joueur !== null ? "Retirez d'abord le joueur" : undefined}
+          aria-label={`Supprimer le choix #${pick.rang}`}
+        >
+          <Trash2 className="h-4 w-4" />
+          <span className="ml-1 sm:hidden">Supprimer le choix</span>
+        </Button>
       )}
     </li>
   );

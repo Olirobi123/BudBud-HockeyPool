@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BACKEND_URL } from '@/lib/apiConfig';
 
-async function send(method: 'PUT' | 'DELETE', path: string, body?: object): Promise<void> {
+async function send(method: 'POST' | 'PUT' | 'DELETE', path: string, body?: object): Promise<void> {
   const response = await fetch(`${BACKEND_URL}/api/draft-day${path}`, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : undefined,
@@ -34,5 +34,17 @@ export function useDraftRegieMutations() {
     onSuccess,
   });
 
-  return { setEquipe, setJoueur, clearJoueur };
+  const addPick = useMutation({
+    mutationFn: ({ equipeId }: { equipeId: number }) => send('POST', '/picks', { equipeId }),
+    onSuccess,
+  });
+
+  const removePick = useMutation({
+    mutationFn: ({ rang }: { rang: number }) => send('DELETE', `/picks/${rang}`),
+    onSuccess,
+  });
+
+  return {
+    setEquipe, setJoueur, clearJoueur, addPick, removePick,
+  };
 }
