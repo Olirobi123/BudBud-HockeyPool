@@ -91,11 +91,11 @@ export function DraftTable({
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
-                  <Table>
+                  <Table className="table-fixed">
                     <TableHeader>
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-24 font-semibold">Rang</TableHead>
-                        <TableHead className="font-semibold">Équipe</TableHead>
+                        <TableHead className="w-16 sm:w-24 font-semibold">Rang</TableHead>
+                        <TableHead className="w-[40%] font-semibold">Équipe</TableHead>
                         <TableHead className="font-semibold">Joueur</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -108,10 +108,13 @@ export function DraftTable({
                           <TableCell className="font-semibold text-foreground">
                             {pick.rang}
                           </TableCell>
-                          <TableCell className="text-foreground">
+                          <TableCell className="truncate text-foreground" title={pick.nom}>
                             {pick.nom}
                           </TableCell>
-                          <TableCell className="font-medium text-foreground">
+                          <TableCell
+                            className="truncate font-medium text-foreground"
+                            title={pick.joueur ?? undefined}
+                          >
                             {pick.joueur ?? '—'}
                           </TableCell>
                         </TableRow>
@@ -132,11 +135,11 @@ export function DraftTable({
     <Card className="border-border/50 shadow-sm">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <Table>
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="w-24 font-semibold">Rang</TableHead>
-                <TableHead className="font-semibold">Équipe</TableHead>
+                <TableHead className="w-16 sm:w-24 font-semibold">Rang</TableHead>
+                <TableHead className="w-[40%] font-semibold">Équipe</TableHead>
                 <TableHead className="font-semibold">Joueur</TableHead>
               </TableRow>
             </TableHeader>
@@ -149,8 +152,13 @@ export function DraftTable({
                   <TableCell className="font-semibold text-foreground">
                     {pick.rang}
                   </TableCell>
-                  <TableCell className="text-foreground">{pick.nom}</TableCell>
-                  <TableCell className="font-medium text-foreground">
+                  <TableCell className="truncate text-foreground" title={pick.nom}>
+                    {pick.nom}
+                  </TableCell>
+                  <TableCell
+                    className="truncate font-medium text-foreground"
+                    title={pick.joueur ?? undefined}
+                  >
                     {pick.joueur ?? '—'}
                   </TableCell>
                 </TableRow>
