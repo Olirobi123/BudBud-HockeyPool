@@ -156,7 +156,7 @@ function DiffCell({ diff }: { diff: number }) {
     return <span className="w-10 text-center tabular-nums text-xs text-muted-foreground/40 shrink-0">—</span>;
   }
   return (
-    <span className="w-10 text-center tabular-nums text-xs text-muted-foreground shrink-0">
+    <span className="w-10 text-center tabular-nums text-xs text-negative shrink-0">
       {`−${diff}`}
     </span>
   );
@@ -209,7 +209,7 @@ function TeamRow({ team, leader, activeCategory }: TeamRowProps) {
             {team.nom}
           </span>
           {diff > 0 && (
-            <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
+            <span className="text-[10px] font-semibold tabular-nums text-negative">
               {`−${diff}`}
             </span>
           )}
