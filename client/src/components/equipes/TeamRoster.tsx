@@ -32,13 +32,30 @@ function sortByPoints(players: RosterPlayerWithStats[]): RosterPlayerWithStats[]
   });
 }
 
-function calculateTotalPoints(players: RosterPlayerWithStats[]): number {
-  return players.reduce((sum, p) => {
+interface SkaterTotals {
+  gp: number;
+  goals: number;
+  assists: number;
+  points: number;
+  ppm: number;
+}
+
+/** Totals over players that count toward pool points (isActive), same rule as Pts. */
+function calculateSkaterTotals(players: RosterPlayerWithStats[]): SkaterTotals {
+  const totals = players.reduce((acc, p) => {
     if (p.isActive && p.nhlStats && isSkaterStats(p.nhlStats)) {
-      return sum + p.nhlStats.points;
+      return {
+        gp: acc.gp + p.nhlStats.gamesPlayed,
+        goals: acc.goals + p.nhlStats.goals,
+        assists: acc.assists + p.nhlStats.assists,
+        points: acc.points + p.nhlStats.points,
+      };
     }
-    return sum;
-  }, 0);
+    return acc;
+  }, {
+    gp: 0, goals: 0, assists: 0, points: 0,
+  });
+  return { ...totals, ppm: totals.gp > 0 ? totals.points / totals.gp : 0 };
 }
 
 function RosterSkeleton() {
@@ -145,7 +162,7 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
   if (players.length === 0) return null;
 
   const sortedPlayers = sortByPoints(players);
-  const totalPoints = calculateTotalPoints(players);
+  const totals = calculateSkaterTotals(players);
 
   return (
     <div>
@@ -171,13 +188,13 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
         <div className="flex items-center px-1 py-2 border-t-2 bg-muted/40">
           <span className="w-7 shrink-0 mr-2" />
           <span className="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total</span>
-          <span className="w-8 shrink-0" />
+          <span className="w-8 text-center text-xs font-semibold text-muted-foreground tabular-nums shrink-0">{totals.gp}</span>
           <span className="w-8 text-center shrink-0">
             <span className="inline-flex items-center justify-center min-w-[2rem] rounded-md bg-primary/15 text-primary text-base font-bold px-2 py-0.5 tabular-nums">
-              {totalPoints}
+              {totals.points}
             </span>
           </span>
-          <span className="w-9 shrink-0" />
+          <span className="w-9 text-center text-xs font-semibold text-muted-foreground tabular-nums shrink-0">{totals.ppm.toFixed(2)}</span>
         </div>
       </div>
 
@@ -234,16 +251,16 @@ function SkaterGroupTable({ players, title, injuries, etat }: SkaterGroupTablePr
             );
           })}
           <TableRow className="bg-muted/50 font-semibold border-t-2">
-            <TableCell className="text-right">Total</TableCell>
-            <TableCell />
-            <TableCell className="hidden md:table-cell" />
-            <TableCell className="hidden md:table-cell" />
-            <TableCell className="text-center">
+            <TableCell className="px-2 sm:px-4">Total</TableCell>
+            <TableCell className="text-center px-1 sm:px-4 tabular-nums">{totals.gp}</TableCell>
+            <TableCell className="text-center px-4 hidden md:table-cell tabular-nums">{totals.goals}</TableCell>
+            <TableCell className="text-center px-4 hidden md:table-cell tabular-nums">{totals.assists}</TableCell>
+            <TableCell className="text-center px-1 sm:px-4">
               <span className="inline-flex items-center justify-center min-w-[2.5rem] rounded-md bg-primary/15 text-primary text-lg font-bold px-2 py-0.5 tabular-nums">
-                {totalPoints}
+                {totals.points}
               </span>
             </TableCell>
-            <TableCell />
+            <TableCell className="text-center px-1 sm:px-4 tabular-nums">{totals.ppm.toFixed(2)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -262,6 +279,32 @@ function getGoaliePoolPoints(player: RosterPlayerWithStats): number {
   return 0;
 }
 
+interface GoalieTotals {
+  gp: number;
+  wins: number;
+  shutouts: number;
+  points: number;
+  ppm: number;
+}
+
+/** Totals over goalies that count toward pool points (isActive), same rule as Pts. */
+function calculateGoalieTotals(goalies: RosterPlayerWithStats[]): GoalieTotals {
+  const totals = goalies.reduce((acc, p) => {
+    if (p.isActive && p.nhlStats && isGoalieStats(p.nhlStats)) {
+      return {
+        gp: acc.gp + p.nhlStats.gamesPlayed,
+        wins: acc.wins + p.nhlStats.wins,
+        shutouts: acc.shutouts + p.nhlStats.shutouts,
+        points: acc.points + getGoaliePoolPoints(p),
+      };
+    }
+    return acc;
+  }, {
+    gp: 0, wins: 0, shutouts: 0, points: 0,
+  });
+  return { ...totals, ppm: totals.gp > 0 ? totals.points / totals.gp : 0 };
+}
+
 function GoaliesTable({ goalies, injuries, etat }: {
   goalies: RosterPlayerWithStats[];
   injuries?: Record<number, InjuryInfo>;
@@ -270,7 +313,7 @@ function GoaliesTable({ goalies, injuries, etat }: {
   if (goalies.length === 0) return null;
 
   const sorted = [...goalies].sort((a, b) => getGoaliePoolPoints(b) - getGoaliePoolPoints(a));
-  const totalPoints = sorted.filter((p) => p.isActive).reduce((sum, p) => sum + getGoaliePoolPoints(p), 0);
+  const totals = calculateGoalieTotals(goalies);
 
   return (
     <div>
@@ -296,13 +339,13 @@ function GoaliesTable({ goalies, injuries, etat }: {
         <div className="flex items-center px-1 py-2 border-t-2 bg-muted/40">
           <span className="w-7 shrink-0 mr-2" />
           <span className="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total</span>
-          <span className="w-8 shrink-0" />
+          <span className="w-8 text-center text-xs font-semibold text-muted-foreground tabular-nums shrink-0">{totals.gp}</span>
           <span className="w-8 text-center shrink-0">
             <span className="inline-flex items-center justify-center min-w-[2rem] rounded-md bg-primary/15 text-primary text-base font-bold px-2 py-0.5 tabular-nums">
-              {totalPoints}
+              {totals.points}
             </span>
           </span>
-          <span className="w-9 shrink-0" />
+          <span className="w-9 text-center text-xs font-semibold text-muted-foreground tabular-nums shrink-0">{totals.ppm.toFixed(2)}</span>
         </div>
       </div>
 
@@ -360,16 +403,16 @@ function GoaliesTable({ goalies, injuries, etat }: {
             );
           })}
           <TableRow className="bg-muted/50 font-semibold border-t-2">
-            <TableCell className="text-right">Total</TableCell>
-            <TableCell />
-            <TableCell className="hidden md:table-cell" />
-            <TableCell className="hidden md:table-cell" />
-            <TableCell className="text-center">
+            <TableCell className="px-2 sm:px-4">Total</TableCell>
+            <TableCell className="text-center px-1 sm:px-4 tabular-nums">{totals.gp}</TableCell>
+            <TableCell className="text-center px-4 hidden md:table-cell tabular-nums">{totals.wins}</TableCell>
+            <TableCell className="text-center px-4 hidden md:table-cell tabular-nums">{totals.shutouts}</TableCell>
+            <TableCell className="text-center px-1 sm:px-4">
               <span className="inline-flex items-center justify-center min-w-[2.5rem] rounded-md bg-primary/15 text-primary text-lg font-bold px-2 py-0.5 tabular-nums">
-                {totalPoints}
+                {totals.points}
               </span>
             </TableCell>
-            <TableCell />
+            <TableCell className="text-center px-1 sm:px-4 tabular-nums">{totals.ppm.toFixed(2)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
