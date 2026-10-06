@@ -94,9 +94,9 @@ export function DraftTable({
                   <Table className="table-fixed">
                     <TableHeader>
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-16 sm:w-24 font-semibold">Rang</TableHead>
-                        <TableHead className="w-[40%] font-semibold">Équipe</TableHead>
-                        <TableHead className="font-semibold">Joueur</TableHead>
+                        <TableHead className="w-10 px-2 sm:w-24 sm:px-4 font-semibold">Rang</TableHead>
+                        <TableHead className="w-[55%] px-2 sm:w-[40%] sm:px-4 font-semibold">Équipe</TableHead>
+                        <TableHead className="px-2 text-right sm:px-4 sm:text-left font-semibold">Joueur</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -105,14 +105,14 @@ export function DraftTable({
                           key={pick.rang}
                           className="hover:bg-muted/50 transition-colors"
                         >
-                          <TableCell className="font-semibold text-foreground">
+                          <TableCell className="px-2 sm:px-4 font-semibold text-foreground">
                             {pick.rang}
                           </TableCell>
-                          <TableCell className="truncate text-foreground" title={pick.nom}>
+                          <TableCell className="truncate px-2 sm:px-4 text-foreground" title={pick.nom}>
                             {pick.nom}
                           </TableCell>
                           <TableCell
-                            className="truncate font-medium text-foreground"
+                            className="truncate px-2 text-right sm:px-4 sm:text-left font-medium text-foreground"
                             title={pick.joueur ?? undefined}
                           >
                             {pick.joueur ?? '—'}
@@ -138,9 +138,9 @@ export function DraftTable({
           <Table className="table-fixed">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="w-16 sm:w-24 font-semibold">Rang</TableHead>
-                <TableHead className="w-[40%] font-semibold">Équipe</TableHead>
-                <TableHead className="font-semibold">Joueur</TableHead>
+                <TableHead className="w-10 px-2 sm:w-24 sm:px-4 font-semibold">Rang</TableHead>
+                <TableHead className="w-[55%] px-2 sm:w-[40%] sm:px-4 font-semibold">Équipe</TableHead>
+                <TableHead className="px-2 text-right sm:px-4 sm:text-left font-semibold">Joueur</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -149,14 +149,14 @@ export function DraftTable({
                   key={pick.rang}
                   className="hover:bg-muted/50 transition-colors"
                 >
-                  <TableCell className="font-semibold text-foreground">
+                  <TableCell className="px-2 sm:px-4 font-semibold text-foreground">
                     {pick.rang}
                   </TableCell>
-                  <TableCell className="truncate text-foreground" title={pick.nom}>
+                  <TableCell className="truncate px-2 sm:px-4 text-foreground" title={pick.nom}>
                     {pick.nom}
                   </TableCell>
                   <TableCell
-                    className="truncate font-medium text-foreground"
+                    className="truncate px-2 text-right sm:px-4 sm:text-left font-medium text-foreground"
                     title={pick.joueur ?? undefined}
                   >
                     {pick.joueur ?? '—'}
