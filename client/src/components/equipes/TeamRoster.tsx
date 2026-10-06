@@ -124,10 +124,8 @@ function MobileGoalieRow({ player, injuries, etat }: MobileSkaterRowProps) {
         <PlayerBadge nhlId={player.nhl_player_id} injuries={injuries} etat={etat} position={player.position} />
       </span>
       <span className="w-8 text-center text-xs text-muted-foreground tabular-nums shrink-0">{stats?.gamesPlayed ?? '-'}</span>
-      <span className="w-10 text-center text-xs text-muted-foreground tabular-nums shrink-0">
-        {stats ? `${stats.wins}·${stats.shutouts}` : '-'}
-      </span>
-      <span className="w-8 text-right text-sm font-bold text-primary tabular-nums shrink-0">{poolPts}</span>
+      <span className="w-8 text-center text-xs font-bold text-primary tabular-nums shrink-0">{poolPts}</span>
+      <span className="w-9 text-center text-xs text-muted-foreground tabular-nums shrink-0">{stats ? stats.ppm.toFixed(2) : '-'}</span>
     </div>
   );
 }
@@ -284,8 +282,8 @@ function GoaliesTable({ goalies, injuries, etat }: {
           <span className="w-7 shrink-0 mr-2" />
           <span className="flex-1 min-w-0">Joueur</span>
           <span className="w-8 text-center shrink-0">PJ</span>
-          <span className="w-10 text-center shrink-0">V·BL</span>
-          <span className="w-8 text-right shrink-0 text-primary">Pts</span>
+          <span className="w-8 text-center shrink-0 text-primary">Pts</span>
+          <span className="w-9 text-center shrink-0">PPM</span>
         </div>
         {sorted.map((player, index) => (
           <Fragment key={player.id}>
@@ -299,12 +297,12 @@ function GoaliesTable({ goalies, injuries, etat }: {
           <span className="w-7 shrink-0 mr-2" />
           <span className="flex-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total</span>
           <span className="w-8 shrink-0" />
-          <span className="w-10 shrink-0" />
-          <span className="w-8 text-right shrink-0">
+          <span className="w-8 text-center shrink-0">
             <span className="inline-flex items-center justify-center min-w-[2rem] rounded-md bg-primary/15 text-primary text-base font-bold px-2 py-0.5 tabular-nums">
               {totalPoints}
             </span>
           </span>
+          <span className="w-9 shrink-0" />
         </div>
       </div>
 
