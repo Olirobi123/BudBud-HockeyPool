@@ -5,6 +5,13 @@ import { LivePlayerPoints, LiveTeamPoints, LivePointsResponse } from '../types';
 import { scoresService } from './scoresService';
 import { calculateGoaliePoints, GOALIE_POSITION, DEFENSE_POSITION } from '../utils/poolRules';
 import { shouldServeSnapshot } from '../utils/snapshotLogic';
+import {
+  BoxscoreGoalieLine,
+  GoalieDecisions,
+  GoalieTimelineEvent,
+  resolveBoxscoreGoalieDecisions,
+  resolveGoalieDecisions,
+} from '../utils/goalieDecisions';
 
 const ACTIVE_GAME_STATES = new Set(['LIVE', 'CRIT', 'FINAL', 'OFF']);
 const COMPLETED_GAME_STATES = new Set(['FINAL', 'OFF']);
@@ -19,7 +26,7 @@ interface BoxscorePlayerStats {
   goals: number;
   assists: number;
   toi: string;
-  goalsAgainst?: number;
+  decision?: string;
 }
 interface BoxscoreTeamStats {
   forwards: BoxscorePlayerStats[];
@@ -45,7 +52,6 @@ interface PlayerAccumulator {
   assists: number;
   wins: number;
   shutouts: number;
-  goalsAgainst: number;
 }
 
 interface OwnershipRow {
@@ -201,6 +207,9 @@ export class LivePointsService {
 
     // Seed all players from the roster so players with 0 points appear
     for (const spot of pbp.rosterSpots ?? []) {
+      if (spot.positionCode === GOALIE_POSITION && spot.teamId != null) {
+        goalieTeamMap.set(spot.playerId, spot.teamId);
+      }
       if (playerMap.has(spot.playerId)) continue;
 
       const teamAbbrev = spot.teamTriCode
@@ -219,17 +228,11 @@ export class LivePointsService {
         assists: 0,
         wins: 0,
         shutouts: 0,
-        goalsAgainst: 0,
       });
-
-      if (spot.positionCode === GOALIE_POSITION && spot.teamId != null) {
-        goalieTeamMap.set(spot.playerId, spot.teamId);
-      }
     }
 
-    // Track the last goalie seen in net per team and goals against per goalie
-    const lastGoalieByTeam = new Map<number, number>();
-    const goalsAgainstMap = new Map<number, number>();
+    // Goalie changes and goals in game order, to resolve wins and shutouts
+    const timeline: GoalieTimelineEvent[] = [];
 
     // Accumulate goals/assists and track goalie activity from play-by-play
     for (const play of pbp.plays ?? []) {
@@ -241,7 +244,7 @@ export class LivePointsService {
         playedGoalies.add(details.goalieInNetId);
         const goalieTeamId = goalieTeamMap.get(details.goalieInNetId);
         if (goalieTeamId != null) {
-          lastGoalieByTeam.set(goalieTeamId, details.goalieInNetId);
+          timeline.push({ kind: 'goalieInNet', teamId: goalieTeamId, goalieId: details.goalieInNetId });
         }
       }
 
@@ -249,6 +252,10 @@ export class LivePointsService {
 
       // Shootout goals don't count for pool points
       if (play.periodDescriptor?.periodType === 'SO') continue;
+
+      if (details.eventOwnerTeamId != null) {
+        timeline.push({ kind: 'goal', teamId: details.eventOwnerTeamId });
+      }
 
       if (details.scoringPlayerId != null) {
         const p = playerMap.get(details.scoringPlayerId);
@@ -262,14 +269,6 @@ export class LivePointsService {
         const p = playerMap.get(details.assist2PlayerId);
         if (p) p.assists++;
       }
-
-      // Count goals against the goalie who was scored on
-      if (details.goalieInNetId != null) {
-        goalsAgainstMap.set(
-          details.goalieInNetId,
-          (goalsAgainstMap.get(details.goalieInNetId) ?? 0) + 1,
-        );
-      }
     }
 
     // Fallback: if no goalieInNetId event was seen (game just started, no shots yet),
@@ -282,33 +281,38 @@ export class LivePointsService {
       }
     }
 
-    // Award wins and shutouts for completed games
     if (COMPLETED_GAME_STATES.has(game.gameState)) {
-      const awayScore = game.awayTeam.score ?? 0;
-      const homeScore = game.homeTeam.score ?? 0;
+      this.applyGoalieDecisions(
+        resolveGoalieDecisions(timeline, [game.awayTeam.id, game.homeTeam.id], this.winningTeamId(game)),
+        playerMap,
+      );
+    }
+  }
 
-      if (awayScore !== homeScore) {
-        const winningTeamId = awayScore > homeScore ? game.awayTeam.id : game.homeTeam.id;
-        const winningGoalieId = lastGoalieByTeam.get(winningTeamId);
+  /** The winning team's id, or null while the score is tied. */
+  private winningTeamId(game: GameScore): number | null {
+    const awayScore = game.awayTeam.score ?? 0;
+    const homeScore = game.homeTeam.score ?? 0;
+    if (awayScore === homeScore) return null;
+    return awayScore > homeScore ? game.awayTeam.id : game.homeTeam.id;
+  }
 
-        if (winningGoalieId != null) {
-          const goalie = playerMap.get(winningGoalieId);
-          if (goalie) {
-            goalie.wins++;
-            const goalsAgainst = goalsAgainstMap.get(winningGoalieId) ?? 0;
-            if (goalsAgainst === 0) {
-              goalie.shutouts++;
-            }
-          }
-        }
-      }
+  /** Credits the resolved win and shutouts to the goalies in playerMap. */
+  private applyGoalieDecisions(decisions: GoalieDecisions, playerMap: Map<number, PlayerAccumulator>): void {
+    if (decisions.winningGoalieId != null) {
+      const goalie = playerMap.get(decisions.winningGoalieId);
+      if (goalie) goalie.wins++;
+    }
+    for (const goalieId of decisions.shutoutGoalieIds) {
+      const goalie = playerMap.get(goalieId);
+      if (goalie) goalie.shutouts++;
     }
   }
 
   /**
    * Processes a single game's boxscore into the shared playerMap.
    * Uses pre-aggregated goals/assists from playerByGameStats. For completed games,
-   * awards the win to the winning team's goalie with the most TOI (highest-toi heuristic).
+   * awards the win from the NHL goalie decision and shutouts per goalieDecisions rules.
    */
   private processBoxscoreGame(
     boxscore: BoxscoreWithPlayerStats,
@@ -321,7 +325,7 @@ export class LivePointsService {
       { stats: boxscore.playerByGameStats?.homeTeam, team: game.homeTeam },
     ] as const;
 
-    const goalieToiByTeam = new Map<number, Map<number, number>>();
+    const goalieLines: BoxscoreGoalieLine[] = [];
 
     for (const { stats, team } of sides) {
       if (!stats) continue;
@@ -342,7 +346,6 @@ export class LivePointsService {
             assists: 0,
             wins: 0,
             shutouts: 0,
-            goalsAgainst: 0,
           });
         }
         const acc = playerMap.get(p.playerId)!;
@@ -367,28 +370,30 @@ export class LivePointsService {
             assists: 0,
             wins: 0,
             shutouts: 0,
-            goalsAgainst: g.goalsAgainst ?? 0,
           });
         }
-        const toiMap = goalieToiByTeam.get(team.id) ?? new Map<number, number>();
-        toiMap.set(g.playerId, seconds);
-        goalieToiByTeam.set(team.id, toiMap);
+        goalieLines.push({ goalieId: g.playerId, teamId: team.id, seconds, decision: g.decision });
       }
     }
 
     if (!COMPLETED_GAME_STATES.has(game.gameState)) return;
-    const awayScore = game.awayTeam.score ?? 0;
-    const homeScore = game.homeTeam.score ?? 0;
-    if (awayScore === homeScore) return;
-    const winningTeamId = awayScore > homeScore ? game.awayTeam.id : game.homeTeam.id;
-    const toiMap = goalieToiByTeam.get(winningTeamId);
-    if (!toiMap) return;
-    const [winningGoalieId] = Array.from(toiMap.entries()).sort((a, b) => b[1] - a[1])[0] ?? [];
-    if (winningGoalieId == null) return;
-    const goalie = playerMap.get(winningGoalieId);
-    if (!goalie) return;
-    goalie.wins++;
-    if (goalie.goalsAgainst === 0) goalie.shutouts++;
+    const winningTeamId = this.winningTeamId(game);
+    // The final score credits the shootout winner with one goal that no goalie allowed
+    const decidedInShootout = game.periodDescriptor?.periodType === 'SO'
+      || boxscore.gameOutcome?.lastPeriodType === 'SO';
+    const nonShootoutGoals = new Map([game.awayTeam, game.homeTeam].map((t) => [
+      t.id,
+      (t.score ?? 0) - (decidedInShootout && t.id === winningTeamId ? 1 : 0),
+    ]));
+    this.applyGoalieDecisions(
+      resolveBoxscoreGoalieDecisions(
+        goalieLines,
+        nonShootoutGoals,
+        [game.awayTeam.id, game.homeTeam.id],
+        winningTeamId,
+      ),
+      playerMap,
+    );
   }
 
   /**
